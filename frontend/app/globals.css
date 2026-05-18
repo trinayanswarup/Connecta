@@ -3,12 +3,12 @@
 @tailwind utilities;
 
 :root {
-  --background: 210 40% 98%;
-  --foreground: 222 47% 11%;
-  --muted: 210 16% 92%;
-  --border: 214 32% 88%;
-  --primary: 173 80% 34%;
-  --accent: 23 94% 60%;
+  --background: 150 10% 4%;
+  --foreground: 160 20% 96%;
+  --muted: 160 8% 18%;
+  --border: 158 18% 18%;
+  --primary: 160 84% 48%;
+  --accent: 31 96% 58%;
 }
 
 * {
@@ -17,7 +17,20 @@
 
 body {
   margin: 0;
-  background: hsl(var(--background));
+  background:
+    linear-gradient(180deg, rgba(8, 14, 12, 0.98), rgba(5, 8, 7, 1) 44%, rgba(9, 8, 6, 1)),
+    hsl(var(--background));
   color: hsl(var(--foreground));
   font-family: Arial, Helvetica, sans-serif;
+}
+
+::selection {
+  background: rgba(52, 211, 153, 0.32);
+  color: #f8fffb;
+}
+
+input,
+select,
+button {
+  font: inherit;
 }
