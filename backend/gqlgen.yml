@@ -1,0 +1,13 @@
+schema:
+  - graph/schema.graphqls
+exec:
+  filename: graph/generated/generated.go
+  package: generated
+model:
+  filename: graph/models/models_gen.go
+  package: models
+resolver:
+  layout: follow-schema
+  dir: graph
+  package: graph
+autobind: []

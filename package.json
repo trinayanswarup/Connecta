@@ -1,0 +1,15 @@
+{
+  "name": "connecta",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "frontend"
+  ],
+  "scripts": {
+    "dev:frontend": "npm --workspace frontend run dev",
+    "dev:backend": "cd backend && go run ./cmd/server",
+    "test:backend": "cd backend && go test ./...",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down"
+  }
+}

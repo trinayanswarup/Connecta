@@ -1,0 +1,117 @@
+type Query {
+  trips: [Trip!]!
+  trip(id: ID!): Trip
+  agentRun(id: ID!): AgentRun
+}
+
+type Mutation {
+  analyzeTrip(input: TripInput!): TripAnalysis!
+}
+
+input TripInput {
+  destination: String!
+  startDate: String!
+  endDate: String!
+  travelerType: TravelerType!
+  budgetUsd: Float
+  usage: UsageInput!
+}
+
+input UsageInput {
+  streaming: UsageLevel!
+  videoCalls: UsageLevel!
+  hotspot: UsageLevel!
+  maps: UsageLevel!
+  socialMedia: UsageLevel!
+  work: UsageLevel!
+}
+
+enum TravelerType {
+  SOLO
+  COUPLE
+  FAMILY
+  BUSINESS
+}
+
+enum UsageLevel {
+  NONE
+  LIGHT
+  MODERATE
+  HEAVY
+}
+
+type Trip {
+  id: ID!
+  destination: String!
+  startDate: String!
+  endDate: String!
+  travelerType: TravelerType!
+  estimatedGb: Float
+  recommendedGb: Float
+}
+
+type TripAnalysis {
+  tripId: ID!
+  agentRunId: ID!
+  estimatedGb: Float!
+  recommendedGb: Float!
+  confidence: Float!
+  usageBreakdown: UsageBreakdown!
+  selectedPlan: PlanOption!
+  recommendation: String!
+  alternatives: [PlanOption!]!
+  connectivityGuide: ConnectivityGuide
+  agentSteps: [AgentStep!]!
+}
+
+type UsageBreakdown {
+  maps: Float!
+  streaming: Float!
+  socialMedia: Float!
+  videoCalls: Float!
+  hotspot: Float!
+  work: Float!
+}
+
+type PlanOption {
+  id: ID!
+  provider: String!
+  name: String!
+  priceUsd: Float!
+  dataGb: Float!
+  validityDays: Int!
+  tradeoff: String!
+}
+
+type ConnectivityGuide {
+  beforeDeparture: [String!]!
+  airportSetup: [String!]!
+  offlineStrategy: [String!]!
+  backupInternet: [String!]!
+  emergencyAccess: [String!]!
+}
+
+type AgentRun {
+  id: ID!
+  tripId: ID
+  status: AgentStatus!
+  steps: [AgentStep!]!
+}
+
+type AgentStep {
+  name: String!
+  status: AgentStatus!
+  durationMs: Int!
+  inputSummary: String
+  outputSummary: String
+  retries: Int!
+  error: String
+}
+
+enum AgentStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  SKIPPED
+}
