@@ -9,6 +9,7 @@ import (
 	"github.com/connecta/connecta/backend/graph"
 	"github.com/connecta/connecta/backend/graph/generated"
 	"github.com/connecta/connecta/backend/internal/config"
+	"github.com/connecta/connecta/backend/internal/groq"
 	"github.com/connecta/connecta/backend/internal/logger"
 	"github.com/connecta/connecta/backend/internal/plans"
 	"github.com/connecta/connecta/backend/repositories"
@@ -20,10 +21,16 @@ func main() {
 	log := logger.New(cfg.Environment)
 
 	tripRepository := repositories.NewInMemoryTripRepository()
+	var enhancer agents.RecommendationEnhancer
+	if cfg.GroqAPIKey != "" {
+		groqClient := groq.NewClient(cfg.GroqAPIKey, cfg.GroqModel)
+		enhancer = groqClient
+	}
 	tripService := services.NewTripService(
 		agents.NewUsageEstimator(),
 		agents.NewPlanOptimizer(plans.MockPlans()),
 		tripRepository,
+		enhancer,
 	)
 	graphqlServer := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{
 		Resolvers: graph.NewResolver(tripService),

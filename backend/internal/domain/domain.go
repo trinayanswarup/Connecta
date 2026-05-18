@@ -73,8 +73,11 @@ type OptimizationResult struct {
 type AgentStatus string
 
 const (
+	AgentStatusPending   AgentStatus = "PENDING"
+	AgentStatusRunning   AgentStatus = "RUNNING"
 	AgentStatusCompleted AgentStatus = "COMPLETED"
 	AgentStatusFailed    AgentStatus = "FAILED"
+	AgentStatusSkipped   AgentStatus = "SKIPPED"
 )
 
 type AgentStep struct {
@@ -108,4 +111,9 @@ type ConnectivityGuide struct {
 	OfflineStrategy []string
 	BackupInternet  []string
 	EmergencyAccess []string
+}
+
+type RecommendationEnhancement struct {
+	Recommendation    string
+	ConnectivityGuide ConnectivityGuide
 }
