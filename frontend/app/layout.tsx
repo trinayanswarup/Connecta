@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Connecta",
-  description: "AI-native travel connectivity planner"
+  title: "Connecta - Travel eSIM plan finder",
+  description: "Premium travel eSIM recommendations, plan comparison, and setup guidance."
 };
 
 export default function RootLayout({

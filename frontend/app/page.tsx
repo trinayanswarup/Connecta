@@ -1,124 +1,341 @@
 import Link from "next/link";
-import { Activity, ArrowRight, CheckCircle2, Plane, Radar, Satellite } from "lucide-react";
+import type { ReactNode } from "react";
+import {
+  ArrowRight,
+  Globe2,
+  LifeBuoy,
+  Plane,
+  ShieldCheck,
+  SignalHigh,
+  Smartphone,
+  Wifi
+} from "lucide-react";
+
+import { DestinationBrowseCard } from "@/components/DestinationBrowseCard";
+import { DestinationDirectory } from "@/components/DestinationDirectory";
+import { HomeSearch } from "@/components/HomeSearch";
+import { destinationOptions, marketingPlans } from "@/lib/destination-catalog";
+
+const popularDestinations = [
+  {
+    location: "Japan",
+    flag: "JP",
+    stats: "From $21 - City trips and rail days",
+    imageUrl: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=900&q=80",
+    themeColor: "157 46% 23%"
+  },
+  {
+    location: "Italy",
+    flag: "IT",
+    stats: "From $14 - Rome, Venice, and beyond",
+    imageUrl: "https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?auto=format&fit=crop&w=900&q=80",
+    themeColor: "206 48% 27%"
+  },
+  {
+    location: "Thailand",
+    flag: "TH",
+    stats: "From $19 - Islands, cities, and stays",
+    imageUrl: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80",
+    themeColor: "184 55% 24%"
+  }
+];
+
+const steps = [
+  {
+    icon: <Plane className="h-5 w-5" />,
+    title: "Tell us your trip",
+    text: "Choose your destination, dates, and the way you use mobile data."
+  },
+  {
+    icon: <SignalHigh className="h-5 w-5" />,
+    title: "Compare clear options",
+    text: "Connecta checks price, allowance, validity, and destination fit."
+  },
+  {
+    icon: <Smartphone className="h-5 w-5" />,
+    title: "Install before you fly",
+    text: "Follow a simple setup guide and land with data ready to go."
+  }
+];
+
+const benefits = [
+  {
+    icon: <ShieldCheck className="h-5 w-5" />,
+    title: "No roaming surprises",
+    text: "See the data, price, and validity before you choose."
+  },
+  {
+    icon: <Globe2 className="h-5 w-5" />,
+    title: "Built for real travel",
+    text: "Plans are framed around trip length, destination, and phone habits."
+  },
+  {
+    icon: <LifeBuoy className="h-5 w-5" />,
+    title: "Setup guidance included",
+    text: "Know what to do before departure, at arrival, and offline."
+  }
+];
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen overflow-hidden px-5 py-6 text-emerald-50 sm:px-8">
-      <section className="mx-auto flex min-h-[calc(100vh-48px)] max-w-7xl flex-col">
-        <nav className="flex items-center justify-between border-b border-white/10 pb-5">
-          <Link className="flex items-center gap-3" href="/">
-            <span className="grid h-9 w-9 place-items-center rounded-lg border border-emerald-300/30 bg-emerald-300/10">
-              <Satellite className="h-4 w-4 text-emerald-200" />
-            </span>
-            <span className="text-lg font-semibold tracking-wide">Connecta</span>
-          </Link>
-          <Link
-            className="inline-flex items-center gap-2 rounded-md border border-emerald-300/30 bg-emerald-300 px-4 py-2 text-sm font-semibold text-zinc-950 shadow-[0_0_32px_rgba(52,211,153,0.18)] transition hover:bg-emerald-200"
-            href="/trip/new"
-          >
-            Plan a trip
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+    <main className="min-h-screen bg-[#fbfaf7] text-slate-950">
+      <header className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 sm:px-8">
+        <Link className="flex items-center gap-3" href="/">
+          <span className="grid h-10 w-10 place-items-center rounded-md bg-slate-950 text-sm font-bold text-white shadow-[0_18px_42px_-28px_rgba(15,23,42,0.65)]">
+            C
+          </span>
+          <span className="text-xl font-semibold">Connecta</span>
+        </Link>
+        <nav className="hidden items-center gap-6 text-sm font-medium text-slate-600 lg:flex">
+          <a className="transition hover:text-slate-950" href="#destinations">
+            Destinations
+          </a>
+          <a className="transition hover:text-slate-950" href="#plans">
+            Plans
+          </a>
+          <a className="transition hover:text-slate-950" href="#how-it-works">
+            How it works
+          </a>
+          <a className="transition hover:text-slate-950" href="#trust">
+            Benefits
+          </a>
         </nav>
+        <Link
+          className="inline-flex items-center justify-center gap-2 rounded-md bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-slate-800"
+          href="/trip/new"
+        >
+          Find my plan
+          <ArrowRight className="hidden h-4 w-4 sm:block" />
+        </Link>
+      </header>
 
-        <div className="grid flex-1 gap-10 py-10 lg:grid-cols-[0.92fr_1.08fr] lg:items-center lg:py-14">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-medium uppercase tracking-[0.18em] text-emerald-200">
-              <Radar className="h-3.5 w-3.5" />
-              Travel intelligence layer
-            </div>
-            <h1 className="mt-5 max-w-4xl text-5xl font-semibold leading-[1.02] tracking-normal text-white sm:text-6xl lg:text-7xl">
-              Connectivity planning for teams that move.
+      <section className="mx-auto max-w-7xl px-5 pb-10 pt-6 sm:px-8 lg:pb-16">
+        <div className="grid gap-10 overflow-hidden rounded-lg bg-[#f7fbf9] p-6 shadow-[0_30px_90px_-72px_rgba(15,23,42,0.45)] sm:p-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-center lg:p-10">
+          <div className="max-w-2xl py-4 lg:py-14">
+            <p className="text-sm font-semibold text-teal-700">eSIM for international travel</p>
+            <h1 className="mt-5 max-w-3xl text-5xl font-semibold leading-[1.02] text-slate-950 sm:text-6xl lg:text-7xl">
+              Stay connected wherever you go.
             </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-300">
-              Connecta turns trip intent, usage patterns, plan coverage, and AI guide generation into a traceable recommendation before roaming costs surprise the itinerary.
+            <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
+              Choose a travel eSIM before you fly and land with data ready for maps, messages, rides, and everything the trip throws at you.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link
-                className="inline-flex items-center justify-center gap-2 rounded-md bg-emerald-300 px-5 py-3 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-200"
-                href="/trip/new"
+              <a
+                className="inline-flex items-center justify-center gap-2 rounded-md bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-slate-800"
+                href="#plan-finder"
               >
-                Analyze connectivity
+                Find my plan
                 <ArrowRight className="h-4 w-4" />
-              </Link>
-              <div className="inline-flex items-center justify-center gap-2 rounded-md border border-white/10 bg-white/[0.04] px-5 py-3 text-sm text-zinc-300">
-                <Activity className="h-4 w-4 text-amber-300" />
-                Observable agent trace
-              </div>
+              </a>
+              <a
+                className="inline-flex items-center justify-center rounded-md border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-800 transition hover:-translate-y-0.5 hover:border-teal-200 hover:bg-teal-50"
+                href="#destinations"
+              >
+                Browse destinations
+              </a>
+            </div>
+            <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-600">
+              <span>No physical SIM swap</span>
+              <span>Setup before departure</span>
+              <span>Clear travel data options</span>
             </div>
           </div>
 
-          <div className="relative">
-            <div className="overflow-hidden rounded-lg border border-white/10 bg-zinc-950/75 shadow-2xl shadow-emerald-950/30 backdrop-blur">
-              <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-                <div className="flex items-center gap-2 text-sm text-zinc-300">
-                  <Plane className="h-4 w-4 text-emerald-200" />
-                  Japan business route
+          <div className="relative min-h-[390px] overflow-hidden rounded-lg bg-[#e8f4ff] shadow-[0_28px_90px_-62px_rgba(15,23,42,0.5)] sm:min-h-[520px]">
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 bg-cover bg-center"
+              style={{
+                backgroundImage:
+                  "url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80')"
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-slate-950/5 to-white/10" />
+            <div className="absolute bottom-5 left-5 right-5 rounded-lg border border-white/60 bg-white/85 p-4 shadow-[0_18px_54px_-34px_rgba(15,23,42,0.45)] backdrop-blur">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal-700">Next stop</p>
+                  <p className="mt-1 text-xl font-semibold text-slate-950">Connected from arrival</p>
                 </div>
-                <span className="rounded-full border border-emerald-300/30 bg-emerald-300/10 px-2.5 py-1 text-xs text-emerald-200">
-                  Live analysis
-                </span>
-              </div>
-
-              <div className="grid gap-0 lg:grid-cols-[1fr_0.8fr]">
-                <div className="border-b border-white/10 p-5 lg:border-b-0 lg:border-r">
-                  <div className="grid grid-cols-2 gap-3">
-                    {[
-                      ["Estimated", "11.4 GB", "usage model"],
-                      ["Target", "14 GB", "safety buffer"],
-                      ["Latency", "284 ms", "agent path"],
-                      ["Confidence", "86%", "stable signal"]
-                    ].map(([label, value, helper]) => (
-                      <div key={label} className="rounded-md border border-white/10 bg-white/[0.035] p-4">
-                        <div className="text-xs uppercase tracking-[0.16em] text-zinc-500">{label}</div>
-                        <div className="mt-2 text-2xl font-semibold text-white">{value}</div>
-                        <div className="mt-1 text-xs text-zinc-400">{helper}</div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="mt-4 rounded-md border border-emerald-300/20 bg-emerald-300/[0.06] p-4">
-                    <div className="flex items-center justify-between gap-4">
-                      <div>
-                        <div className="text-sm font-semibold text-emerald-100">MetroSignal Japan 15GB</div>
-                        <p className="mt-1 text-sm leading-6 text-zinc-300">
-                          Selected for coverage, allowance, validity, and measured safety margin.
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-2xl font-semibold text-white">$21</div>
-                        <div className="text-xs text-zinc-500">15 days</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-5">
-                  <div className="mb-4 text-sm font-medium text-zinc-300">Agent execution</div>
-                  <div className="space-y-3">
-                    {[
-                      ["Usage estimation", "completed"],
-                      ["Plan optimization", "completed"],
-                      ["AI guide generation", "fallback ready"],
-                      ["Save trip", "completed"]
-                    ].map(([label, status]) => (
-                      <div key={label} className="flex items-start gap-3">
-                        <span className="mt-0.5 grid h-6 w-6 place-items-center rounded-full border border-emerald-300/30 bg-emerald-300/10">
-                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-200" />
-                        </span>
-                        <div>
-                          <div className="text-sm font-medium text-zinc-100">{label}</div>
-                          <div className="text-xs uppercase tracking-[0.14em] text-zinc-500">{status}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <span className="rounded-full bg-[#dffcec] px-3 py-1 text-sm font-semibold text-teal-800">Travel ready</span>
               </div>
             </div>
           </div>
         </div>
       </section>
+
+      <section className="mx-auto max-w-7xl px-5 pb-14 sm:px-8" id="plan-finder">
+        <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-[0_24px_80px_-62px_rgba(15,23,42,0.45)] sm:p-5">
+          <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-teal-700">Find your ideal plan</p>
+              <h2 className="mt-1 text-2xl font-semibold text-slate-950">Where are you traveling?</h2>
+            </div>
+            <p className="text-sm text-slate-500">Search by destination and travel dates.</p>
+          </div>
+          <HomeSearch />
+        </div>
+      </section>
+
+      <section className="mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:px-8" id="destinations">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-teal-700">Popular destinations</p>
+            <h2 className="mt-2 text-4xl font-semibold text-slate-950">Start with where you are headed</h2>
+          </div>
+          <p className="max-w-lg text-sm leading-6 text-slate-600">
+            Destination browsing stays visual and emotional. Recommendations stay clear and decision-focused.
+          </p>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-3">
+          {popularDestinations.map((destination) => (
+            <DestinationBrowseCard
+              flag={destination.flag}
+              href={`/trip/new?destination=${encodeURIComponent(destination.location)}`}
+              imageUrl={destination.imageUrl}
+              key={destination.location}
+              location={destination.location}
+              stats={destination.stats}
+              themeColor={destination.themeColor}
+            />
+          ))}
+        </div>
+
+        <DestinationDirectory destinations={destinationOptions} />
+      </section>
+
+      <section className="bg-[#f1f7ff] py-16" id="plans">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-blue-700">Choose your data plan</p>
+              <h2 className="mt-2 text-4xl font-semibold text-slate-950">Multiple plan sizes for every destination</h2>
+            </div>
+            <Link
+              className="inline-flex w-fit items-center gap-2 rounded-md bg-white px-4 py-2.5 text-sm font-semibold text-slate-900 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:ring-blue-200"
+              href="/trip/new"
+            >
+              Check plan
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {marketingPlans.map((plan) => (
+              <PlanPreviewCard key={plan.data} plan={plan} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto grid max-w-7xl gap-6 px-5 py-16 sm:px-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-center">
+        <div>
+          <p className="text-sm font-semibold text-teal-700">What is an eSIM?</p>
+          <h2 className="mt-2 text-4xl font-semibold leading-tight text-slate-950">A digital SIM for travel data, without the counter queue.</h2>
+        </div>
+        <div className="grid gap-4 md:grid-cols-3">
+          <InfoTile icon={<Smartphone className="h-5 w-5" />} title="No plastic SIM" text="Install the plan digitally on supported phones." />
+          <InfoTile icon={<Wifi className="h-5 w-5" />} title="Keep your number" text="Use travel data while your regular SIM stays available." />
+          <InfoTile icon={<Globe2 className="h-5 w-5" />} title="Made for trips" text="Pick a destination, validity, and data amount that match your stay." />
+        </div>
+      </section>
+
+      <section className="bg-[#fff4e8] py-16" id="how-it-works">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8">
+          <div className="max-w-3xl">
+            <p className="text-sm font-semibold text-orange-700">How it works</p>
+            <h2 className="mt-2 text-4xl font-semibold text-slate-950">Find your plan in three calm steps</h2>
+          </div>
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            {steps.map((step, index) => (
+              <article className="rounded-lg border border-orange-100 bg-white p-5 shadow-[0_20px_70px_-56px_rgba(15,23,42,0.45)]" key={step.title}>
+                <div className="flex items-center justify-between">
+                  <span className="grid h-11 w-11 place-items-center rounded-md bg-orange-50 text-orange-700">{step.icon}</span>
+                  <span className="text-sm font-semibold text-slate-400">0{index + 1}</span>
+                </div>
+                <h3 className="mt-8 text-xl font-semibold text-slate-950">{step.title}</h3>
+                <p className="mt-3 text-sm leading-6 text-slate-600">{step.text}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-5 py-16 sm:px-8" id="trust">
+        <div className="grid gap-8 lg:grid-cols-[0.86fr_1.14fr] lg:items-start">
+          <div>
+            <p className="text-sm font-semibold text-teal-700">Benefits</p>
+            <h2 className="mt-2 text-4xl font-semibold leading-tight text-slate-950">Built to feel clear before you buy.</h2>
+            <p className="mt-4 text-sm leading-6 text-slate-600">
+              Connecta balances travel discovery with calm recommendation clarity, so the final choice feels easy to trust.
+            </p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            {benefits.map((benefit) => (
+              <InfoTile icon={benefit.icon} key={benefit.title} text={benefit.text} title={benefit.title} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-5 pb-16 sm:px-8">
+        <div className="grid gap-6 rounded-lg bg-slate-950 p-6 text-white sm:p-8 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div>
+            <h2 className="text-4xl font-semibold">Ready to choose a travel eSIM?</h2>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-white/70">
+              Share your destination and data habits. Connecta will return a plan, alternatives, and a setup guide.
+            </p>
+          </div>
+          <Link
+            className="inline-flex items-center justify-center gap-2 rounded-md bg-[#dffcec] px-5 py-3 text-sm font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-white"
+            href="/trip/new"
+          >
+            Find my plan
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </section>
     </main>
+  );
+}
+
+function PlanPreviewCard({
+  plan
+}: {
+  plan: {
+    data: string;
+    days: string;
+    price: string;
+    bestChoice?: boolean;
+  };
+}) {
+  return (
+    <article className={`relative rounded-lg border bg-white p-5 shadow-[0_24px_80px_-60px_rgba(15,23,42,0.55)] transition hover:-translate-y-1 hover:shadow-[0_30px_90px_-58px_rgba(15,23,42,0.6)] ${plan.bestChoice ? "border-slate-950" : "border-white"}`}>
+      {plan.bestChoice ? (
+        <div className="absolute inset-x-0 -top-px rounded-t-lg bg-slate-950 py-2 text-center text-sm font-semibold text-white">
+          Best choice
+        </div>
+      ) : null}
+      <div className={plan.bestChoice ? "pt-8" : ""}>
+        <div className="h-4 w-4 rounded-full border border-slate-300" />
+        <h3 className="mt-5 text-2xl font-semibold text-slate-950">{plan.data}</h3>
+        <p className="mt-4 text-lg text-slate-500">{plan.days}</p>
+        <p className="mt-4 text-xl font-semibold text-slate-950">{plan.price}</p>
+        <span className="mt-2 inline-flex rounded-full bg-[#fff4d8] px-3 py-1 text-xs font-medium text-slate-700">
+          3% in Connecta credits
+        </span>
+      </div>
+    </article>
+  );
+}
+
+function InfoTile({ icon, title, text }: { icon: ReactNode; title: string; text: string }) {
+  return (
+    <article className="rounded-lg border border-slate-200 bg-white p-5 shadow-[0_18px_60px_-50px_rgba(15,23,42,0.45)] transition hover:-translate-y-0.5 hover:border-teal-200">
+      <span className="grid h-11 w-11 place-items-center rounded-md bg-teal-50 text-teal-700">{icon}</span>
+      <h3 className="mt-8 text-lg font-semibold text-slate-950">{title}</h3>
+      <p className="mt-3 text-sm leading-6 text-slate-600">{text}</p>
+    </article>
   );
 }
