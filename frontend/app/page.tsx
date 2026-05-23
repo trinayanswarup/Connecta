@@ -15,7 +15,7 @@ import {
 import { DestinationBrowseCard } from "@/components/DestinationBrowseCard";
 import { DestinationDirectory } from "@/components/DestinationDirectory";
 import { HomeSearch } from "@/components/HomeSearch";
-import { destinationOptions, marketingPlans } from "@/lib/destination-catalog";
+import { destinationOptions } from "@/lib/destination-catalog";
 
 const popularDestinations = [
   {
@@ -90,9 +90,6 @@ export default function HomePage() {
         <nav className="hidden items-center gap-6 text-sm font-medium text-slate-600 lg:flex">
           <a className="transition hover:text-slate-950" href="#destinations">
             Destinations
-          </a>
-          <a className="transition hover:text-slate-950" href="#plans">
-            Plans
           </a>
           <a className="transition hover:text-slate-950" href="#how-it-works">
             How it works
@@ -187,30 +184,6 @@ export default function HomePage() {
         <DestinationDirectory destinations={destinationOptions} />
       </section>
 
-      <section className="bg-[#f1f7ff] py-16" id="plans">
-        <div className="mx-auto max-w-7xl px-5 sm:px-8">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="text-sm font-semibold text-blue-700">Choose your data plan</p>
-              <h2 className="mt-2 text-4xl font-semibold text-slate-950">Multiple plan sizes for every destination</h2>
-            </div>
-            <Link
-              className="inline-flex w-fit items-center gap-2 rounded-md bg-white px-4 py-2.5 text-sm font-semibold text-slate-900 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:ring-blue-200"
-              href="/trip/new"
-            >
-              Check plan
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {marketingPlans.map((plan) => (
-              <PlanPreviewCard key={plan.data} plan={plan} />
-            ))}
-          </div>
-        </div>
-      </section>
-
       <section className="mx-auto grid max-w-7xl gap-6 px-5 py-16 sm:px-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-center">
         <div>
           <p className="text-sm font-semibold text-teal-700">What is an eSIM?</p>
@@ -279,36 +252,6 @@ export default function HomePage() {
         </div>
       </section>
     </main>
-  );
-}
-
-function PlanPreviewCard({
-  plan
-}: {
-  plan: {
-    data: string;
-    days: string;
-    price: string;
-    bestChoice?: boolean;
-  };
-}) {
-  return (
-    <article className={`relative rounded-lg border bg-white p-5 shadow-[0_24px_80px_-60px_rgba(15,23,42,0.55)] transition hover:-translate-y-1 hover:shadow-[0_30px_90px_-58px_rgba(15,23,42,0.6)] ${plan.bestChoice ? "border-slate-950" : "border-white"}`}>
-      {plan.bestChoice ? (
-        <div className="absolute inset-x-0 -top-px rounded-t-lg bg-slate-950 py-2 text-center text-sm font-semibold text-white">
-          Best choice
-        </div>
-      ) : null}
-      <div className={plan.bestChoice ? "pt-8" : ""}>
-        <div className="h-4 w-4 rounded-full border border-slate-300" />
-        <h3 className="mt-5 text-2xl font-semibold text-slate-950">{plan.data}</h3>
-        <p className="mt-4 text-lg text-slate-500">{plan.days}</p>
-        <p className="mt-4 text-xl font-semibold text-slate-950">{plan.price}</p>
-        <span className="mt-2 inline-flex rounded-full bg-[#fff4d8] px-3 py-1 text-xs font-medium text-slate-700">
-          3% in Connecta credits
-        </span>
-      </div>
-    </article>
   );
 }
 
