@@ -4,7 +4,7 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, CalendarDays, MapPin } from "lucide-react";
 
-import { destinationOptions } from "@/lib/destination-catalog";
+import { destinationHref, destinationOptions } from "@/lib/destination-catalog";
 
 type HomeSearchProps = {
   defaultDestination?: string;
@@ -25,18 +25,7 @@ export function HomeSearch({ defaultDestination = "Japan", variant = "horizontal
     const formStartDate = String(formData.get("startDate") ?? "");
     const formEndDate = String(formData.get("endDate") ?? "");
 
-    const params = new URLSearchParams();
-    if (formDestination) {
-      params.set("destination", formDestination);
-    }
-    if (formStartDate) {
-      params.set("startDate", formStartDate);
-    }
-    if (formEndDate) {
-      params.set("endDate", formEndDate);
-    }
-
-    router.push(`/trip/new?${params.toString()}`);
+    router.push(destinationHref(formDestination, { startDate: formStartDate, endDate: formEndDate }));
   }
 
   return (

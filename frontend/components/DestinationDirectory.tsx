@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Check, ChevronLeft, ChevronRight, Globe2, MapPin, Search } from "lucide-react";
 
-import { plansForDestination, type DestinationKind, type DestinationOption } from "@/lib/destination-catalog";
+import { destinationHref, plansForDestination, type DestinationKind, type DestinationOption } from "@/lib/destination-catalog";
 
 type DestinationDirectoryProps = {
   destinations: DestinationOption[];
@@ -111,7 +111,7 @@ export function DestinationDirectory({ destinations }: DestinationDirectoryProps
         {visibleDestinations.map((destination) => (
           <Link
             className="group relative min-h-28 overflow-hidden rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-orange-200 hover:shadow-[0_18px_60px_-46px_rgba(15,23,42,0.55)]"
-            href={`/trip/new?destination=${encodeURIComponent(destination.name)}`}
+            href={destinationHref(destination.name)}
             key={destination.name}
           >
             <div className="relative z-10 flex items-start gap-4">

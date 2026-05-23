@@ -230,6 +230,31 @@ export const countryDestinations: DestinationOption[] = [
 
 export const destinationOptions = [...regionalDestinations, ...countryDestinations];
 
+export function slugifyDestination(name: string) {
+  return name
+    .toLowerCase()
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+export function destinationHref(destination: string, params: Record<string, string | undefined> = {}) {
+  const searchParams = new URLSearchParams();
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value) {
+      searchParams.set(key, value);
+    }
+  });
+
+  const query = searchParams.toString();
+  return `/esim/${slugifyDestination(destination)}${query ? `?${query}` : ""}`;
+}
+
+export function findDestinationBySlug(slug: string) {
+  return destinationOptions.find((destination) => slugifyDestination(destination.name) === slug);
+}
+
 export const marketingPlans: MarketingPlan[] = [
   { data: "1 GB", days: "7 days", price: "US$8.99" },
   { data: "2 GB", days: "15 days", price: "US$16.49" },

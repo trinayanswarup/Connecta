@@ -15,7 +15,7 @@ import {
 import { DestinationBrowseCard } from "@/components/DestinationBrowseCard";
 import { DestinationDirectory } from "@/components/DestinationDirectory";
 import { HomeSearch } from "@/components/HomeSearch";
-import { destinationOptions } from "@/lib/destination-catalog";
+import { destinationHref, destinationOptions } from "@/lib/destination-catalog";
 
 const popularDestinations = [
   {
@@ -171,7 +171,7 @@ export default function HomePage() {
           {popularDestinations.map((destination) => (
             <DestinationBrowseCard
               flag={destination.flag}
-              href={`/trip/new?destination=${encodeURIComponent(destination.location)}`}
+              href={destinationHref(destination.location)}
               imageUrl={destination.imageUrl}
               key={destination.location}
               location={destination.location}
