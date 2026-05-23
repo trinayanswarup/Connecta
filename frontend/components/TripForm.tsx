@@ -94,55 +94,78 @@ export function TripForm({
 
   return (
     <div className="grid gap-8" id="planner">
-      <section className="rounded-lg bg-[#e9f7f4] p-4 shadow-[0_26px_90px_-70px_rgba(15,23,42,0.5)] sm:p-6">
-        <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-sm font-semibold text-teal-700">Compact planner</p>
-            <h2 className="mt-1 text-3xl font-semibold text-slate-950">Build your travel eSIM plan</h2>
+      <section className="relative overflow-hidden rounded-lg bg-[#e9f7f4] p-4 shadow-[0_30px_100px_-76px_rgba(15,23,42,0.55)] sm:p-6">
+        <div className="pointer-events-none absolute -bottom-20 -right-16 h-64 w-64 rounded-full border border-teal-700/10" />
+        <div className="pointer-events-none absolute -bottom-10 right-16 h-44 w-80 rotate-[-18deg] rounded-[50%] border border-teal-700/10" />
+        <div className="relative rounded-lg bg-white p-5 shadow-[0_24px_76px_-62px_rgba(15,23,42,0.55)] sm:p-7">
+          <div className="mb-7">
+            <div>
+              <p className="text-sm font-semibold text-teal-700">Connecta eSIM planner</p>
+              <h2 className="mt-1 text-3xl font-semibold text-slate-950">Build your travel eSIM plan</h2>
+            </div>
           </div>
-          <p className="max-w-md text-sm leading-6 text-slate-600">A few details are enough to compare plans and prepare your setup guide.</p>
-        </div>
 
-        <form className="grid gap-4 rounded-lg bg-white p-3 shadow-[0_22px_80px_-64px_rgba(15,23,42,0.55)]" onSubmit={handleSubmit}>
-          <div className="grid gap-3 lg:grid-cols-[1.25fr_0.86fr_0.86fr_auto] lg:items-end">
-            <Field icon={<MapPin className="h-4 w-4 text-teal-600" />} label="Destination">
-              <input
-                className={inputClassName}
-                list="connecta-trip-destinations"
-                minLength={2}
-                onChange={(event) => setDestination(event.target.value)}
-                required
-                value={destination}
-              />
-              <datalist id="connecta-trip-destinations">
-                {destinationOptions.map((option) => (
-                  <option key={option.name} value={option.name} />
+          <form className="grid gap-6" onSubmit={handleSubmit}>
+            <div className="grid gap-4 lg:grid-cols-[1.16fr_0.82fr_0.82fr]">
+              <Field icon={<MapPin className="h-4 w-4 text-teal-600" />} label="Destination">
+                <input
+                  className={inputClassName}
+                  list="connecta-trip-destinations"
+                  minLength={2}
+                  onChange={(event) => setDestination(event.target.value)}
+                  required
+                  value={destination}
+                />
+                <datalist id="connecta-trip-destinations">
+                  {destinationOptions.map((option) => (
+                    <option key={option.name} value={option.name} />
+                  ))}
+                </datalist>
+              </Field>
+
+              <Field icon={<CalendarDays className="h-4 w-4 text-teal-600" />} label="Start date">
+                <input
+                  className={inputClassName}
+                  onChange={(event) => setStartDate(event.target.value)}
+                  required
+                  type="date"
+                  value={startDate}
+                />
+              </Field>
+
+              <Field icon={<CalendarDays className="h-4 w-4 text-teal-600" />} label="End date">
+                <input
+                  className={inputClassName}
+                  onChange={(event) => setEndDate(event.target.value)}
+                  required
+                  type="date"
+                  value={endDate}
+                />
+              </Field>
+            </div>
+
+            <div className="rounded-lg bg-[#fbfaf7] p-5 ring-1 ring-slate-100">
+              <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-slate-950">
+                <SignalHigh className="h-4 w-4 text-teal-700" />
+                How much data will you use?
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {usageLabels.map(([key, label]) => (
+                  <Field key={key} label={label}>
+                    <select className={inputClassName} onChange={updateUsage(key)} value={usage[key]}>
+                      {usageLevels.map((level) => (
+                        <option key={level} value={level}>
+                          {formatEnum(level)}
+                        </option>
+                      ))}
+                    </select>
+                  </Field>
                 ))}
-              </datalist>
-            </Field>
-
-            <Field icon={<CalendarDays className="h-4 w-4 text-teal-600" />} label="Start date">
-              <input
-                className={inputClassName}
-                onChange={(event) => setStartDate(event.target.value)}
-                required
-                type="date"
-                value={startDate}
-              />
-            </Field>
-
-            <Field icon={<CalendarDays className="h-4 w-4 text-teal-600" />} label="End date">
-              <input
-                className={inputClassName}
-                onChange={(event) => setEndDate(event.target.value)}
-                required
-                type="date"
-                value={endDate}
-              />
-            </Field>
+              </div>
+            </div>
 
             <button
-              className="inline-flex h-12 items-center justify-center gap-2 rounded-md bg-slate-950 px-5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-slate-800 disabled:cursor-not-allowed disabled:translate-y-0 disabled:bg-slate-300"
+              className="inline-flex h-14 items-center justify-center gap-2 rounded-md bg-slate-950 px-5 text-base font-semibold text-white transition hover:-translate-y-0.5 hover:bg-slate-800 disabled:cursor-not-allowed disabled:translate-y-0 disabled:bg-slate-300"
               disabled={isSubmitting}
               type="submit"
             >
@@ -158,28 +181,8 @@ export function TripForm({
                 </>
               )}
             </button>
-          </div>
-
-          <div className="rounded-lg bg-[#fbfaf7] p-4">
-            <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-950">
-              <SignalHigh className="h-4 w-4 text-teal-700" />
-              How much data will you use?
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
-              {usageLabels.map(([key, label]) => (
-                <Field key={key} label={label}>
-                  <select className={inputClassName} onChange={updateUsage(key)} value={usage[key]}>
-                    {usageLevels.map((level) => (
-                      <option key={level} value={level}>
-                        {formatEnum(level)}
-                      </option>
-                    ))}
-                  </select>
-                </Field>
-              ))}
-            </div>
-          </div>
-        </form>
+          </form>
+        </div>
       </section>
 
       {error ? (
@@ -210,11 +213,11 @@ export function TripForm({
 }
 
 const inputClassName =
-  "w-full min-w-0 rounded-md border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-teal-400 focus:ring-4 focus:ring-teal-50";
+  "w-full min-w-0 rounded-md border border-slate-200 bg-white px-3 py-3 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-teal-400 focus:ring-4 focus:ring-teal-50";
 
 function Field({ children, icon, label }: { children: ReactNode; icon?: ReactNode; label: string }) {
   return (
-    <label className="grid gap-2 text-sm font-medium text-slate-700">
+    <label className="grid gap-2.5 text-sm font-medium text-slate-700">
       <span className="flex items-center gap-2">
         {icon}
         {label}
