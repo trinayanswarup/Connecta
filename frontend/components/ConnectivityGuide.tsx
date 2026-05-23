@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Backpack, LifeBuoy, MapPinned, PlaneLanding, Route, Wifi } from "lucide-react";
+import { Backpack, LifeBuoy, MapPinned, PlaneLanding, Wifi } from "lucide-react";
 
 import type { ConnectivityGuideResult } from "@/lib/graphql";
 
@@ -13,23 +13,19 @@ const sections: Array<[keyof ConnectivityGuideResult, string, ReactNode]> = [
 
 export function ConnectivityGuide({ guide }: { guide: ConnectivityGuideResult }) {
   return (
-    <section className="rounded-lg border border-white/10 bg-zinc-950/70 p-5 shadow-xl shadow-black/20 backdrop-blur">
-      <div className="flex items-center gap-2 text-lg font-semibold text-white">
-        <Route className="h-5 w-5 text-amber-300" />
-        Connectivity guide
-      </div>
-      <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+    <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-[0_24px_80px_-64px_rgba(15,23,42,0.5)] sm:p-6">
+      <h2 className="text-2xl font-semibold text-slate-950">Setup guide</h2>
+      <p className="mt-2 text-sm text-slate-500">What to do before departure and when you arrive.</p>
+      <div className="mt-5 grid gap-4 md:grid-cols-2">
         {sections.map(([key, label, icon]) => (
-          <div className="rounded-md border border-white/10 bg-white/[0.035] p-4" key={key}>
-            <h3 className="flex items-center gap-2 text-sm font-semibold text-zinc-100">
-              <span className="text-emerald-200">{icon}</span>
+          <div className="rounded-lg bg-[#f1f7ff] p-4" key={key}>
+            <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-950">
+              <span className="text-teal-700">{icon}</span>
               {label}
             </h3>
-            <ul className="mt-3 space-y-2 text-sm leading-6 text-zinc-400">
+            <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-600">
               {guide[key].map((item) => (
-                <li className="border-l border-emerald-300/30 pl-3" key={item}>
-                  {item}
-                </li>
+                <li key={item}>{item}</li>
               ))}
             </ul>
           </div>

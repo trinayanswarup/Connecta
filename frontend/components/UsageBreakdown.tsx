@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { AreaChart, BriefcaseBusiness, Map, Radio, Share2, Video, Wifi } from "lucide-react";
+import { BriefcaseBusiness, Map, Radio, Share2, Video, Wifi } from "lucide-react";
 
 import type { UsageBreakdownResult } from "@/lib/graphql";
 
@@ -16,33 +16,25 @@ export function UsageBreakdown({ breakdown }: { breakdown: UsageBreakdownResult 
   const maxValue = Math.max(...labels.map(([key]) => breakdown[key]), 1);
 
   return (
-    <section className="rounded-lg border border-white/10 bg-zinc-950/70 p-5 shadow-xl shadow-black/20 backdrop-blur">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 text-lg font-semibold text-white">
-            <AreaChart className="h-5 w-5 text-amber-300" />
-            Usage breakdown
-          </div>
-          <p className="mt-1 text-sm text-zinc-500">Deterministic usage estimate by activity</p>
-        </div>
-      </div>
-
+    <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-[0_24px_80px_-64px_rgba(15,23,42,0.5)] sm:p-6">
+      <h2 className="text-2xl font-semibold text-slate-950">Your expected data use</h2>
+      <p className="mt-2 text-sm text-slate-500">A simple estimate based on how you use your phone.</p>
       <div className="mt-5 grid gap-3">
         {labels.map(([key, label, icon]) => {
           const value = breakdown[key];
-          const width = `${Math.max((value / maxValue) * 100, value > 0 ? 8 : 0)}%`;
+          const width = `${Math.max((value / maxValue) * 100, value > 0 ? 7 : 0)}%`;
 
           return (
-            <div key={key} className="rounded-md border border-white/10 bg-white/[0.035] p-3">
-              <div className="mb-2 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2 text-sm font-medium text-zinc-200">
-                  <span className="text-emerald-200">{icon}</span>
+            <div key={key}>
+              <div className="mb-1.5 flex items-center justify-between gap-3 text-sm">
+                <div className="flex items-center gap-2 text-slate-600">
+                  <span className="text-teal-700">{icon}</span>
                   {label}
                 </div>
-                <div className="text-sm font-semibold text-white">{value.toFixed(1)} GB</div>
+                <span className="font-medium text-slate-950">{value.toFixed(1)} GB</span>
               </div>
-              <div className="h-2 overflow-hidden rounded-full bg-white/10">
-                <div className="h-full rounded-full bg-emerald-300" style={{ width }} />
+              <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+                <div className="h-full rounded-full bg-teal-500" style={{ width }} />
               </div>
             </div>
           );

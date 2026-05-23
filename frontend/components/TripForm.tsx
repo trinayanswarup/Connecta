@@ -1,9 +1,8 @@
 "use client";
 
-import type { ChangeEvent, FormEvent } from "react";
+import type { ChangeEvent, FormEvent, ReactNode } from "react";
 import { useState } from "react";
-import { AlertTriangle, Loader2, MapPin, Plane, RadioTower, Sparkles } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AlertCircle, ArrowRight, CalendarDays, Loader2, MapPin, SignalHigh } from "lucide-react";
 
 import { AgentStepsTrace } from "@/components/AgentStepsTrace";
 import { ConnectivityGuide } from "@/components/ConnectivityGuide";
@@ -18,6 +17,7 @@ import {
   type UsageInput,
   type UsageLevel
 } from "@/lib/graphql";
+import { destinationOptions } from "@/lib/destination-catalog";
 import { validateTripInput } from "@/lib/validations";
 
 const usageLabels: Array<[keyof UsageInput, string]> = [
@@ -30,7 +30,6 @@ const usageLabels: Array<[keyof UsageInput, string]> = [
 ];
 
 const usageLevels: UsageLevel[] = ["NONE", "LIGHT", "MODERATE", "HEAVY"];
-const travelerTypes: TravelerType[] = ["SOLO", "COUPLE", "FAMILY", "BUSINESS"];
 
 const initialUsage: UsageInput = {
   maps: "MODERATE",
@@ -41,12 +40,20 @@ const initialUsage: UsageInput = {
   work: "LIGHT"
 };
 
-export function TripForm() {
-  const [destination, setDestination] = useState("Japan");
-  const [startDate, setStartDate] = useState("2026-06-10");
-  const [endDate, setEndDate] = useState("2026-06-17");
-  const [travelerType, setTravelerType] = useState<TravelerType>("SOLO");
-  const [budgetUsd, setBudgetUsd] = useState("");
+type TripFormProps = {
+  initialDestination?: string;
+  initialStartDate?: string;
+  initialEndDate?: string;
+};
+
+export function TripForm({
+  initialDestination = "Japan",
+  initialStartDate = "2026-06-10",
+  initialEndDate = "2026-06-17"
+}: TripFormProps) {
+  const [destination, setDestination] = useState(initialDestination);
+  const [startDate, setStartDate] = useState(initialStartDate);
+  const [endDate, setEndDate] = useState(initialEndDate);
   const [usage, setUsage] = useState<UsageInput>(initialUsage);
   const [analysis, setAnalysis] = useState<TripAnalysis | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -57,13 +64,11 @@ export function TripForm() {
     setError(null);
     setIsSubmitting(true);
 
-    const parsedBudget = budgetUsd.trim() === "" ? undefined : Number(budgetUsd);
     const input: TripInput = {
       destination,
       startDate,
       endDate,
-      travelerType,
-      ...(parsedBudget === undefined ? {} : { budgetUsd: parsedBudget }),
+      travelerType: inferTravelerType(usage),
       usage
     };
 
@@ -71,8 +76,8 @@ export function TripForm() {
       validateTripInput(input);
       const result = await analyzeTrip(input);
       setAnalysis(result);
-    } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : "Trip analysis failed");
+    } catch {
+      setError("We could not find a plan right now. Please check your trip details and try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -88,224 +93,157 @@ export function TripForm() {
   }
 
   return (
-    <div className="grid gap-6">
-      <form
-        className="overflow-hidden rounded-lg border border-white/10 bg-zinc-950/70 shadow-2xl shadow-emerald-950/20 backdrop-blur"
-        onSubmit={handleSubmit}
-      >
-        <div className="border-b border-white/10 px-5 py-4 sm:px-6">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <div className="flex items-center gap-2 text-sm font-semibold text-white">
-                <Plane className="h-4 w-4 text-emerald-200" />
-                Trip intelligence
-              </div>
-              <p className="mt-1 text-sm text-zinc-400">
-                Inputs stay deterministic; AI only refines the reasoning and guide text.
-              </p>
-            </div>
-            <span className="inline-flex w-fit items-center gap-2 rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-xs uppercase tracking-[0.14em] text-emerald-200">
-              <RadioTower className="h-3.5 w-3.5" />
-              Live GraphQL
-            </span>
+    <div className="grid gap-8" id="planner">
+      <section className="rounded-lg bg-[#e9f7f4] p-4 shadow-[0_26px_90px_-70px_rgba(15,23,42,0.5)] sm:p-6">
+        <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-teal-700">Compact planner</p>
+            <h2 className="mt-1 text-3xl font-semibold text-slate-950">Build your travel eSIM plan</h2>
           </div>
+          <p className="max-w-md text-sm leading-6 text-slate-600">A few details are enough to compare plans and prepare your setup guide.</p>
         </div>
 
-        <div className="grid gap-6 p-5 sm:p-6 lg:grid-cols-[1fr_0.72fr]">
-          <div className="grid gap-4 md:grid-cols-2">
-            <label className="grid gap-2 text-sm font-medium text-zinc-200">
-              Destination
-            <input
-              className="rounded-md border border-white/10 bg-white/[0.04] px-3 py-2.5 font-normal text-white outline-none transition placeholder:text-zinc-600 focus:border-emerald-300/50 focus:bg-white/[0.07]"
-              minLength={2}
-              onChange={(event) => setDestination(event.target.value)}
-              required
-              value={destination}
-            />
-          </label>
-            <label className="grid gap-2 text-sm font-medium text-zinc-200">
-            Traveler type
-            <select
-              className="rounded-md border border-white/10 bg-zinc-950 px-3 py-2.5 font-normal text-white outline-none transition focus:border-emerald-300/50"
-              onChange={(event) => setTravelerType(event.target.value as TravelerType)}
-              value={travelerType}
-            >
-              {travelerTypes.map((type) => (
-                <option key={type} value={type}>
-                  {formatEnum(type)}
-                </option>
-              ))}
-            </select>
-          </label>
-            <label className="grid gap-2 text-sm font-medium text-zinc-200">
-            Start date
-            <input
-              className="rounded-md border border-white/10 bg-white/[0.04] px-3 py-2.5 font-normal text-white outline-none transition focus:border-emerald-300/50 focus:bg-white/[0.07]"
-              onChange={(event) => setStartDate(event.target.value)}
-              required
-              type="date"
-              value={startDate}
-            />
-          </label>
-            <label className="grid gap-2 text-sm font-medium text-zinc-200">
-            End date
-            <input
-              className="rounded-md border border-white/10 bg-white/[0.04] px-3 py-2.5 font-normal text-white outline-none transition focus:border-emerald-300/50 focus:bg-white/[0.07]"
-              onChange={(event) => setEndDate(event.target.value)}
-              required
-              type="date"
-              value={endDate}
-            />
-          </label>
-            <label className="grid gap-2 text-sm font-medium text-zinc-200 md:col-span-2">
-            Budget USD
-            <input
-              className="rounded-md border border-white/10 bg-white/[0.04] px-3 py-2.5 font-normal text-white outline-none transition placeholder:text-zinc-600 focus:border-emerald-300/50 focus:bg-white/[0.07]"
-              min={1}
-              onChange={(event) => setBudgetUsd(event.target.value)}
-              placeholder="Optional"
-              step="1"
-              type="number"
-              value={budgetUsd}
-            />
-          </label>
+        <form className="grid gap-4 rounded-lg bg-white p-3 shadow-[0_22px_80px_-64px_rgba(15,23,42,0.55)]" onSubmit={handleSubmit}>
+          <div className="grid gap-3 lg:grid-cols-[1.25fr_0.86fr_0.86fr_auto] lg:items-end">
+            <Field icon={<MapPin className="h-4 w-4 text-teal-600" />} label="Destination">
+              <input
+                className={inputClassName}
+                list="connecta-trip-destinations"
+                minLength={2}
+                onChange={(event) => setDestination(event.target.value)}
+                required
+                value={destination}
+              />
+              <datalist id="connecta-trip-destinations">
+                {destinationOptions.map((option) => (
+                  <option key={option.name} value={option.name} />
+                ))}
+              </datalist>
+            </Field>
 
-            <AnimatePresence>
-              {error ? (
-                <motion.div
-                  animate={{ opacity: 1, y: 0 }}
-                  className="rounded-md border border-rose-400/30 bg-rose-500/10 p-4 text-sm text-rose-100 md:col-span-2"
-                  exit={{ opacity: 0, y: -8 }}
-                  initial={{ opacity: 0, y: -8 }}
-                >
-                  <div className="flex gap-3">
-                    <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-rose-300" />
-                    <div>
-                      <div className="font-semibold">Analysis failed</div>
-                      <p className="mt-1 leading-6 text-rose-100/80">{error}</p>
-                    </div>
-                  </div>
-                </motion.div>
-              ) : null}
-            </AnimatePresence>
+            <Field icon={<CalendarDays className="h-4 w-4 text-teal-600" />} label="Start date">
+              <input
+                className={inputClassName}
+                onChange={(event) => setStartDate(event.target.value)}
+                required
+                type="date"
+                value={startDate}
+              />
+            </Field>
+
+            <Field icon={<CalendarDays className="h-4 w-4 text-teal-600" />} label="End date">
+              <input
+                className={inputClassName}
+                onChange={(event) => setEndDate(event.target.value)}
+                required
+                type="date"
+                value={endDate}
+              />
+            </Field>
+
+            <button
+              className="inline-flex h-12 items-center justify-center gap-2 rounded-md bg-slate-950 px-5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-slate-800 disabled:cursor-not-allowed disabled:translate-y-0 disabled:bg-slate-300"
+              disabled={isSubmitting}
+              type="submit"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Finding plan
+                </>
+              ) : (
+                <>
+                  Find my plan
+                  <ArrowRight className="h-4 w-4" />
+                </>
+              )}
+            </button>
           </div>
 
-          <div className="rounded-lg border border-white/10 bg-white/[0.035] p-4">
-            <div className="mb-4 flex items-center justify-between gap-3">
-              <div>
-                <div className="flex items-center gap-2 text-sm font-semibold text-white">
-                  <MapPin className="h-4 w-4 text-amber-300" />
-                  Usage profile
-                </div>
-                <p className="mt-1 text-xs text-zinc-500">Signal intensity by workflow</p>
-              </div>
-              <Sparkles className="h-4 w-4 text-emerald-200" />
+          <div className="rounded-lg bg-[#fbfaf7] p-4">
+            <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-950">
+              <SignalHigh className="h-4 w-4 text-teal-700" />
+              How much data will you use?
             </div>
-
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
               {usageLabels.map(([key, label]) => (
-                <label key={key} className="grid gap-2 text-sm font-medium text-zinc-200">
-                  {label}
-                  <select
-                    className="rounded-md border border-white/10 bg-zinc-950 px-3 py-2.5 font-normal text-white outline-none transition focus:border-emerald-300/50"
-                    onChange={updateUsage(key)}
-                    value={usage[key]}
-                  >
+                <Field key={key} label={label}>
+                  <select className={inputClassName} onChange={updateUsage(key)} value={usage[key]}>
                     {usageLevels.map((level) => (
                       <option key={level} value={level}>
                         {formatEnum(level)}
                       </option>
                     ))}
                   </select>
-                </label>
+                </Field>
               ))}
             </div>
           </div>
-        </div>
+        </form>
+      </section>
 
-        <div className="flex flex-col gap-3 border-t border-white/10 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <p className="text-sm text-zinc-500">
-            The backend remains the source of truth for estimates and plan selection.
-          </p>
-          <button
-            className="inline-flex items-center justify-center gap-2 rounded-md bg-emerald-300 px-5 py-3 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-200 disabled:cursor-not-allowed disabled:opacity-60"
-            disabled={isSubmitting}
-            type="submit"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Analyzing route
-              </>
-            ) : (
-              "Analyze trip"
-            )}
-          </button>
+      {error ? (
+        <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          <div className="flex gap-3">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+            <div>
+              <div className="font-medium">Could not find a plan</div>
+              <p className="mt-1 leading-6">{error}</p>
+            </div>
+          </div>
         </div>
-      </form>
+      ) : null}
 
-      <AnimatePresence>
-        {isSubmitting ? <LoadingState /> : null}
-      </AnimatePresence>
+      {isSubmitting ? <LoadingState /> : null}
 
       {analysis ? (
-        <motion.div
-          animate={{ opacity: 1, y: 0 }}
-          className="grid gap-6"
-          initial={{ opacity: 0, y: 16 }}
-          transition={{ duration: 0.35 }}
-        >
+        <div className="grid gap-5">
           <RecommendationCard analysis={analysis} />
-          <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
-            <UsageBreakdown breakdown={analysis.usageBreakdown} />
-            <PlanComparison selected={analysis.selectedPlan} alternatives={analysis.alternatives} />
-          </div>
-          {analysis.connectivityGuide ? (
-            <ConnectivityGuide guide={analysis.connectivityGuide} />
-          ) : null}
+          {analysis.connectivityGuide ? <ConnectivityGuide guide={analysis.connectivityGuide} /> : null}
+          <PlanComparison selected={analysis.selectedPlan} alternatives={analysis.alternatives} />
+          <UsageBreakdown breakdown={analysis.usageBreakdown} />
           <AgentStepsTrace steps={analysis.agentSteps} />
-        </motion.div>
+        </div>
       ) : null}
     </div>
   );
 }
 
-function LoadingState() {
-  const steps = ["Estimating usage", "Scoring plans", "Generating guide", "Recording trace"];
+const inputClassName =
+  "w-full min-w-0 rounded-md border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-teal-400 focus:ring-4 focus:ring-teal-50";
 
+function Field({ children, icon, label }: { children: ReactNode; icon?: ReactNode; label: string }) {
   return (
-    <motion.section
-      animate={{ opacity: 1, y: 0 }}
-      className="rounded-lg border border-emerald-300/20 bg-emerald-300/[0.06] p-5 text-emerald-50 shadow-xl shadow-emerald-950/20"
-      exit={{ opacity: 0, y: -10 }}
-      initial={{ opacity: 0, y: -10 }}
-    >
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <label className="grid gap-2 text-sm font-medium text-slate-700">
+      <span className="flex items-center gap-2">
+        {icon}
+        {label}
+      </span>
+      {children}
+    </label>
+  );
+}
+
+function LoadingState() {
+  return (
+    <section className="rounded-lg border border-teal-100 bg-teal-50 p-4 text-sm text-teal-800">
+      <div className="flex items-center gap-3">
+        <Loader2 className="h-4 w-4 animate-spin" />
         <div>
-          <div className="flex items-center gap-2 text-sm font-semibold">
-            <Loader2 className="h-4 w-4 animate-spin text-emerald-200" />
-            Running recommendation pipeline
-          </div>
-          <p className="mt-2 text-sm leading-6 text-zinc-300">
-            Connecta is keeping the deterministic plan decision intact while preparing the observable result.
-          </p>
-        </div>
-        <div className="grid gap-2 sm:min-w-64">
-          {steps.map((step, index) => (
-            <motion.div
-              animate={{ opacity: [0.35, 1, 0.35] }}
-              className="flex items-center gap-2 text-xs uppercase tracking-[0.14em] text-emerald-100"
-              key={step}
-              transition={{ delay: index * 0.14, duration: 1.2, repeat: Infinity }}
-            >
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
-              {step}
-            </motion.div>
-          ))}
+          <div className="font-medium">Finding your best plan</div>
+          <p className="mt-1 text-teal-700">Checking your trip needs and preparing a simple recommendation.</p>
         </div>
       </div>
-    </motion.section>
+    </section>
   );
+}
+
+function inferTravelerType(usage: UsageInput): TravelerType {
+  if (usage.work === "HEAVY" || usage.hotspot === "HEAVY" || usage.videoCalls === "HEAVY") {
+    return "BUSINESS";
+  }
+
+  return "SOLO";
 }
 
 function formatEnum(value: string) {

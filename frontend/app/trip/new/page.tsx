@@ -1,36 +1,94 @@
-import { TripForm } from "@/components/TripForm";
 import Link from "next/link";
-import { ArrowLeft, Satellite } from "lucide-react";
+import { ArrowLeft, Globe2, ShieldCheck, SignalHigh, Smartphone } from "lucide-react";
 
-export default function NewTripPage() {
+import { TripForm } from "@/components/TripForm";
+
+type NewTripPageProps = {
+  searchParams?: Promise<{
+    destination?: string;
+    startDate?: string;
+    endDate?: string;
+  }>;
+};
+
+export default async function NewTripPage({ searchParams }: NewTripPageProps) {
+  const params = await searchParams;
+  const initialDestination =
+    typeof params?.destination === "string" && params.destination.trim().length >= 2
+      ? params.destination.trim()
+      : undefined;
+  const initialStartDate = isIsoDate(params?.startDate) ? params?.startDate : undefined;
+  const initialEndDate = isIsoDate(params?.endDate) ? params?.endDate : undefined;
+
   return (
-    <main className="min-h-screen px-5 py-6 text-emerald-50 sm:px-8">
+    <main className="min-h-screen bg-[#fbfaf7] px-5 py-6 text-slate-950 sm:px-8">
       <div className="mx-auto max-w-7xl">
-        <nav className="mb-8 flex items-center justify-between border-b border-white/10 pb-5">
-          <Link className="inline-flex items-center gap-2 text-sm text-zinc-300 transition hover:text-white" href="/">
+        <nav className="mb-10 flex items-center justify-between border-b border-slate-200/80 pb-5">
+          <Link className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-slate-950" href="/">
             <ArrowLeft className="h-4 w-4" />
             Connecta
           </Link>
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs uppercase tracking-[0.16em] text-emerald-200">
-            <Satellite className="h-3.5 w-3.5" />
-            Phase 4 console
+          <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 shadow-sm">
+            Travel data plans
           </span>
         </nav>
 
-        <div className="mb-8 max-w-3xl">
-          <p className="text-sm font-medium uppercase tracking-[0.18em] text-emerald-200">
-            Connectivity command center
-          </p>
-          <h1 className="mt-3 text-4xl font-semibold tracking-normal text-white sm:text-5xl">
-            Analyze trip data before the route goes live.
-          </h1>
-          <p className="mt-4 text-base leading-7 text-zinc-300">
-            Tune the itinerary, usage profile, and budget guardrail. Connecta returns the deterministic plan decision, AI-enhanced guidance when available, and the full agent trace.
-          </p>
-        </div>
+        <section className="pb-12 pt-4 lg:pb-16">
+          <div className="max-w-4xl">
+            <p className="text-sm font-semibold text-teal-700">Travel eSIM planner</p>
+            <h1 className="mt-4 text-5xl font-semibold leading-[1.02] text-slate-950 sm:text-6xl">
+              Find the travel data plan that fits your trip.
+            </h1>
+            <p className="mt-5 max-w-xl text-base leading-7 text-slate-600 sm:text-lg">
+              Tell us where you are going and how you use your phone. Connecta keeps the choice calm, clear, and ready before departure.
+            </p>
+            <div className="mt-8 divide-y divide-slate-200 border-y border-slate-200">
+              {plannerBenefits.map((benefit) => (
+                <div className="grid grid-cols-[auto_1fr] gap-4 py-4" key={benefit.title}>
+                  <span className="mt-1 grid h-9 w-9 place-items-center rounded-md bg-teal-50 text-teal-700">{benefit.icon}</span>
+                  <div>
+                    <h2 className="text-lg font-semibold text-slate-950">{benefit.title}</h2>
+                    <p className="mt-1 text-sm leading-6 text-slate-500">{benefit.text}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
 
-        <TripForm />
+        <TripForm
+          initialDestination={initialDestination}
+          initialEndDate={initialEndDate}
+          initialStartDate={initialStartDate}
+        />
       </div>
     </main>
   );
+}
+
+const plannerBenefits = [
+  {
+    icon: <Smartphone className="h-4 w-4" />,
+    title: "Setup before departure",
+    text: "Install your eSIM while you still have Wi-Fi at home."
+  },
+  {
+    icon: <ShieldCheck className="h-4 w-4" />,
+    title: "Avoid roaming surprises",
+    text: "See data, validity, and total price before you choose."
+  },
+  {
+    icon: <SignalHigh className="h-4 w-4" />,
+    title: "Compare plans clearly",
+    text: "Get a best match with alternatives when you want options."
+  },
+  {
+    icon: <Globe2 className="h-4 w-4" />,
+    title: "Works globally",
+    text: "Plan around one country or a trip that crosses regions."
+  }
+];
+
+function isIsoDate(value: unknown): value is string {
+  return typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value);
 }
