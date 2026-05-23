@@ -24,7 +24,7 @@ export function PlanComparison({ selected, alternatives }: PlanComparisonProps) 
         {plans.map((plan) => {
           return (
             <article
-              className="rounded-lg border border-slate-200 bg-white p-4 transition hover:-translate-y-0.5 hover:border-teal-200 hover:shadow-[0_18px_58px_-48px_rgba(15,23,42,0.45)]"
+              className="rounded-lg border border-slate-200 bg-white p-4 transition hover:-translate-y-0.5 hover:border-orange-200 hover:shadow-[0_18px_58px_-48px_rgba(15,23,42,0.45)]"
               key={plan.id}
             >
               <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
@@ -32,7 +32,7 @@ export function PlanComparison({ selected, alternatives }: PlanComparisonProps) 
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="font-semibold text-slate-950">{plan.name}</h3>
                     {plan.id === selected.id ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-teal-50 px-2 py-1 text-xs font-semibold text-teal-700">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-orange-50 px-2 py-1 text-xs font-semibold text-orange-700">
                         <CheckCircle2 className="h-3.5 w-3.5" />
                         Best match
                       </span>
@@ -63,3 +63,4 @@ function PlanMetric({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+

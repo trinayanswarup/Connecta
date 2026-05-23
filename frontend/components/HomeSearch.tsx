@@ -57,7 +57,7 @@ export function HomeSearch({ defaultDestination = "Japan", variant = "horizontal
               : "flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2.5"
           }
         >
-          <MapPin className="h-4 w-4 shrink-0 text-teal-600" />
+          <MapPin className="h-4 w-4 shrink-0 text-orange-600" />
           {isHero ? <span className="h-5 w-px bg-slate-200" /> : null}
           <input
             className="min-w-0 flex-1 bg-transparent text-base text-slate-950 outline-none placeholder:text-slate-400 sm:text-sm"
@@ -122,7 +122,7 @@ export function HomeSearch({ defaultDestination = "Japan", variant = "horizontal
       <button
         className={
           isHero
-            ? "inline-flex h-14 items-center justify-center gap-2 rounded-md bg-[#43e983] px-5 text-base font-semibold text-slate-950 shadow-[0_18px_44px_-32px_rgba(18,118,69,0.7)] transition hover:-translate-y-0.5 hover:bg-[#58ef91] sm:col-span-2"
+            ? "inline-flex h-14 items-center justify-center gap-2 rounded-md bg-[#e94f13] px-5 text-base font-semibold text-white shadow-[0_18px_44px_-32px_rgba(217,76,13,0.45)] transition hover:-translate-y-0.5 hover:bg-[#f26822] sm:col-span-2"
             : "inline-flex h-11 items-center justify-center gap-2 rounded-md bg-slate-950 px-5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-slate-800"
         }
         type="submit"
@@ -133,3 +133,4 @@ export function HomeSearch({ defaultDestination = "Japan", variant = "horizontal
     </form>
   );
 }
+

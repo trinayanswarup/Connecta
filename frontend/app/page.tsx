@@ -23,21 +23,21 @@ const popularDestinations = [
     flag: "JP",
     stats: "From $21 - City trips and rail days",
     imageUrl: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=900&q=80",
-    themeColor: "157 46% 23%"
+    themeColor: "18 72% 28%"
   },
   {
     location: "Italy",
     flag: "IT",
     stats: "From $14 - Rome, Venice, and beyond",
     imageUrl: "https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?auto=format&fit=crop&w=900&q=80",
-    themeColor: "206 48% 27%"
+    themeColor: "17 65% 31%"
   },
   {
     location: "Thailand",
     flag: "TH",
     stats: "From $19 - Islands, cities, and stays",
     imageUrl: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80",
-    themeColor: "184 55% 24%"
+    themeColor: "20 68% 29%"
   }
 ];
 
@@ -118,15 +118,15 @@ export default function HomePage() {
             }}
           />
           <div className="relative z-10 flex flex-col justify-center px-6 py-10 sm:px-10 lg:px-14 xl:px-20">
-            <p className="text-base font-semibold text-teal-700">eSIM for international travel</p>
+            <p className="text-base font-semibold text-orange-700">eSIM for international travel</p>
             <h1 className="mt-6 max-w-4xl text-5xl font-semibold leading-[1.03] text-slate-950 sm:text-6xl lg:text-[3.95rem] xl:text-[4.65rem]">
-              Stay Connecta <span className="text-[#e84e6a]">wherever</span> you go
+              Stay Connecta <span className="text-[#e94f13]">wherever</span> you go
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-7 text-slate-700 sm:text-lg">
               Choose a travel eSIM before you fly and land with data ready for maps, messages, rides, and everything the trip throws at you.
             </p>
             <div className="mt-8 flex items-center gap-3 text-xl font-semibold text-slate-800">
-              <span className="grid h-7 w-7 place-items-center rounded-full bg-[#e5fff0] text-teal-700">
+              <span className="grid h-7 w-7 place-items-center rounded-full bg-[#fff4e8] text-orange-700">
                 <Check className="h-4 w-4" />
               </span>
               Keep your physical SIM
@@ -149,8 +149,8 @@ export default function HomePage() {
             <div className="absolute inset-0 bg-gradient-to-t from-white via-white/5 to-[#eaf4ff]/20 lg:bg-gradient-to-r lg:from-white/10 lg:via-transparent lg:to-white/0" />
             <div className="absolute bottom-0 left-0 right-0 h-16 rounded-t-[50%] bg-[#fbfaf7]" />
             <div className="absolute bottom-0 right-[8%] hidden gap-5 sm:flex">
-              <span className="block h-28 w-8 bg-[#e84e6a]" />
-              <span className="block h-28 w-8 bg-[#e84e6a]" />
+              <span className="block h-28 w-8 bg-[#e94f13]" />
+              <span className="block h-28 w-8 bg-[#e94f13]" />
             </div>
           </div>
         </div>
@@ -159,7 +159,7 @@ export default function HomePage() {
       <section className="mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:px-8" id="destinations">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-semibold text-teal-700">Popular destinations</p>
+            <p className="text-sm font-semibold text-orange-700">Popular destinations</p>
             <h2 className="mt-2 text-4xl font-semibold text-slate-950">Start with where you are headed</h2>
           </div>
           <p className="max-w-lg text-sm leading-6 text-slate-600">
@@ -186,7 +186,7 @@ export default function HomePage() {
 
       <section className="mx-auto grid max-w-7xl gap-6 px-5 py-16 sm:px-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-center">
         <div>
-          <p className="text-sm font-semibold text-teal-700">What is an eSIM?</p>
+          <p className="text-sm font-semibold text-orange-700">What is an eSIM?</p>
           <h2 className="mt-2 text-4xl font-semibold leading-tight text-slate-950">A digital SIM for travel data, without the counter queue.</h2>
         </div>
         <div className="grid gap-4 md:grid-cols-3">
@@ -220,7 +220,7 @@ export default function HomePage() {
       <section className="mx-auto max-w-7xl px-5 py-16 sm:px-8" id="trust">
         <div className="grid gap-8 lg:grid-cols-[0.86fr_1.14fr] lg:items-start">
           <div>
-            <p className="text-sm font-semibold text-teal-700">Benefits</p>
+            <p className="text-sm font-semibold text-orange-700">Benefits</p>
             <h2 className="mt-2 text-4xl font-semibold leading-tight text-slate-950">Built to feel clear before you buy.</h2>
             <p className="mt-4 text-sm leading-6 text-slate-600">
               Connecta balances travel discovery with calm recommendation clarity, so the final choice feels easy to trust.
@@ -243,7 +243,7 @@ export default function HomePage() {
             </p>
           </div>
           <Link
-            className="inline-flex items-center justify-center gap-2 rounded-md bg-[#dffcec] px-5 py-3 text-sm font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-white"
+            className="inline-flex items-center justify-center gap-2 rounded-md bg-[#fff4e8] px-5 py-3 text-sm font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-white"
             href="/trip/new"
           >
             Find my plan
@@ -257,10 +257,11 @@ export default function HomePage() {
 
 function InfoTile({ icon, title, text }: { icon: ReactNode; title: string; text: string }) {
   return (
-    <article className="rounded-lg border border-slate-200 bg-white p-5 shadow-[0_18px_60px_-50px_rgba(15,23,42,0.45)] transition hover:-translate-y-0.5 hover:border-teal-200">
-      <span className="grid h-11 w-11 place-items-center rounded-md bg-teal-50 text-teal-700">{icon}</span>
+    <article className="rounded-lg border border-slate-200 bg-white p-5 shadow-[0_18px_60px_-50px_rgba(15,23,42,0.45)] transition hover:-translate-y-0.5 hover:border-orange-200">
+      <span className="grid h-11 w-11 place-items-center rounded-md bg-orange-50 text-orange-700">{icon}</span>
       <h3 className="mt-8 text-lg font-semibold text-slate-950">{title}</h3>
       <p className="mt-3 text-sm leading-6 text-slate-600">{text}</p>
     </article>
   );
 }
+

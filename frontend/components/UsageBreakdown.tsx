@@ -28,13 +28,13 @@ export function UsageBreakdown({ breakdown }: { breakdown: UsageBreakdownResult 
             <div key={key}>
               <div className="mb-1.5 flex items-center justify-between gap-3 text-sm">
                 <div className="flex items-center gap-2 text-slate-600">
-                  <span className="text-teal-700">{icon}</span>
+                  <span className="text-orange-700">{icon}</span>
                   {label}
                 </div>
                 <span className="font-medium text-slate-950">{value.toFixed(1)} GB</span>
               </div>
               <div className="h-2 overflow-hidden rounded-full bg-slate-100">
-                <div className="h-full rounded-full bg-teal-500" style={{ width }} />
+                <div className="h-full rounded-full bg-orange-500" style={{ width }} />
               </div>
             </div>
           );
@@ -43,3 +43,4 @@ export function UsageBreakdown({ breakdown }: { breakdown: UsageBreakdownResult 
     </section>
   );
 }
+

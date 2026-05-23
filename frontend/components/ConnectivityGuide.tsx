@@ -20,7 +20,7 @@ export function ConnectivityGuide({ guide }: { guide: ConnectivityGuideResult })
         {sections.map(([key, label, icon]) => (
           <div className="rounded-lg bg-[#f1f7ff] p-4" key={key}>
             <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-950">
-              <span className="text-teal-700">{icon}</span>
+              <span className="text-orange-700">{icon}</span>
               {label}
             </h3>
             <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-600">
@@ -34,3 +34,4 @@ export function ConnectivityGuide({ guide }: { guide: ConnectivityGuideResult })
     </section>
   );
 }
+

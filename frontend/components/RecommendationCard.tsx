@@ -12,7 +12,7 @@ export function RecommendationCard({ analysis }: RecommendationCardProps) {
     <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-[0_28px_90px_-68px_rgba(15,23,42,0.55)]">
       <div className="grid gap-6 p-6 sm:p-8 lg:grid-cols-[1fr_0.62fr] lg:items-center">
         <div>
-          <div className="inline-flex items-center gap-2 rounded-full bg-teal-50 px-3 py-1 text-sm font-semibold text-teal-700">
+          <div className="inline-flex items-center gap-2 rounded-full bg-orange-50 px-3 py-1 text-sm font-semibold text-orange-700">
             <CheckCircle2 className="h-4 w-4" />
             Best match for your trip
           </div>
@@ -24,14 +24,14 @@ export function RecommendationCard({ analysis }: RecommendationCardProps) {
           </div>
         </div>
 
-        <div className="rounded-lg border border-teal-100 bg-[#e9f7f4] p-5 text-slate-950">
+        <div className="rounded-lg border border-orange-100 bg-[#fff4e8] p-5 text-slate-950">
           <div className="text-sm text-slate-500">{analysis.selectedPlan.provider}</div>
           <div className="mt-2 flex items-end justify-between gap-4">
             <div>
               <div className="text-4xl font-semibold">${analysis.selectedPlan.priceUsd.toFixed(2)}</div>
               <div className="mt-1 text-sm text-slate-500">{analysis.selectedPlan.validityDays} days</div>
             </div>
-            <div className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-teal-700 shadow-sm">
+            <div className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-orange-700 shadow-sm">
               {analysis.selectedPlan.dataGb} GB
             </div>
           </div>
@@ -59,3 +59,4 @@ function PlanFact({ icon, label, value }: { icon: ReactNode; label: string; valu
     </div>
   );
 }
+

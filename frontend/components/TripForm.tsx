@@ -94,20 +94,20 @@ export function TripForm({
 
   return (
     <div className="grid gap-8" id="planner">
-      <section className="relative overflow-hidden rounded-lg bg-[#e9f7f4] p-4 shadow-[0_30px_100px_-76px_rgba(15,23,42,0.55)] sm:p-6">
-        <div className="pointer-events-none absolute -bottom-20 -right-16 h-64 w-64 rounded-full border border-teal-700/10" />
-        <div className="pointer-events-none absolute -bottom-10 right-16 h-44 w-80 rotate-[-18deg] rounded-[50%] border border-teal-700/10" />
+      <section className="relative overflow-hidden rounded-lg bg-[#fff4e8] p-4 shadow-[0_30px_100px_-76px_rgba(15,23,42,0.55)] sm:p-6">
+        <div className="pointer-events-none absolute -bottom-20 -right-16 h-64 w-64 rounded-full border border-orange-700/10" />
+        <div className="pointer-events-none absolute -bottom-10 right-16 h-44 w-80 rotate-[-18deg] rounded-[50%] border border-orange-700/10" />
         <div className="relative rounded-lg bg-white p-5 shadow-[0_24px_76px_-62px_rgba(15,23,42,0.55)] sm:p-7">
           <div className="mb-7">
             <div>
-              <p className="text-sm font-semibold text-teal-700">Connecta eSIM planner</p>
+              <p className="text-sm font-semibold text-orange-700">Connecta eSIM planner</p>
               <h2 className="mt-1 text-3xl font-semibold text-slate-950">Build your travel eSIM plan</h2>
             </div>
           </div>
 
           <form className="grid gap-6" onSubmit={handleSubmit}>
             <div className="grid gap-4 lg:grid-cols-[1.16fr_0.82fr_0.82fr]">
-              <Field icon={<MapPin className="h-4 w-4 text-teal-600" />} label="Destination">
+              <Field icon={<MapPin className="h-4 w-4 text-orange-600" />} label="Destination">
                 <input
                   className={inputClassName}
                   list="connecta-trip-destinations"
@@ -123,7 +123,7 @@ export function TripForm({
                 </datalist>
               </Field>
 
-              <Field icon={<CalendarDays className="h-4 w-4 text-teal-600" />} label="Start date">
+              <Field icon={<CalendarDays className="h-4 w-4 text-orange-600" />} label="Start date">
                 <input
                   className={inputClassName}
                   onChange={(event) => setStartDate(event.target.value)}
@@ -133,7 +133,7 @@ export function TripForm({
                 />
               </Field>
 
-              <Field icon={<CalendarDays className="h-4 w-4 text-teal-600" />} label="End date">
+              <Field icon={<CalendarDays className="h-4 w-4 text-orange-600" />} label="End date">
                 <input
                   className={inputClassName}
                   onChange={(event) => setEndDate(event.target.value)}
@@ -146,7 +146,7 @@ export function TripForm({
 
             <div className="rounded-lg bg-[#fbfaf7] p-5 ring-1 ring-slate-100">
               <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-slate-950">
-                <SignalHigh className="h-4 w-4 text-teal-700" />
+                <SignalHigh className="h-4 w-4 text-orange-700" />
                 How much data will you use?
               </div>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -213,7 +213,7 @@ export function TripForm({
 }
 
 const inputClassName =
-  "w-full min-w-0 rounded-md border border-slate-200 bg-white px-3 py-3 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-teal-400 focus:ring-4 focus:ring-teal-50";
+  "w-full min-w-0 rounded-md border border-slate-200 bg-white px-3 py-3 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-orange-400 focus:ring-4 focus:ring-orange-50";
 
 function Field({ children, icon, label }: { children: ReactNode; icon?: ReactNode; label: string }) {
   return (
@@ -229,12 +229,12 @@ function Field({ children, icon, label }: { children: ReactNode; icon?: ReactNod
 
 function LoadingState() {
   return (
-    <section className="rounded-lg border border-teal-100 bg-teal-50 p-4 text-sm text-teal-800">
+    <section className="rounded-lg border border-orange-100 bg-orange-50 p-4 text-sm text-orange-800">
       <div className="flex items-center gap-3">
         <Loader2 className="h-4 w-4 animate-spin" />
         <div>
           <div className="font-medium">Finding your best plan</div>
-          <p className="mt-1 text-teal-700">Checking your trip needs and preparing a simple recommendation.</p>
+          <p className="mt-1 text-orange-700">Checking your trip needs and preparing a simple recommendation.</p>
         </div>
       </div>
     </section>
@@ -256,3 +256,4 @@ function formatEnum(value: string) {
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
 }
+

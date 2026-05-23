@@ -16,7 +16,7 @@ export function AgentStepsTrace({ steps }: { steps: AgentStep[] }) {
       <div className="mt-5 grid gap-3">
         {steps.map((step, index) => (
           <div className="flex gap-3 rounded-lg bg-[#fbfaf7] p-4" key={`${step.name}-${index}`}>
-            <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-teal-50 text-teal-700">
+            <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-orange-50 text-orange-700">
               <CheckCircle2 className="h-4 w-4" />
             </span>
             <div>
@@ -63,3 +63,4 @@ function friendlyStepSummary(name: string) {
       return "This check helped shape the final recommendation.";
   }
 }
+

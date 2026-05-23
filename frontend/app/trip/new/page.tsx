@@ -35,7 +35,7 @@ export default async function NewTripPage({ searchParams }: NewTripPageProps) {
 
         <section className="grid gap-10 pb-12 pt-4 lg:grid-cols-[0.68fr_1.32fr] lg:items-start lg:pb-16">
           <div className="lg:sticky lg:top-8">
-            <p className="text-sm font-semibold text-teal-700">Travel eSIM planner</p>
+            <p className="text-sm font-semibold text-orange-700">Travel eSIM planner</p>
             <h1 className="mt-4 max-w-2xl text-4xl font-semibold leading-[1.05] text-slate-950 sm:text-5xl">
               Find a travel data plan before you fly.
             </h1>
@@ -45,7 +45,7 @@ export default async function NewTripPage({ searchParams }: NewTripPageProps) {
             <div className="mt-8 divide-y divide-slate-200 border-y border-slate-200">
               {plannerBenefits.map((benefit) => (
                 <div className="grid grid-cols-[auto_1fr] gap-4 py-5" key={benefit.title}>
-                  <span className="mt-1 grid h-10 w-10 place-items-center rounded-md bg-[#dbe6e3] text-slate-700">
+                  <span className="mt-1 grid h-10 w-10 place-items-center rounded-md bg-[#f6e6d7] text-slate-700">
                     <ArrowRight className="h-5 w-5" />
                   </span>
                   <div>
@@ -90,3 +90,4 @@ const plannerBenefits = [
 function isIsoDate(value: unknown): value is string {
   return typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value);
 }
+
