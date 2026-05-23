@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Check, ChevronDown, Globe2, MapPin, Search } from "lucide-react";
+import { ArrowRight, Check, ChevronLeft, ChevronRight, Globe2, MapPin, Search } from "lucide-react";
 
 import { plansForDestination, type DestinationKind, type DestinationOption } from "@/lib/destination-catalog";
 
@@ -10,46 +10,73 @@ type DestinationDirectoryProps = {
   destinations: DestinationOption[];
 };
 
-const filters: Array<{ label: string; value: "popular" | DestinationKind }> = [
+const filters: Array<{ label: string; value: "popular" | "all" | DestinationKind }> = [
   { label: "Popular", value: "popular" },
   { label: "Regional plans", value: "regional" },
   { label: "Countries", value: "country" },
-  { label: "Global", value: "global" }
+  { label: "Global", value: "global" },
+  { label: "All destinations", value: "all" }
 ];
 
-const popularNames = new Set(["Global", "Europe", "Asia", "United States", "United Kingdom", "Japan", "Italy", "Thailand", "India", "Brazil", "Singapore", "Mexico"]);
+const popularNames = new Set(["United States", "United Kingdom", "Japan", "Italy", "Thailand", "India", "Brazil", "Singapore", "Mexico"]);
+const pageSize = 18;
 
 export function DestinationDirectory({ destinations }: DestinationDirectoryProps) {
-  const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [activeFilter, setActiveFilter] = useState<"popular" | DestinationKind>("popular");
+  const [activeFilter, setActiveFilter] = useState<"popular" | "all" | DestinationKind>("popular");
+  const [page, setPage] = useState(1);
   const normalizedQuery = query.trim().toLowerCase();
+  const isSearching = normalizedQuery.length > 0;
   const filteredDestinations = destinations.filter((destination) => {
-    const matchesFilter =
-      activeFilter === "popular" ? popularNames.has(destination.name) : destination.kind === activeFilter;
     const matchesQuery =
-      normalizedQuery.length === 0 ||
+      !isSearching ||
       destination.name.toLowerCase().includes(normalizedQuery) ||
       destination.region.toLowerCase().includes(normalizedQuery);
 
-    return matchesFilter && matchesQuery;
+    if (isSearching) {
+      return matchesQuery;
+    }
+
+    if (activeFilter === "all") {
+      return true;
+    }
+
+    const matchesFilter =
+      activeFilter === "popular" ? popularNames.has(destination.name) : destination.kind === activeFilter;
+
+    return matchesFilter;
   });
-  const visibleDestinations = isOpen || normalizedQuery.length > 0 ? filteredDestinations : filteredDestinations.slice(0, 18);
-  const hasHiddenDestinations = filteredDestinations.length > visibleDestinations.length;
+  const shouldPaginate = isSearching || activeFilter === "all";
+  const totalPages = Math.max(1, Math.ceil(filteredDestinations.length / pageSize));
+  const safePage = Math.min(page, totalPages);
+  const pageStart = (safePage - 1) * pageSize;
+  const visibleDestinations = shouldPaginate
+    ? filteredDestinations.slice(pageStart, pageStart + pageSize)
+    : filteredDestinations.slice(0, 9);
+  const isFullDirectory = isSearching || activeFilter === "all";
 
   return (
     <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-[0_18px_60px_-48px_rgba(15,23,42,0.45)] sm:p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-sm font-semibold text-teal-700">Destination finder</p>
-          <h2 className="mt-2 text-3xl font-semibold text-slate-950">Explore every country and region</h2>
-          <p className="mt-2 text-sm text-slate-500">Every destination includes multiple data sizes, validity windows, and prices.</p>
+          <h2 className="mt-2 text-3xl font-semibold text-slate-950">
+            {isFullDirectory ? "Explore every country and region" : "Popular eSIM destinations"}
+          </h2>
+          <p className="mt-2 text-sm text-slate-500">
+            {isFullDirectory
+              ? "Every destination includes multiple data sizes, validity windows, and prices."
+              : "Start with 9 popular countries, or search any country, region, or global plan."}
+          </p>
         </div>
         <div className="flex min-w-0 items-center gap-2 rounded-md border border-slate-200 bg-[#fbfaf7] px-3 py-2.5 sm:min-w-80">
           <Search className="h-4 w-4 shrink-0 text-slate-400" />
           <input
             className="min-w-0 flex-1 bg-transparent text-sm text-slate-950 outline-none placeholder:text-slate-400"
-            onChange={(event) => setQuery(event.target.value)}
+            onChange={(event) => {
+              setQuery(event.target.value);
+              setPage(1);
+            }}
             placeholder="Search countries or regions"
             value={query}
           />
@@ -69,7 +96,7 @@ export function DestinationDirectory({ destinations }: DestinationDirectoryProps
               key={filter.value}
               onClick={() => {
                 setActiveFilter(filter.value);
-                setIsOpen(false);
+                setPage(1);
               }}
               type="button"
             >
@@ -118,16 +145,52 @@ export function DestinationDirectory({ destinations }: DestinationDirectoryProps
         </div>
       ) : null}
 
-      {hasHiddenDestinations || isOpen ? (
-        <div className="mt-6 flex justify-center">
+      {!isFullDirectory ? (
+        <div className="mt-6 flex justify-center border-t border-slate-100 pt-6">
           <button
             className="inline-flex items-center justify-center gap-2 rounded-md border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 transition hover:-translate-y-0.5 hover:border-teal-200 hover:bg-teal-50"
-            onClick={() => setIsOpen((current) => !current)}
+            onClick={() => {
+              setActiveFilter("all");
+              setPage(1);
+            }}
             type="button"
           >
-            {isOpen ? "Show fewer" : "View all destinations"}
-            <ChevronDown className={`h-4 w-4 transition ${isOpen ? "rotate-180" : ""}`} />
+            Show all countries and regions
+            <ArrowRight className="h-4 w-4" />
           </button>
+        </div>
+      ) : null}
+
+      {isFullDirectory && filteredDestinations.length > 0 ? (
+        <div className="mt-6 flex flex-col gap-4 border-t border-slate-100 pt-5 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+          <p>
+            Showing {pageStart + 1} - {Math.min(pageStart + visibleDestinations.length, filteredDestinations.length)} of{" "}
+            {filteredDestinations.length} destinations
+          </p>
+          {totalPages > 1 ? (
+            <div className="flex items-center gap-2">
+              <button
+                className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-600 transition hover:border-teal-200 hover:bg-teal-50 disabled:cursor-not-allowed disabled:opacity-40"
+                disabled={safePage === 1}
+                onClick={() => setPage((current) => Math.max(1, current - 1))}
+                type="button"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <span className="rounded-md border border-slate-200 bg-white px-3 py-2 font-semibold text-slate-800">
+                {safePage}
+              </span>
+              <span>of {totalPages}</span>
+              <button
+                className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-600 transition hover:border-teal-200 hover:bg-teal-50 disabled:cursor-not-allowed disabled:opacity-40"
+                disabled={safePage === totalPages}
+                onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
+                type="button"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+          ) : null}
         </div>
       ) : null}
     </section>
