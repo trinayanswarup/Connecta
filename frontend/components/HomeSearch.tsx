@@ -43,12 +43,12 @@ export function HomeSearch({ defaultDestination = "Japan", variant = "horizontal
     <form
       className={
         isHero
-          ? "grid max-w-[31.5rem] gap-3"
+          ? "grid max-w-[31.5rem] gap-3 sm:grid-cols-2"
           : "grid gap-3 rounded-lg border border-slate-200 bg-[#fbfaf7] p-3 sm:grid-cols-[1.12fr_0.74fr_0.74fr_auto] sm:items-end"
       }
       onSubmit={handleSubmit}
     >
-      <label className={isHero ? "grid gap-2 text-sm font-semibold text-slate-950" : "grid gap-2 text-sm font-semibold text-slate-800"}>
+      <label className={isHero ? "grid gap-2 text-sm font-semibold text-slate-950 sm:col-span-2" : "grid gap-2 text-sm font-semibold text-slate-800"}>
         {isHero ? "Where are you traveling?" : "Destination"}
         <span
           className={
@@ -122,7 +122,7 @@ export function HomeSearch({ defaultDestination = "Japan", variant = "horizontal
       <button
         className={
           isHero
-            ? "inline-flex h-14 items-center justify-center gap-2 rounded-md bg-[#43e983] px-5 text-base font-semibold text-slate-950 shadow-[0_18px_44px_-32px_rgba(18,118,69,0.7)] transition hover:-translate-y-0.5 hover:bg-[#58ef91]"
+            ? "inline-flex h-14 items-center justify-center gap-2 rounded-md bg-[#43e983] px-5 text-base font-semibold text-slate-950 shadow-[0_18px_44px_-32px_rgba(18,118,69,0.7)] transition hover:-translate-y-0.5 hover:bg-[#58ef91] sm:col-span-2"
             : "inline-flex h-11 items-center justify-center gap-2 rounded-md bg-slate-950 px-5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-slate-800"
         }
         type="submit"

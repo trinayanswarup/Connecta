@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import {
   ArrowRight,
+  Check,
   Globe2,
   LifeBuoy,
   Plane,
@@ -109,71 +110,52 @@ export default function HomePage() {
         </Link>
       </header>
 
-      <section className="mx-auto max-w-7xl px-5 pb-10 pt-6 sm:px-8 lg:pb-16">
-        <div className="grid gap-10 overflow-hidden rounded-lg bg-[#f7fbf9] p-6 shadow-[0_30px_90px_-72px_rgba(15,23,42,0.45)] sm:p-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-center lg:p-10">
-          <div className="max-w-2xl py-4 lg:py-14">
-            <p className="text-sm font-semibold text-teal-700">eSIM for international travel</p>
-            <h1 className="mt-5 max-w-3xl text-5xl font-semibold leading-[1.02] text-slate-950 sm:text-6xl lg:text-7xl">
-              Stay connected wherever you go.
+      <section className="mx-auto flex min-h-[calc(100vh-5.5rem)] max-w-[94rem] px-4 pb-6 pt-2 sm:px-6 lg:px-8">
+        <div className="relative grid w-full overflow-hidden rounded-lg border border-[#e7eceb] bg-white shadow-[0_34px_120px_-86px_rgba(15,23,42,0.55)] lg:grid-cols-[0.62fr_0.38fr]">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 opacity-[0.55]"
+            style={{
+              backgroundImage:
+                "repeating-radial-gradient(ellipse at 22% 12%, transparent 0 58px, rgba(15,23,42,0.06) 59px 60px, transparent 61px 118px)"
+            }}
+          />
+          <div className="relative z-10 flex flex-col justify-center px-6 py-10 sm:px-10 lg:px-14 xl:px-20">
+            <p className="text-base font-semibold text-teal-700">eSIM for international travel</p>
+            <h1 className="mt-6 max-w-4xl text-5xl font-semibold leading-[1.03] text-slate-950 sm:text-6xl lg:text-[3.95rem] xl:text-[4.65rem]">
+              Stay Connecta <span className="text-[#e84e6a]">wherever</span> you go
             </h1>
-            <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
+            <p className="mt-6 max-w-2xl text-base leading-7 text-slate-700 sm:text-lg">
               Choose a travel eSIM before you fly and land with data ready for maps, messages, rides, and everything the trip throws at you.
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <a
-                className="inline-flex items-center justify-center gap-2 rounded-md bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-slate-800"
-                href="#plan-finder"
-              >
-                Find my plan
-                <ArrowRight className="h-4 w-4" />
-              </a>
-              <a
-                className="inline-flex items-center justify-center rounded-md border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-800 transition hover:-translate-y-0.5 hover:border-teal-200 hover:bg-teal-50"
-                href="#destinations"
-              >
-                Browse destinations
-              </a>
+            <div className="mt-8 flex items-center gap-3 text-xl font-semibold text-slate-800">
+              <span className="grid h-7 w-7 place-items-center rounded-full bg-[#e5fff0] text-teal-700">
+                <Check className="h-4 w-4" />
+              </span>
+              Keep your physical SIM
             </div>
-            <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-600">
-              <span>No physical SIM swap</span>
-              <span>Setup before departure</span>
-              <span>Clear travel data options</span>
+            <div className="mt-8" id="plan-finder">
+              <p className="mb-4 text-sm font-semibold text-slate-950">Find your ideal plan</p>
+              <HomeSearch variant="hero" />
             </div>
           </div>
 
-          <div className="relative min-h-[390px] overflow-hidden rounded-lg bg-[#e8f4ff] shadow-[0_28px_90px_-62px_rgba(15,23,42,0.5)] sm:min-h-[520px]">
+          <div className="relative min-h-[28rem] overflow-hidden bg-[#eaf4ff] lg:min-h-full">
             <div
               aria-hidden="true"
               className="absolute inset-0 bg-cover bg-center"
               style={{
                 backgroundImage:
-                  "url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80')"
+                  "url('https://images.unsplash.com/photo-1501555088652-021faa106b9b?auto=format&fit=crop&w=1200&q=80')"
               }}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-slate-950/5 to-white/10" />
-            <div className="absolute bottom-5 left-5 right-5 rounded-lg border border-white/60 bg-white/85 p-4 shadow-[0_18px_54px_-34px_rgba(15,23,42,0.45)] backdrop-blur">
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal-700">Next stop</p>
-                  <p className="mt-1 text-xl font-semibold text-slate-950">Connected from arrival</p>
-                </div>
-                <span className="rounded-full bg-[#dffcec] px-3 py-1 text-sm font-semibold text-teal-800">Travel ready</span>
-              </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-white via-white/5 to-[#eaf4ff]/20 lg:bg-gradient-to-r lg:from-white/10 lg:via-transparent lg:to-white/0" />
+            <div className="absolute bottom-0 left-0 right-0 h-16 rounded-t-[50%] bg-[#fbfaf7]" />
+            <div className="absolute bottom-0 right-[8%] hidden gap-5 sm:flex">
+              <span className="block h-28 w-8 bg-[#e84e6a]" />
+              <span className="block h-28 w-8 bg-[#e84e6a]" />
             </div>
           </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-5 pb-14 sm:px-8" id="plan-finder">
-        <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-[0_24px_80px_-62px_rgba(15,23,42,0.45)] sm:p-5">
-          <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="text-sm font-semibold text-teal-700">Find your ideal plan</p>
-              <h2 className="mt-1 text-2xl font-semibold text-slate-950">Where are you traveling?</h2>
-            </div>
-            <p className="text-sm text-slate-500">Search by destination and travel dates.</p>
-          </div>
-          <HomeSearch />
         </div>
       </section>
 
