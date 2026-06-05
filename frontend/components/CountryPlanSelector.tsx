@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, BadgePercent, Info } from "lucide-react";
 
@@ -31,6 +31,11 @@ export function CountryPlanSelector({ destination, plans, startDate, endDate, ti
 
     return date.toLocaleDateString("en-US", { day: "numeric", month: "long" });
   }, []);
+
+  useEffect(() => {
+    setSelectedIndex(initialIndex);
+    setUnlimitedDays(initialUnlimitedDays);
+  }, [destination.name, initialIndex, initialUnlimitedDays]);
 
   const plannerHref = useMemo(() => {
     const params = new URLSearchParams({

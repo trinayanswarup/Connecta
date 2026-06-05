@@ -50,7 +50,7 @@ export function PlannerExperience({
         endDate={tripDetails.endDate}
         plans={plans}
         startDate={tripDetails.startDate}
-        title="Choose it yourself"
+        title={`Choose it yourself: ${selectedDestination.name} eSIM`}
       />
     </div>
   );

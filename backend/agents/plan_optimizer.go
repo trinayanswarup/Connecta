@@ -14,10 +14,52 @@ type PlanOptimizer struct {
 	plans []plans.Plan
 }
 
-const (
-	countryPriceMultiplier  = 1.00
-	regionalPriceMultiplier = 1.25
-	globalPriceMultiplier   = 1.48
+type generatedPlanTemplate struct {
+	dataGB       float64
+	validityDays int
+	priceUSD     float64
+}
+
+var (
+	brazilPlanTemplates = []generatedPlanTemplate{
+		{dataGB: 1, validityDays: 7, priceUSD: 3.99},
+		{dataGB: 3, validityDays: 30, priceUSD: 9.99},
+		{dataGB: 5, validityDays: 30, priceUSD: 13.99},
+		{dataGB: 10, validityDays: 30, priceUSD: 24.99},
+		{dataGB: 20, validityDays: 30, priceUSD: 39.99},
+		{dataGB: 50, validityDays: 30, priceUSD: 59.00},
+	}
+	europeCountryPlanTemplates = []generatedPlanTemplate{
+		{dataGB: 1, validityDays: 7, priceUSD: 3.99},
+		{dataGB: 3, validityDays: 30, priceUSD: 6.99},
+		{dataGB: 5, validityDays: 30, priceUSD: 9.99},
+		{dataGB: 10, validityDays: 30, priceUSD: 15.99},
+		{dataGB: 20, validityDays: 30, priceUSD: 22.99},
+		{dataGB: 50, validityDays: 30, priceUSD: 48.99},
+	}
+	europeRegionalPlanTemplates = []generatedPlanTemplate{
+		{dataGB: 1, validityDays: 7, priceUSD: 4.99},
+		{dataGB: 3, validityDays: 30, priceUSD: 12.49},
+		{dataGB: 5, validityDays: 30, priceUSD: 19.49},
+		{dataGB: 10, validityDays: 30, priceUSD: 35.99},
+		{dataGB: 50, validityDays: 90, priceUSD: 95.99},
+	}
+	regionalPlanTemplates = []generatedPlanTemplate{
+		{dataGB: 1, validityDays: 7, priceUSD: 4.99},
+		{dataGB: 3, validityDays: 30, priceUSD: 12.49},
+		{dataGB: 5, validityDays: 30, priceUSD: 19.49},
+		{dataGB: 10, validityDays: 30, priceUSD: 35.99},
+		{dataGB: 20, validityDays: 30, priceUSD: 59.99},
+		{dataGB: 50, validityDays: 90, priceUSD: 95.99},
+	}
+	globalPlanTemplates = []generatedPlanTemplate{
+		{dataGB: 1, validityDays: 7, priceUSD: 5.99},
+		{dataGB: 3, validityDays: 30, priceUSD: 14.99},
+		{dataGB: 5, validityDays: 30, priceUSD: 22.99},
+		{dataGB: 10, validityDays: 30, priceUSD: 39.99},
+		{dataGB: 20, validityDays: 30, priceUSD: 69.99},
+		{dataGB: 50, validityDays: 30, priceUSD: 87.32},
+	}
 )
 
 func NewPlanOptimizer(mockPlans []plans.Plan) PlanOptimizer {
@@ -60,11 +102,11 @@ func (o PlanOptimizer) candidatesFor(destination string) []plans.Plan {
 
 	switch {
 	case normalized == "GLOBAL":
-		return generatedPlans("Global", "GLOBAL", "Connecta Global", 0.90, globalPriceMultiplier)
+		return generatedPlans("Global", "GLOBAL", "Connecta Global", 0.90, globalPlanTemplates)
 	case isRegionalDestination(normalized):
-		return generatedPlans(displayDestination(normalized), normalized, "Connecta Regional", 0.91, regionalPriceMultiplier)
+		return generatedPlans(displayDestination(normalized), normalized, "Connecta Regional", 0.91, regionalTemplatesFor(normalized))
 	default:
-		return generatedPlans(displayDestination(normalized), normalized, "Connecta Local", 0.94, countryPriceMultiplier)
+		return generatedPlans(displayDestination(normalized), normalized, "Connecta Local", 0.94, countryTemplatesFor(normalized))
 	}
 }
 
@@ -107,22 +149,9 @@ func normalizeDestination(destination string) string {
 	return strings.ToUpper(strings.TrimSpace(destination))
 }
 
-func generatedPlans(label string, destinationCode string, provider string, coverageScore float64, priceMultiplier float64) []plans.Plan {
+func generatedPlans(label string, destinationCode string, provider string, coverageScore float64, templates []generatedPlanTemplate) []plans.Plan {
 	if strings.TrimSpace(label) == "" {
 		label = "Travel"
-	}
-
-	templates := []struct {
-		dataGB       float64
-		validityDays int
-		priceUSD     float64
-	}{
-		{dataGB: 1, validityDays: 7, priceUSD: 3.99},
-		{dataGB: 3, validityDays: 30, priceUSD: 9.99},
-		{dataGB: 5, validityDays: 30, priceUSD: 13.99},
-		{dataGB: 10, validityDays: 30, priceUSD: 24.99},
-		{dataGB: 20, validityDays: 30, priceUSD: 39.99},
-		{dataGB: 50, validityDays: 30, priceUSD: 59.00},
 	}
 
 	generated := make([]plans.Plan, 0, len(templates))
@@ -133,7 +162,7 @@ func generatedPlans(label string, destinationCode string, provider string, cover
 			Provider:      provider,
 			Name:          label + " " + formatGB(dataLabel),
 			Destination:   destinationCode,
-			PriceUSD:      roundCents(template.priceUSD * priceMultiplier),
+			PriceUSD:      template.priceUSD,
 			DataGB:        template.dataGB,
 			ValidityDays:  template.validityDays,
 			CoverageScore: coverageScore,
@@ -152,6 +181,31 @@ func isRegionalDestination(destination string) bool {
 	}
 }
 
+func regionalTemplatesFor(destination string) []generatedPlanTemplate {
+	if destination == "EUROPE" {
+		return europeRegionalPlanTemplates
+	}
+
+	return regionalPlanTemplates
+}
+
+func countryTemplatesFor(destination string) []generatedPlanTemplate {
+	if europeanCountry(destination) {
+		return europeCountryPlanTemplates
+	}
+
+	return brazilPlanTemplates
+}
+
+func europeanCountry(destination string) bool {
+	switch destination {
+	case "ALBANIA", "ANDORRA", "AUSTRIA", "BELARUS", "BELGIUM", "BOSNIA AND HERZEGOVINA", "BULGARIA", "CROATIA", "CYPRUS", "CZECH REPUBLIC", "DENMARK", "ESTONIA", "FINLAND", "FRANCE", "GERMANY", "GREECE", "HUNGARY", "ICELAND", "IRELAND", "ITALY", "KOSOVO", "LATVIA", "LIECHTENSTEIN", "LITHUANIA", "LUXEMBOURG", "MALTA", "MOLDOVA", "MONACO", "MONTENEGRO", "NETHERLANDS", "NORTH MACEDONIA", "NORWAY", "POLAND", "PORTUGAL", "ROMANIA", "RUSSIA", "SAN MARINO", "SERBIA", "SLOVAKIA", "SLOVENIA", "SPAIN", "SWEDEN", "SWITZERLAND", "UKRAINE", "UNITED KINGDOM", "VATICAN CITY":
+		return true
+	default:
+		return false
+	}
+}
+
 func displayDestination(destination string) string {
 	return strings.Join(strings.Fields(strings.Title(strings.ToLower(destination))), " ")
 }
@@ -164,8 +218,4 @@ func planID(destinationCode string, dataGB int) string {
 
 func formatGB(dataGB int) string {
 	return strconv.Itoa(dataGB) + "GB"
-}
-
-func roundCents(value float64) float64 {
-	return math.Round(value*100) / 100
 }

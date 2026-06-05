@@ -22,6 +22,7 @@ func TestOptimizeUsesRegionalPlansForRegionDestination(t *testing.T) {
 	result := testOptimizerResult("Europe")
 
 	assertPlanScope(t, result.Selected, "Europe ", "Connecta Regional")
+	assertPlanPrice(t, result.Selected, 35.99)
 	for _, alternative := range result.Alternatives {
 		assertPlanScope(t, alternative, "Europe ", "Connecta Regional")
 	}
@@ -34,6 +35,20 @@ func TestOptimizeUsesGlobalPlansForGlobalDestination(t *testing.T) {
 	for _, alternative := range result.Alternatives {
 		assertPlanScope(t, alternative, "Global ", "Connecta Global")
 	}
+}
+
+func TestOptimizeUsesEuropeanCountryPricesForEuropeanCountry(t *testing.T) {
+	result := testOptimizerResult("Spain")
+
+	assertPlanScope(t, result.Selected, "Spain ", "Connecta Local")
+	assertPlanPrice(t, result.Selected, 15.99)
+}
+
+func TestOptimizeUsesBrazilPricesForBrazil(t *testing.T) {
+	result := testOptimizerResult("Brazil")
+
+	assertPlanScope(t, result.Selected, "Brazil ", "Connecta Local")
+	assertPlanPrice(t, result.Selected, 24.99)
 }
 
 func testOptimizerResult(destination string) domain.OptimizationResult {
@@ -56,5 +71,13 @@ func assertPlanScope(t *testing.T, plan domain.PlanOption, namePrefix string, pr
 	}
 	if plan.Provider != provider {
 		t.Fatalf("expected provider %q, got %q", provider, plan.Provider)
+	}
+}
+
+func assertPlanPrice(t *testing.T, plan domain.PlanOption, price float64) {
+	t.Helper()
+
+	if plan.PriceUSD != price {
+		t.Fatalf("expected price %.2f, got %.2f for %s", price, plan.PriceUSD, plan.Name)
 	}
 }

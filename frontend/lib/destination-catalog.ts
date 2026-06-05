@@ -18,6 +18,18 @@ export type MarketingPlan = {
   }>;
 };
 
+type MarketingPlanTemplate = {
+  data: string;
+  days: string;
+  priceUsd: number;
+  bestChoice?: boolean;
+  validityOptions?: Array<{
+    days: string;
+    dayCount: number;
+    priceUsd: number;
+  }>;
+};
+
 export const regionalDestinations: DestinationOption[] = [
   { name: "Global", region: "Worldwide coverage", kind: "global" },
   { name: "Africa", region: "Regional plan", kind: "regional" },
@@ -264,28 +276,123 @@ export function findDestinationBySlug(slug: string) {
   return destinationOptions.find((destination) => slugifyDestination(destination.name) === slug);
 }
 
-export const marketingPlans: MarketingPlan[] = [
-  { data: "1 GB", days: "7 days", price: "US$3.99" },
-  { data: "3 GB", days: "30 days", price: "US$9.99" },
-  { data: "5 GB", days: "30 days", price: "US$13.99" },
-  { data: "10 GB", days: "30 days", price: "US$24.99", bestChoice: true },
-  { data: "20 GB", days: "30 days", price: "US$39.99" },
+const brazilPlanTemplates: MarketingPlanTemplate[] = [
+  { data: "1 GB", days: "7 days", priceUsd: 3.99 },
+  { data: "3 GB", days: "30 days", priceUsd: 9.99 },
+  { data: "5 GB", days: "30 days", priceUsd: 13.99 },
+  { data: "10 GB", days: "30 days", priceUsd: 24.99, bestChoice: true },
+  { data: "20 GB", days: "30 days", priceUsd: 39.99 },
   {
     data: "Unlimited GB",
     days: "15 days",
-    price: "US$48.99",
+    priceUsd: 48.99,
     validityOptions: [
-      { dayCount: 5, days: "5 days", price: "US$24.99" },
-      { dayCount: 10, days: "10 days", price: "US$34.99" },
-      { dayCount: 15, days: "15 days", price: "US$48.99" },
-      { dayCount: 20, days: "20 days", price: "US$59.99" },
-      { dayCount: 25, days: "25 days", price: "US$65.99" },
-      { dayCount: 30, days: "30 days", price: "US$71.99" }
+      { dayCount: 5, days: "5 days", priceUsd: 24.99 },
+      { dayCount: 10, days: "10 days", priceUsd: 34.99 },
+      { dayCount: 15, days: "15 days", priceUsd: 48.99 },
+      { dayCount: 20, days: "20 days", priceUsd: 59.99 },
+      { dayCount: 25, days: "25 days", priceUsd: 65.99 },
+      { dayCount: 30, days: "30 days", priceUsd: 71.99 }
     ]
   }
 ];
 
+const spainPlanTemplates: MarketingPlanTemplate[] = [
+  { data: "1 GB", days: "7 days", priceUsd: 3.99 },
+  { data: "3 GB", days: "30 days", priceUsd: 6.99 },
+  { data: "5 GB", days: "30 days", priceUsd: 9.99 },
+  { data: "10 GB", days: "30 days", priceUsd: 15.99 },
+  { data: "20 GB", days: "30 days", priceUsd: 22.99, bestChoice: true },
+  unlimitedPlanTemplate(48.99)
+];
+
+const europePlanTemplates: MarketingPlanTemplate[] = [
+  { data: "1 GB", days: "7 days", priceUsd: 4.99 },
+  { data: "3 GB", days: "30 days", priceUsd: 12.49 },
+  { data: "5 GB", days: "30 days", priceUsd: 19.49 },
+  { data: "10 GB", days: "30 days", priceUsd: 35.99 },
+  { data: "50 GB", days: "90 days", priceUsd: 95.99 },
+  unlimitedPlanTemplate(49.99, true)
+];
+
+const regionalPlanTemplates: MarketingPlanTemplate[] = [
+  { data: "1 GB", days: "7 days", priceUsd: 4.99 },
+  { data: "3 GB", days: "30 days", priceUsd: 12.49 },
+  { data: "5 GB", days: "30 days", priceUsd: 19.49 },
+  { data: "10 GB", days: "30 days", priceUsd: 35.99, bestChoice: true },
+  { data: "20 GB", days: "30 days", priceUsd: 59.99 },
+  unlimitedPlanTemplate(49.99)
+];
+
+const globalPlanTemplates: MarketingPlanTemplate[] = [
+  { data: "1 GB", days: "7 days", priceUsd: 5.99 },
+  { data: "3 GB", days: "30 days", priceUsd: 14.99 },
+  { data: "5 GB", days: "30 days", priceUsd: 22.99 },
+  { data: "10 GB", days: "30 days", priceUsd: 39.99 },
+  { data: "20 GB", days: "30 days", priceUsd: 69.99, bestChoice: true },
+  unlimitedPlanTemplate(59.99)
+];
+
+export const marketingPlans: MarketingPlan[] = toMarketingPlans(brazilPlanTemplates);
+
 export function plansForDestination(destination: string) {
-  void destination;
-  return marketingPlans;
+  const option = destinationOptions.find((candidate) => candidate.name.toLowerCase() === destination.trim().toLowerCase());
+  const normalizedDestination = destination.trim().toLowerCase();
+
+  if (normalizedDestination === "spain") {
+    return toMarketingPlans(spainPlanTemplates);
+  }
+
+  if (normalizedDestination === "europe") {
+    return toMarketingPlans(europePlanTemplates);
+  }
+
+  if (option?.kind === "global") {
+    return toMarketingPlans(globalPlanTemplates);
+  }
+
+  if (option?.kind === "regional") {
+    return toMarketingPlans(regionalPlanTemplates);
+  }
+
+  if (option?.region === "Europe") {
+    return toMarketingPlans(spainPlanTemplates);
+  }
+
+  return toMarketingPlans(brazilPlanTemplates);
+}
+
+function unlimitedPlanTemplate(priceUsd: number, bestChoice = false): MarketingPlanTemplate {
+  return {
+    data: "Unlimited GB",
+    days: "15 days",
+    priceUsd,
+    bestChoice,
+    validityOptions: [
+      { dayCount: 5, days: "5 days", priceUsd: Math.max(19.99, priceUsd - 24) },
+      { dayCount: 10, days: "10 days", priceUsd: Math.max(29.99, priceUsd - 14) },
+      { dayCount: 15, days: "15 days", priceUsd },
+      { dayCount: 20, days: "20 days", priceUsd: priceUsd + 11 },
+      { dayCount: 25, days: "25 days", priceUsd: priceUsd + 17 },
+      { dayCount: 30, days: "30 days", priceUsd: priceUsd + 23 }
+    ]
+  };
+}
+
+function toMarketingPlans(templates: MarketingPlanTemplate[]): MarketingPlan[] {
+  return templates.map((template) => ({
+    data: template.data,
+    days: template.days,
+    price: formatUsd(template.priceUsd),
+    bestChoice: template.bestChoice,
+    validityOptions: template.validityOptions?.map((option) => ({
+      dayCount: option.dayCount,
+      days: option.days,
+      price: formatUsd(option.priceUsd)
+    }))
+  }));
+}
+
+function formatUsd(value: number) {
+  return `US$${value.toFixed(2)}`;
 }
