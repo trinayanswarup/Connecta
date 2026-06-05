@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Globe2, ShieldCheck, Smartphone, Wifi } from "lucide-react";
+import { ArrowRight, BadgePercent, Info } from "lucide-react";
 
 import type { DestinationOption, MarketingPlan } from "@/lib/destination-catalog";
 
@@ -18,14 +18,24 @@ export function CountryPlanSelector({ destination, plans, startDate, endDate }: 
     0,
     plans.findIndex((plan) => plan.bestChoice)
   );
+  const tripDays = tripLengthDays(startDate, endDate);
+  const initialUnlimitedDays = nearestUnlimitedValidity(plans, tripDays);
   const [selectedIndex, setSelectedIndex] = useState(initialIndex);
+  const [unlimitedDays, setUnlimitedDays] = useState(initialUnlimitedDays);
   const selectedPlan = plans[selectedIndex] ?? plans[0];
+  const selectedDisplayPlan = planWithSelectedValidity(selectedPlan, unlimitedDays);
+  const activationDate = useMemo(() => {
+    const date = new Date();
+    date.setDate(date.getDate() + 30);
+
+    return date.toLocaleDateString("en-US", { day: "numeric", month: "long" });
+  }, []);
 
   const plannerHref = useMemo(() => {
     const params = new URLSearchParams({
       destination: destination.name,
-      selectedData: selectedPlan.data,
-      selectedValidity: selectedPlan.days
+      selectedData: selectedDisplayPlan.data,
+      selectedValidity: selectedDisplayPlan.days
     });
 
     if (startDate) {
@@ -36,102 +46,130 @@ export function CountryPlanSelector({ destination, plans, startDate, endDate }: 
     }
 
     return `/trip/new?${params.toString()}`;
-  }, [destination.name, endDate, selectedPlan.data, selectedPlan.days, startDate]);
+  }, [destination.name, endDate, selectedDisplayPlan.data, selectedDisplayPlan.days, startDate]);
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_22rem] lg:items-start">
-      <section className="rounded-lg border border-orange-100 bg-white p-4 shadow-[0_24px_90px_-72px_rgba(15,23,42,0.5)] sm:p-6">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-sm font-semibold text-orange-700">Choose your data plan</p>
-            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{destination.name} eSIM plans</h2>
-          </div>
-          <p className="max-w-md text-sm leading-6 text-slate-500">
-            Pick a data size and validity window. You can still compare recommendations before checkout.
-          </p>
-        </div>
-
-        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {plans.map((plan, index) => {
-            const isSelected = selectedIndex === index;
-            return (
-              <button
-                className={`group relative min-h-44 overflow-hidden rounded-lg border bg-white p-5 text-left transition hover:-translate-y-0.5 hover:shadow-[0_18px_60px_-48px_rgba(15,23,42,0.55)] ${
-                  isSelected ? "border-slate-950 ring-1 ring-slate-950" : "border-slate-200 hover:border-orange-200"
-                }`}
-                key={`${plan.data}-${plan.days}`}
-                onClick={() => setSelectedIndex(index)}
-                type="button"
-              >
-                {plan.bestChoice ? (
-                  <span className="absolute inset-x-0 top-0 bg-slate-950 py-2 text-center text-xs font-semibold text-white">Best choice</span>
-                ) : null}
-                <span
-                  className={`flex h-4 w-4 rounded-full border ${
-                    plan.bestChoice ? "mt-8" : ""
-                  } ${isSelected ? "border-slate-950 bg-slate-950" : "border-slate-300"}`}
-                >
-                  {isSelected ? <span className="m-auto h-1.5 w-1.5 rounded-full bg-white" /> : null}
-                </span>
-                <span className="mt-6 block text-2xl font-semibold text-slate-950">{plan.data}</span>
-                <span className="mt-4 block text-base text-slate-500">{plan.days}</span>
-                <span className="mt-5 block text-lg font-semibold text-slate-950">{plan.price}</span>
-                <span className="mt-3 inline-flex rounded-full bg-[#fff4e8] px-3 py-1 text-xs font-medium text-orange-800">
-                  3% in Connecta credits
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </section>
-
-      <aside className="rounded-lg border border-orange-100 bg-[#fffaf4] p-5 shadow-[0_24px_90px_-74px_rgba(15,23,42,0.55)] lg:sticky lg:top-6">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-orange-700">Selected plan</p>
-            <h3 className="mt-2 text-2xl font-semibold text-slate-950">{destination.name}</h3>
-          </div>
-          <span className="grid h-12 w-12 place-items-center rounded-full bg-white text-orange-700 shadow-sm">
-            {destination.kind === "country" ? <Wifi className="h-5 w-5" /> : <Globe2 className="h-5 w-5" />}
-          </span>
-        </div>
-
-        <div className="mt-6 rounded-lg bg-white p-4">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <p className="text-sm text-slate-500">Travel data</p>
-              <p className="mt-1 text-4xl font-semibold text-slate-950">{selectedPlan.data}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-sm text-slate-500">{selectedPlan.days}</p>
-              <p className="mt-1 text-2xl font-semibold text-slate-950">{selectedPlan.price}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-5 grid gap-3 text-sm font-medium text-slate-700">
-          <span className="flex items-center gap-3 rounded-md bg-white px-3 py-3">
-            <CheckCircle2 className="h-4 w-4 text-orange-700" />
-            Install before you leave
-          </span>
-          <span className="flex items-center gap-3 rounded-md bg-white px-3 py-3">
-            <Smartphone className="h-4 w-4 text-orange-700" />
-            Keep your regular number
-          </span>
-          <span className="flex items-center gap-3 rounded-md bg-white px-3 py-3">
-            <ShieldCheck className="h-4 w-4 text-orange-700" />
-            Clear setup guide included
-          </span>
-        </div>
-
+    <section className="rounded-lg bg-white p-4 shadow-[0_24px_90px_-72px_rgba(15,23,42,0.5)] sm:p-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
+          Get an eSIM data plan for {destination.name}
+        </h2>
         <Link
-          className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-slate-950 px-5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-slate-800"
+          className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-slate-950 px-4 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-slate-800"
           href={plannerHref}
         >
-          Continue to planner
+          Continue
           <ArrowRight className="h-4 w-4" />
         </Link>
-      </aside>
-    </div>
+      </div>
+
+      <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {plans.map((plan, index) => {
+          const isSelected = selectedIndex === index;
+          const displayPlan = planWithSelectedValidity(plan, unlimitedDays);
+
+          return (
+            <label
+              className={`relative flex min-h-[170px] cursor-pointer flex-col rounded-lg border bg-white p-4 text-left transition hover:-translate-y-0.5 hover:shadow-[0_18px_60px_-48px_rgba(15,23,42,0.55)] ${
+                isSelected ? "border-slate-950 ring-1 ring-slate-950" : "border-slate-200 hover:border-slate-400"
+              }`}
+              key={`${plan.data}-${plan.days}`}
+            >
+              {plan.bestChoice ? (
+                <span className="absolute inset-x-0 top-0 rounded-t-lg bg-black py-2 text-center text-xs font-semibold text-white">
+                  Best Choice
+                </span>
+              ) : null}
+              <input
+                checked={isSelected}
+                className={`h-4 w-4 accent-black ${plan.bestChoice ? "mt-8" : ""}`}
+                name="selectedPlan"
+                onChange={() => setSelectedIndex(index)}
+                type="radio"
+              />
+              <span className="mt-3 block text-lg font-semibold text-slate-950">{displayPlan.data}</span>
+              {plan.validityOptions ? (
+                <select
+                  className="mt-3 h-9 w-full rounded-md border border-slate-300 bg-white px-3 text-sm font-medium text-slate-950 outline-none transition focus:border-slate-950 focus:ring-2 focus:ring-slate-200"
+                  onChange={(event) => {
+                    setUnlimitedDays(Number(event.target.value));
+                    setSelectedIndex(index);
+                  }}
+                  value={unlimitedDays}
+                >
+                  {plan.validityOptions.map((option) => (
+                    <option key={option.dayCount} value={option.dayCount}>
+                      {option.days}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <span className="mt-3 block text-base text-slate-500">{displayPlan.days}</span>
+              )}
+              <span className="mt-4 block text-lg font-semibold text-slate-950">{displayPlan.price}</span>
+              <span className="mt-2 inline-flex w-fit items-center gap-1 rounded-full bg-[#fff4d6] px-3 py-1 text-[11px] font-medium text-slate-800">
+                <BadgePercent className="h-3 w-3" />
+                3% in Saily credits
+              </span>
+            </label>
+          );
+        })}
+      </div>
+
+      <div className="mt-4 rounded-lg bg-slate-50 px-4 py-4 text-sm text-slate-950">
+        <p className="text-center font-semibold">Can I activate my plan later?</p>
+        <p className="mt-2 flex items-start justify-center gap-2 text-center leading-6">
+          <Info className="mt-0.5 h-4 w-4 shrink-0" />
+          <span>
+            All plans have a 30-day activation period. If you get a plan today and do not activate it until{" "}
+            {activationDate}, it will be activated automatically.
+          </span>
+        </p>
+      </div>
+    </section>
   );
+}
+
+function planWithSelectedValidity(plan: MarketingPlan, selectedDays: number) {
+  const selectedOption = plan.validityOptions?.find((option) => option.dayCount === selectedDays);
+
+  if (!selectedOption) {
+    return plan;
+  }
+
+  return {
+    ...plan,
+    days: selectedOption.days,
+    price: selectedOption.price
+  };
+}
+
+function nearestUnlimitedValidity(plans: MarketingPlan[], tripDays?: number) {
+  const options = plans.find((plan) => plan.validityOptions)?.validityOptions;
+
+  if (!options?.length) {
+    return 15;
+  }
+
+  if (!tripDays) {
+    return options.find((option) => option.dayCount === 15)?.dayCount ?? options[0].dayCount;
+  }
+
+  return options.find((option) => option.dayCount >= tripDays)?.dayCount ?? options[options.length - 1].dayCount;
+}
+
+function tripLengthDays(startDate?: string, endDate?: string) {
+  if (!startDate || !endDate) {
+    return undefined;
+  }
+
+  const start = new Date(`${startDate}T00:00:00`);
+  const end = new Date(`${endDate}T00:00:00`);
+  const difference = end.getTime() - start.getTime();
+
+  if (!Number.isFinite(difference) || difference < 0) {
+    return undefined;
+  }
+
+  return Math.floor(difference / 86_400_000) + 1;
 }

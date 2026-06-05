@@ -11,6 +11,11 @@ export type MarketingPlan = {
   days: string;
   price: string;
   bestChoice?: boolean;
+  validityOptions?: Array<{
+    days: string;
+    dayCount: number;
+    price: string;
+  }>;
 };
 
 export const regionalDestinations: DestinationOption[] = [
@@ -256,12 +261,24 @@ export function findDestinationBySlug(slug: string) {
 }
 
 export const marketingPlans: MarketingPlan[] = [
-  { data: "1 GB", days: "7 days", price: "US$8.99" },
-  { data: "2 GB", days: "15 days", price: "US$16.49" },
-  { data: "5 GB", days: "60 days", price: "US$33.99" },
-  { data: "10 GB", days: "180 days", price: "US$56.99" },
-  { data: "20 GB", days: "365 days", price: "US$66.99", bestChoice: true },
-  { data: "50 GB", days: "365 days", price: "US$129.99" }
+  { data: "1 GB", days: "7 days", price: "US$3.99" },
+  { data: "3 GB", days: "30 days", price: "US$9.99" },
+  { data: "5 GB", days: "30 days", price: "US$13.99" },
+  { data: "10 GB", days: "30 days", price: "US$24.99", bestChoice: true },
+  { data: "20 GB", days: "30 days", price: "US$39.99" },
+  {
+    data: "Unlimited GB",
+    days: "15 days",
+    price: "US$48.99",
+    validityOptions: [
+      { dayCount: 5, days: "5 days", price: "US$24.99" },
+      { dayCount: 10, days: "10 days", price: "US$34.99" },
+      { dayCount: 15, days: "15 days", price: "US$48.99" },
+      { dayCount: 20, days: "20 days", price: "US$59.99" },
+      { dayCount: 25, days: "25 days", price: "US$65.99" },
+      { dayCount: 30, days: "30 days", price: "US$71.99" }
+    ]
+  }
 ];
 
 export function plansForDestination(destination: string) {

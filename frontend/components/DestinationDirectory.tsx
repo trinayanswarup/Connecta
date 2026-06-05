@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Check, ChevronLeft, ChevronRight, Globe2, MapPin, Search } from "lucide-react";
 
-import { destinationHref, plansForDestination, type DestinationKind, type DestinationOption } from "@/lib/destination-catalog";
+import { destinationHref, type DestinationKind, type DestinationOption } from "@/lib/destination-catalog";
 
 type DestinationDirectoryProps = {
   destinations: DestinationOption[];
@@ -124,15 +124,6 @@ export function DestinationDirectory({ destinations }: DestinationDirectoryProps
                 <span className="mt-1 block text-sm text-slate-500">{destination.region}</span>
               </span>
               <ArrowRight className="mt-8 h-4 w-4 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-orange-700" />
-            </div>
-            <div className="relative z-10 mt-5 flex flex-wrap gap-2">
-              {plansForDestination(destination.name)
-                .slice(0, 3)
-                .map((plan) => (
-                  <span className="rounded-full bg-[#fbfaf7] px-2.5 py-1 text-xs font-medium text-slate-600" key={plan.data}>
-                    {plan.data} / {plan.days}
-                  </span>
-                ))}
             </div>
             <div className="absolute bottom-0 right-0 h-16 w-44 rounded-tl-[100%] bg-slate-50" />
           </Link>
