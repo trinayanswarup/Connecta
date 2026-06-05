@@ -13,12 +13,12 @@ const sections: Array<[keyof ConnectivityGuideResult, string, ReactNode]> = [
 
 export function ConnectivityGuide({ guide }: { guide: ConnectivityGuideResult }) {
   return (
-    <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-[0_24px_80px_-64px_rgba(15,23,42,0.5)] sm:p-6">
+    <section className="rounded-[1.5rem] bg-white p-5 shadow-[0_22px_80px_-70px_rgba(15,23,42,0.5)] ring-1 ring-slate-200/80 sm:p-6">
       <h2 className="text-2xl font-semibold text-slate-950">Setup guide</h2>
-      <p className="mt-2 text-sm text-slate-500">What to do before departure and when you arrive.</p>
-      <div className="mt-5 grid gap-4 md:grid-cols-2">
+      <p className="mt-2 text-sm leading-6 text-slate-500">Simple steps for before departure and when you arrive.</p>
+      <div className="mt-6 grid gap-4 md:grid-cols-2">
         {sections.map(([key, label, icon]) => (
-          <div className="rounded-lg bg-[#f1f7ff] p-4" key={key}>
+          <div className="rounded-[1.15rem] bg-[#f4f8ff] p-4" key={key}>
             <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-950">
               <span className="text-orange-700">{icon}</span>
               {label}

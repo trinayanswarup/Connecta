@@ -33,17 +33,17 @@ export function HomeSearch({ defaultDestination = "Japan", variant = "horizontal
       className={
         isHero
           ? "grid max-w-[31.5rem] gap-3 sm:grid-cols-2"
-          : "grid gap-3 rounded-lg border border-slate-200 bg-[#fbfaf7] p-3 sm:grid-cols-[1.12fr_0.74fr_0.74fr_auto] sm:items-end"
+          : "grid gap-4 sm:grid-cols-[1.12fr_0.74fr_0.74fr_auto] sm:items-end"
       }
       onSubmit={handleSubmit}
     >
-      <label className={isHero ? "grid gap-2 text-sm font-semibold text-slate-950 sm:col-span-2" : "grid gap-2 text-sm font-semibold text-slate-800"}>
+      <label className={isHero ? "grid gap-2 text-sm font-semibold text-slate-950 sm:col-span-2" : "grid gap-2 text-sm font-semibold text-slate-700"}>
         {isHero ? "Where are you traveling?" : "Destination"}
         <span
           className={
             isHero
               ? "flex min-h-14 items-center gap-3 rounded-md border border-slate-200 bg-white px-4 shadow-[0_18px_50px_-42px_rgba(15,23,42,0.55)]"
-              : "flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2.5"
+              : "flex min-h-14 items-center gap-3 rounded-full bg-[#fbfaf7] px-4 ring-1 ring-slate-200/80 transition focus-within:ring-4 focus-within:ring-orange-100"
           }
         >
           <MapPin className="h-4 w-4 shrink-0 text-orange-600" />
@@ -66,13 +66,13 @@ export function HomeSearch({ defaultDestination = "Japan", variant = "horizontal
         </span>
       </label>
 
-      <label className={isHero ? "grid gap-2 text-sm font-semibold text-slate-950" : "grid gap-2 text-sm font-semibold text-slate-800"}>
+      <label className={isHero ? "grid gap-2 text-sm font-semibold text-slate-950" : "grid gap-2 text-sm font-semibold text-slate-700"}>
         {isHero ? "When do you leave?" : "Start"}
         <span
           className={
             isHero
               ? "flex min-h-14 items-center gap-3 rounded-md border border-slate-200 bg-white px-4 shadow-[0_18px_50px_-42px_rgba(15,23,42,0.55)]"
-              : "flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2.5"
+              : "flex min-h-14 items-center gap-3 rounded-full bg-[#fbfaf7] px-4 ring-1 ring-slate-200/80 transition focus-within:ring-4 focus-within:ring-orange-100"
           }
         >
           <CalendarDays className="h-4 w-4 shrink-0 text-slate-400" />
@@ -87,13 +87,13 @@ export function HomeSearch({ defaultDestination = "Japan", variant = "horizontal
         </span>
       </label>
 
-      <label className={isHero ? "grid gap-2 text-sm font-semibold text-slate-950" : "grid gap-2 text-sm font-semibold text-slate-800"}>
+      <label className={isHero ? "grid gap-2 text-sm font-semibold text-slate-950" : "grid gap-2 text-sm font-semibold text-slate-700"}>
         {isHero ? "When do you return?" : "End"}
         <span
           className={
             isHero
               ? "flex min-h-14 items-center gap-3 rounded-md border border-slate-200 bg-white px-4 shadow-[0_18px_50px_-42px_rgba(15,23,42,0.55)]"
-              : "flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2.5"
+              : "flex min-h-14 items-center gap-3 rounded-full bg-[#fbfaf7] px-4 ring-1 ring-slate-200/80 transition focus-within:ring-4 focus-within:ring-orange-100"
           }
         >
           <CalendarDays className="h-4 w-4 shrink-0 text-slate-400" />
@@ -111,8 +111,8 @@ export function HomeSearch({ defaultDestination = "Japan", variant = "horizontal
       <button
         className={
           isHero
-            ? "inline-flex h-14 items-center justify-center gap-2 rounded-md bg-[#e94f13] px-5 text-base font-semibold text-white shadow-[0_18px_44px_-32px_rgba(217,76,13,0.45)] transition hover:-translate-y-0.5 hover:bg-[#f26822] sm:col-span-2"
-            : "inline-flex h-11 items-center justify-center gap-2 rounded-md bg-slate-950 px-5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-slate-800"
+            ? "inline-flex h-14 items-center justify-center gap-2 rounded-full bg-[#e94f13] px-5 text-base font-semibold text-white shadow-[0_18px_44px_-32px_rgba(217,76,13,0.45)] transition-colors duration-200 hover:bg-[#f26822] sm:col-span-2"
+            : "inline-flex h-14 cursor-pointer items-center justify-center gap-2 rounded-full bg-slate-950 px-6 text-sm font-semibold text-white shadow-[0_18px_50px_-34px_rgba(15,23,42,0.7)] transition-colors duration-200 hover:bg-slate-800"
         }
         type="submit"
       >

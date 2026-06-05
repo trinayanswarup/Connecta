@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Connecta - Travel eSIM plan finder",
-  description: "Premium travel eSIM recommendations, plan comparison, and setup guidance."
+  description: "Travel eSIM recommendations, plan comparison, and setup guidance."
 };
 
 export default function RootLayout({

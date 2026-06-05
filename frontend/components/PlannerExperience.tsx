@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight } from "lucide-react";
+import { CheckCircle2, Globe2, ShieldCheck, Smartphone } from "lucide-react";
 
 import { AgentStepsTrace } from "@/components/AgentStepsTrace";
 import { ConnectivityGuide } from "@/components/ConnectivityGuide";
@@ -80,27 +80,27 @@ export function PlannerExperience({
 
   return (
     <div
-      className={`grid gap-10 lg:items-start ${resultsMode ? "" : "lg:grid-cols-[0.68fr_1.32fr]"}`}
+      className={`grid gap-10 lg:items-start ${resultsMode ? "" : "lg:grid-cols-[0.82fr_1.18fr]"}`}
       ref={resultsRef}
     >
       {!resultsMode ? (
-        <aside className="lg:sticky lg:top-8">
-          <p className="text-sm font-semibold text-orange-700">Travel eSIM planner</p>
-          <h1 className="mt-4 max-w-2xl text-4xl font-semibold leading-[1.05] text-slate-950 sm:text-5xl">
-            Find a travel data plan before you fly.
+        <aside className="pt-3 lg:sticky lg:top-8">
+          <p className="text-sm font-semibold text-orange-700">Plan your travel data</p>
+          <h1 className="mt-4 max-w-2xl text-4xl font-semibold leading-[1.04] text-slate-950 sm:text-5xl">
+            Find a plan that feels right before you land.
           </h1>
-          <p className="mt-5 max-w-xl text-base leading-7 text-slate-600">
-            A few trip details are enough to compare data, validity, price, and setup steps in one calm place.
+          <p className="mt-6 max-w-xl text-base leading-8 text-slate-600">
+            Tell us where you are going and how you use data. We will keep the choice simple, clear, and ready before departure.
           </p>
-          <div className="mt-8 divide-y divide-slate-200 border-y border-slate-200">
+          <div className="mt-10 grid gap-4">
             {plannerBenefits.map((benefit) => (
-              <div className="grid grid-cols-[auto_1fr] gap-4 py-5" key={benefit.title}>
-                <span className="mt-1 grid h-10 w-10 place-items-center rounded-md bg-[#f6e6d7] text-slate-700">
-                  <ArrowRight className="h-5 w-5" />
+              <div className="grid grid-cols-[auto_1fr] gap-4 rounded-[1.25rem] bg-white/70 p-4 shadow-[0_16px_56px_-48px_rgba(15,23,42,0.45)] ring-1 ring-slate-200/70" key={benefit.title}>
+                <span className="mt-1 grid h-11 w-11 place-items-center rounded-full bg-orange-50 text-orange-700">
+                  {benefit.icon}
                 </span>
                 <div>
-                  <h2 className="text-xl font-semibold text-slate-950">{benefit.title}</h2>
-                  <p className="mt-2 text-sm font-medium leading-6 text-slate-500">{benefit.text}</p>
+                  <h2 className="text-base font-semibold text-slate-950">{benefit.title}</h2>
+                  <p className="mt-1.5 text-sm leading-6 text-slate-500">{benefit.text}</p>
                 </div>
               </div>
             ))}
@@ -109,7 +109,7 @@ export function PlannerExperience({
       ) : null}
 
       <div className="min-w-0">
-        <div className={resultsMode && analysis ? "grid gap-5 lg:grid-cols-[0.9fr_1.1fr] lg:items-start" : "grid gap-10"}>
+        <div className={resultsMode && analysis ? "grid gap-5 lg:grid-cols-[0.78fr_1.22fr] lg:items-start" : "grid gap-10"}>
           <TripForm
             compact={resultsMode}
             initialDestination={initialDestination}
@@ -129,7 +129,7 @@ export function PlannerExperience({
         </div>
 
         {resultsMode && analysis ? (
-          <div className="mt-5 grid gap-5 transition-all duration-700 ease-out">
+          <div className="mt-6 grid gap-6">
             <PlanComparison
               alternatives={analysis.alternatives}
               checkoutHref={otherOption ? checkoutHrefForPlan(otherOption, selectedDestination.name) : undefined}
@@ -141,7 +141,7 @@ export function PlannerExperience({
           </div>
         ) : null}
 
-        <div className={resultsMode && analysis ? "mt-5" : "mt-10"}>
+        <div className={resultsMode && analysis ? "mt-6" : "mt-12"}>
           <CountryPlanSelector
             bestChoiceData={bestChoiceData}
             destination={selectedDestination}
@@ -159,20 +159,24 @@ export function PlannerExperience({
 
 const plannerBenefits = [
   {
+    icon: <Smartphone className="h-5 w-5" />,
     title: "Setup before departure",
     text: "Install your eSIM while you still have Wi-Fi at home."
   },
   {
+    icon: <ShieldCheck className="h-5 w-5" />,
     title: "Avoid roaming surprises",
     text: "See data, validity, and total price before you choose."
   },
   {
+    icon: <CheckCircle2 className="h-5 w-5" />,
     title: "Compare plans clearly",
     text: "Get a best match with alternatives when you want options."
   },
   {
-    title: "Works globally",
-    text: "Plan around one country or a trip that crosses regions."
+    icon: <Globe2 className="h-5 w-5" />,
+    title: "Works in your destination",
+    text: "Plan around one country, a region, or a global trip."
   }
 ];
 

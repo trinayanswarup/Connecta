@@ -56,20 +56,20 @@ export function DestinationDirectory({ destinations }: DestinationDirectoryProps
   const isFullDirectory = isSearching || activeFilter === "all";
 
   return (
-    <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-[0_18px_60px_-48px_rgba(15,23,42,0.45)] sm:p-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <section className="rounded-[1.75rem] bg-white p-5 shadow-[0_24px_90px_-78px_rgba(15,23,42,0.55)] sm:p-8">
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-sm font-semibold text-orange-700">Destination finder</p>
-          <h2 className="mt-2 text-3xl font-semibold text-slate-950">
+          <h2 className="mt-2 text-3xl font-semibold leading-tight text-slate-950">
             {isFullDirectory ? "Explore every country and region" : "Popular eSIM destinations"}
           </h2>
-          <p className="mt-2 text-sm text-slate-500">
+          <p className="mt-3 max-w-xl text-sm leading-6 text-slate-500">
             {isFullDirectory
               ? "Every destination includes multiple data sizes, validity windows, and prices."
               : "Start with 9 popular countries, or search any country, region, or global plan."}
           </p>
         </div>
-        <div className="flex min-w-0 items-center gap-2 rounded-md border border-slate-200 bg-[#fbfaf7] px-3 py-2.5 sm:min-w-80">
+        <div className="flex min-h-12 min-w-0 items-center gap-3 rounded-full bg-[#fbfaf7] px-4 ring-1 ring-slate-200/80 transition focus-within:ring-4 focus-within:ring-orange-100 sm:min-w-80">
           <Search className="h-4 w-4 shrink-0 text-slate-400" />
           <input
             className="min-w-0 flex-1 bg-transparent text-sm text-slate-950 outline-none placeholder:text-slate-400"
@@ -83,12 +83,12 @@ export function DestinationDirectory({ destinations }: DestinationDirectoryProps
         </div>
       </div>
 
-      <div className="mt-6 flex flex-wrap gap-2">
+      <div className="mt-7 flex flex-wrap gap-2.5">
         {filters.map((filter) => {
           const isActive = activeFilter === filter.value;
           return (
             <button
-              className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition ${
+              className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-semibold transition-colors duration-200 ${
                 isActive
                   ? "border-slate-950 bg-slate-950 text-white"
                   : "border-slate-200 bg-white text-slate-700 hover:border-orange-200 hover:bg-orange-50"
@@ -107,15 +107,15 @@ export function DestinationDirectory({ destinations }: DestinationDirectoryProps
         })}
       </div>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {visibleDestinations.map((destination) => (
           <Link
-            className="group relative min-h-28 overflow-hidden rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-orange-200 hover:shadow-[0_18px_60px_-46px_rgba(15,23,42,0.55)]"
+            className="group relative min-h-32 overflow-hidden rounded-[1.25rem] bg-white p-5 shadow-[inset_0_0_0_1px_rgba(226,232,240,0.95),0_16px_44px_-38px_rgba(15,23,42,0.55)] transition-shadow duration-200 hover:shadow-[inset_0_0_0_1px_rgba(251,146,60,0.38),0_22px_70px_-48px_rgba(15,23,42,0.55)]"
             href={destinationHref(destination.name)}
             key={destination.name}
           >
             <div className="relative z-10 flex items-start gap-4">
-              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-orange-50 text-orange-700 shadow-sm">
+              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-orange-50 text-orange-700">
                 {destination.kind === "country" ? <MapPin className="h-5 w-5" /> : <Globe2 className="h-5 w-5" />}
               </span>
               <span className="min-w-0 flex-1">
@@ -123,9 +123,9 @@ export function DestinationDirectory({ destinations }: DestinationDirectoryProps
                 <span className="mt-1 block text-lg font-semibold text-slate-950">{destination.name}</span>
                 <span className="mt-1 block text-sm text-slate-500">{destination.region}</span>
               </span>
-              <ArrowRight className="mt-8 h-4 w-4 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-orange-700" />
+              <ArrowRight className="mt-8 h-4 w-4 text-slate-400 transition-colors duration-200 group-hover:text-orange-700" />
             </div>
-            <div className="absolute bottom-0 right-0 h-16 w-44 rounded-tl-[100%] bg-slate-50" />
+            <div className="absolute bottom-0 right-0 h-16 w-44 rounded-tl-[100%] bg-slate-50/80" />
           </Link>
         ))}
       </div>
@@ -137,9 +137,9 @@ export function DestinationDirectory({ destinations }: DestinationDirectoryProps
       ) : null}
 
       {!isFullDirectory ? (
-        <div className="mt-6 flex justify-center border-t border-slate-100 pt-6">
+        <div className="mt-7 flex justify-center border-t border-slate-100 pt-7">
           <button
-            className="inline-flex items-center justify-center gap-2 rounded-md border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 transition hover:-translate-y-0.5 hover:border-orange-200 hover:bg-orange-50"
+            className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-800 transition-colors duration-200 hover:border-orange-200 hover:bg-orange-50"
             onClick={() => {
               setActiveFilter("all");
               setPage(1);

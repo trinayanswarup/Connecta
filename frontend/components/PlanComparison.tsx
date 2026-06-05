@@ -12,7 +12,7 @@ export function PlanComparison({ selected, alternatives, checkoutHref }: PlanCom
   const option = bestAlternativeForUsage(selected, alternatives);
 
   return (
-    <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-[0_24px_80px_-64px_rgba(15,23,42,0.5)] sm:p-6">
+    <section className="rounded-[1.5rem] bg-white p-5 shadow-[0_24px_86px_-72px_rgba(15,23,42,0.55)] ring-1 ring-slate-200/80 sm:p-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h2 className="text-2xl font-semibold text-slate-950">Other option</h2>
@@ -22,23 +22,23 @@ export function PlanComparison({ selected, alternatives, checkoutHref }: PlanCom
       </div>
 
       <div className="mt-5 grid gap-3">
-        <article className="rounded-lg border border-slate-200 bg-white p-4 transition hover:-translate-y-0.5 hover:border-orange-200 hover:shadow-[0_18px_58px_-48px_rgba(15,23,42,0.45)]">
-          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <article className="rounded-[1.25rem] bg-[#fbfaf7] p-4 ring-1 ring-slate-200/80 transition-shadow duration-200 hover:ring-orange-200">
+          <div className="grid gap-5 md:grid-cols-[1fr_auto_auto] md:items-center">
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <h3 className="font-semibold text-slate-950">{option.name}</h3>
+                <h3 className="text-lg font-semibold text-slate-950">{option.name}</h3>
               </div>
               <p className="mt-1 text-sm text-slate-500">{option.provider}</p>
               <p className="mt-3 text-sm leading-6 text-slate-600">{option.tradeoff}</p>
             </div>
-            <div className="grid grid-cols-3 gap-2 text-sm md:min-w-64">
+            <div className="grid grid-cols-3 gap-2 text-sm md:min-w-72">
               <PlanMetric label="Data" value={`${option.dataGb} GB`} />
               <PlanMetric label="Price" value={`$${option.priceUsd.toFixed(2)}`} />
               <PlanMetric label="Valid" value={`${option.validityDays}d`} />
             </div>
             {checkoutHref ? (
               <Link
-                className="inline-flex h-9 items-center justify-center rounded-md border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-800 transition hover:border-orange-200 hover:bg-orange-50 md:self-end"
+                className="inline-flex h-10 items-center justify-center rounded-full bg-white px-4 text-sm font-semibold text-slate-800 shadow-sm ring-1 ring-slate-200 transition-colors duration-200 hover:bg-orange-50 hover:ring-orange-200"
                 href={checkoutHref}
               >
                 Choose
@@ -72,7 +72,7 @@ export function bestAlternativeForUsage(selected: PlanOption, alternatives: Plan
 
 function PlanMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-md border border-slate-200 bg-[#fbfaf7] p-3">
+    <div className="rounded-[0.9rem] bg-white p-3 ring-1 ring-slate-200/80">
       <div className="text-xs text-slate-500">{label}</div>
       <div className="mt-1 font-semibold text-slate-950">{value}</div>
     </div>

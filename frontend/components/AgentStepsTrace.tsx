@@ -4,18 +4,18 @@ import type { AgentStep } from "@/lib/graphql";
 
 export function AgentStepsTrace({ steps }: { steps: AgentStep[] }) {
   return (
-    <details className="group rounded-lg border border-slate-200 bg-white p-5 shadow-[0_24px_80px_-64px_rgba(15,23,42,0.5)] sm:p-6">
+    <details className="group rounded-[1.25rem] bg-white p-5 shadow-[0_18px_70px_-62px_rgba(15,23,42,0.45)] ring-1 ring-slate-200/80 sm:p-6">
       <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold text-slate-950">How we chose this plan</h2>
-          <p className="mt-2 text-sm text-slate-500">A quick look at the checks behind your recommendation.</p>
+          <h2 className="text-lg font-semibold text-slate-950">How we chose this plan</h2>
+          <p className="mt-1.5 text-sm text-slate-500">A quick look at the checks behind your recommendation.</p>
         </div>
         <ChevronDown className="h-5 w-5 shrink-0 text-slate-400 transition group-open:rotate-180" />
       </summary>
 
       <div className="mt-5 grid gap-3">
         {steps.map((step, index) => (
-          <div className="flex gap-3 rounded-lg bg-[#fbfaf7] p-4" key={`${step.name}-${index}`}>
+          <div className="flex gap-3 rounded-[1rem] bg-[#fbfaf7] p-4" key={`${step.name}-${index}`}>
             <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-orange-50 text-orange-700">
               <CheckCircle2 className="h-4 w-4" />
             </span>
@@ -39,7 +39,7 @@ function friendlyStepName(name: string) {
     case "Recommendation summary":
       return "Prepared the recommendation";
     case "AI guide generation":
-      return "Created setup guidance";
+      return "Prepared setup guidance";
     case "Save trip":
       return "Made the result ready to view";
     default:

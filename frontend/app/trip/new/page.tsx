@@ -23,17 +23,17 @@ export default async function NewTripPage({ searchParams }: NewTripPageProps) {
   return (
     <main className="min-h-screen bg-[#fbfaf7] px-5 py-6 text-slate-950 sm:px-8">
       <div className="mx-auto max-w-7xl">
-        <nav className="mb-10 flex items-center justify-between border-b border-slate-200/80 pb-5">
+        <nav className="mb-12 flex items-center justify-between">
           <Link className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-slate-950" href="/">
             <ArrowLeft className="h-4 w-4" />
             Connecta
           </Link>
-          <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 shadow-sm">
+          <span className="rounded-full bg-white px-4 py-2 text-xs font-medium text-slate-600 shadow-[0_14px_42px_-34px_rgba(15,23,42,0.65)] ring-1 ring-slate-200/80">
             Travel data plans
           </span>
         </nav>
 
-        <section className="pb-12 pt-4 lg:pb-16">
+        <section className="pb-16 pt-2 lg:pb-24">
           <PlannerExperience
             initialDestination={initialDestination}
             initialEndDate={initialEndDate}
