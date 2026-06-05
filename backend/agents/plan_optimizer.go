@@ -3,6 +3,7 @@ package agents
 import (
 	"math"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/connecta/connecta/backend/internal/domain"
@@ -13,15 +14,18 @@ type PlanOptimizer struct {
 	plans []plans.Plan
 }
 
+const (
+	countryPriceMultiplier  = 1.00
+	regionalPriceMultiplier = 1.25
+	globalPriceMultiplier   = 1.48
+)
+
 func NewPlanOptimizer(mockPlans []plans.Plan) PlanOptimizer {
 	return PlanOptimizer{plans: mockPlans}
 }
 
 func (o PlanOptimizer) Optimize(input domain.TripInput, estimate domain.UsageEstimate) domain.OptimizationResult {
 	candidates := o.candidatesFor(input.Destination)
-	if len(candidates) == 0 {
-		candidates = o.plans
-	}
 
 	scored := make([]scoredPlan, 0, len(candidates))
 	for _, plan := range candidates {
@@ -53,13 +57,15 @@ type scoredPlan struct {
 
 func (o PlanOptimizer) candidatesFor(destination string) []plans.Plan {
 	normalized := normalizeDestination(destination)
-	candidates := make([]plans.Plan, 0, len(o.plans))
-	for _, plan := range o.plans {
-		if plan.Destination == "GLOBAL" || plan.Destination == normalized || regionalMatch(normalized, plan.Destination) {
-			candidates = append(candidates, plan)
-		}
+
+	switch {
+	case normalized == "GLOBAL":
+		return generatedPlans("Global", "GLOBAL", "Connecta Global", 0.90, globalPriceMultiplier)
+	case isRegionalDestination(normalized):
+		return generatedPlans(displayDestination(normalized), normalized, "Connecta Regional", 0.91, regionalPriceMultiplier)
+	default:
+		return generatedPlans(displayDestination(normalized), normalized, "Connecta Local", 0.94, countryPriceMultiplier)
 	}
-	return candidates
 }
 
 func scorePlan(input domain.TripInput, estimate domain.UsageEstimate, plan plans.Plan) float64 {
@@ -101,14 +107,65 @@ func normalizeDestination(destination string) string {
 	return strings.ToUpper(strings.TrimSpace(destination))
 }
 
-func regionalMatch(destination string, region string) bool {
-	if region != "EUROPE" {
-		return false
+func generatedPlans(label string, destinationCode string, provider string, coverageScore float64, priceMultiplier float64) []plans.Plan {
+	if strings.TrimSpace(label) == "" {
+		label = "Travel"
 	}
+
+	templates := []struct {
+		dataGB       float64
+		validityDays int
+		priceUSD     float64
+	}{
+		{dataGB: 1, validityDays: 7, priceUSD: 3.99},
+		{dataGB: 3, validityDays: 30, priceUSD: 9.99},
+		{dataGB: 5, validityDays: 30, priceUSD: 13.99},
+		{dataGB: 10, validityDays: 30, priceUSD: 24.99},
+		{dataGB: 20, validityDays: 30, priceUSD: 39.99},
+		{dataGB: 50, validityDays: 30, priceUSD: 59.00},
+	}
+
+	generated := make([]plans.Plan, 0, len(templates))
+	for _, template := range templates {
+		dataLabel := int(template.dataGB)
+		generated = append(generated, plans.Plan{
+			ID:            planID(destinationCode, dataLabel),
+			Provider:      provider,
+			Name:          label + " " + formatGB(dataLabel),
+			Destination:   destinationCode,
+			PriceUSD:      roundCents(template.priceUSD * priceMultiplier),
+			DataGB:        template.dataGB,
+			ValidityDays:  template.validityDays,
+			CoverageScore: coverageScore,
+		})
+	}
+
+	return generated
+}
+
+func isRegionalDestination(destination string) bool {
 	switch destination {
-	case "POLAND", "SPAIN", "FRANCE", "GERMANY", "ITALY", "PORTUGAL", "NETHERLANDS":
+	case "AFRICA", "ASIA", "EUROPE", "NORTH AMERICA", "SOUTH AMERICA", "OCEANIA", "MIDDLE EAST", "CARIBBEAN":
 		return true
 	default:
 		return false
 	}
+}
+
+func displayDestination(destination string) string {
+	return strings.Join(strings.Fields(strings.Title(strings.ToLower(destination))), " ")
+}
+
+func planID(destinationCode string, dataGB int) string {
+	slug := strings.ToLower(destinationCode)
+	slug = strings.ReplaceAll(slug, " ", "-")
+	return slug + "-" + formatGB(dataGB)
+}
+
+func formatGB(dataGB int) string {
+	return strconv.Itoa(dataGB) + "GB"
+}
+
+func roundCents(value float64) float64 {
+	return math.Round(value*100) / 100
 }

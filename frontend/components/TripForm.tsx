@@ -1,7 +1,7 @@
 "use client";
 
 import type { ChangeEvent, FormEvent, ReactNode } from "react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AlertCircle, ArrowRight, CalendarDays, Loader2, MapPin, SignalHigh } from "lucide-react";
 
 import { AgentStepsTrace } from "@/components/AgentStepsTrace";
@@ -60,6 +60,15 @@ export function TripForm({
   const [analysis, setAnalysis] = useState<TripAnalysis | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const resultsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!analysis) {
+      return;
+    }
+
+    resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [analysis]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -221,7 +230,7 @@ export function TripForm({
       {isSubmitting ? <LoadingState /> : null}
 
       {analysis ? (
-        <div className="grid gap-5">
+        <div className="grid gap-5 scroll-mt-6" ref={resultsRef}>
           <RecommendationCard analysis={analysis} />
           {analysis.connectivityGuide ? <ConnectivityGuide guide={analysis.connectivityGuide} /> : null}
           <PlanComparison selected={analysis.selectedPlan} alternatives={analysis.alternatives} />
