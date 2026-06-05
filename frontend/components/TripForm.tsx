@@ -124,7 +124,7 @@ export function TripForm({
   return (
     <div className="grid gap-8" id="planner">
       <section
-        className={`relative overflow-hidden rounded-lg transition-all duration-500 ease-out ${
+        className={`relative overflow-hidden rounded-lg ${
           compact ? "border border-slate-200 bg-white p-5 shadow-sm sm:p-6" : "bg-[#fff4e8] p-4 shadow-[0_30px_100px_-76px_rgba(15,23,42,0.55)] sm:p-6"
         }`}
       >
@@ -135,7 +135,7 @@ export function TripForm({
           </>
         ) : null}
         <div
-          className={`relative rounded-lg transition-all duration-500 ease-out ${
+          className={`relative rounded-lg ${
             compact ? "bg-white" : "bg-white p-5 shadow-[0_24px_76px_-62px_rgba(15,23,42,0.55)] sm:p-7"
           }`}
         >

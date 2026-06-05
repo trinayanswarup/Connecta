@@ -36,6 +36,7 @@ export function PlannerExperience({
     endDate: initialEndDate
   });
   const [analysis, setAnalysis] = useState<TripAnalysis | null>(null);
+  const [bestChoiceData, setBestChoiceData] = useState<string | undefined>(undefined);
   const [resultsMode, setResultsMode] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
 
@@ -62,49 +63,47 @@ export function PlannerExperience({
 
   function handleAnalysisReady(nextAnalysis: TripAnalysis) {
     setAnalysis(nextAnalysis);
+    setBestChoiceData(`${nextAnalysis.selectedPlan.dataGb} GB`);
     setResultsMode(true);
   }
 
   function handleManualContinue(plan: MarketingPlan) {
     setAnalysis(createManualAnalysis(plan, plans, selectedDestination.name, selectedDestination.kind));
+    setBestChoiceData(plan.data);
     setResultsMode(true);
   }
 
   return (
     <div
-      className={`grid gap-10 transition-all duration-700 ease-out lg:items-start ${
-        resultsMode ? "lg:grid-cols-[0fr_1fr]" : "lg:grid-cols-[0.68fr_1.32fr]"
-      }`}
+      className={`grid gap-10 lg:items-start ${resultsMode ? "" : "lg:grid-cols-[0.68fr_1.32fr]"}`}
       ref={resultsRef}
     >
-      <aside
-        className={`overflow-hidden transition-all duration-700 ease-out lg:sticky lg:top-8 ${
-          resultsMode ? "max-h-0 -translate-x-4 opacity-0 lg:max-w-0" : "max-h-[52rem] translate-x-0 opacity-100"
-        }`}
-      >
-        <p className="text-sm font-semibold text-orange-700">Travel eSIM planner</p>
-        <h1 className="mt-4 max-w-2xl text-4xl font-semibold leading-[1.05] text-slate-950 sm:text-5xl">
-          Find a travel data plan before you fly.
-        </h1>
-        <p className="mt-5 max-w-xl text-base leading-7 text-slate-600">
-          A few trip details are enough to compare data, validity, price, and setup steps in one calm place.
-        </p>
-        <div className="mt-8 divide-y divide-slate-200 border-y border-slate-200">
-          {plannerBenefits.map((benefit) => (
-            <div className="grid grid-cols-[auto_1fr] gap-4 py-5" key={benefit.title}>
-              <span className="mt-1 grid h-10 w-10 place-items-center rounded-md bg-[#f6e6d7] text-slate-700">
-                <ArrowRight className="h-5 w-5" />
-              </span>
-              <div>
-                <h2 className="text-xl font-semibold text-slate-950">{benefit.title}</h2>
-                <p className="mt-2 text-sm font-medium leading-6 text-slate-500">{benefit.text}</p>
+      {!resultsMode ? (
+        <aside className="lg:sticky lg:top-8">
+          <p className="text-sm font-semibold text-orange-700">Travel eSIM planner</p>
+          <h1 className="mt-4 max-w-2xl text-4xl font-semibold leading-[1.05] text-slate-950 sm:text-5xl">
+            Find a travel data plan before you fly.
+          </h1>
+          <p className="mt-5 max-w-xl text-base leading-7 text-slate-600">
+            A few trip details are enough to compare data, validity, price, and setup steps in one calm place.
+          </p>
+          <div className="mt-8 divide-y divide-slate-200 border-y border-slate-200">
+            {plannerBenefits.map((benefit) => (
+              <div className="grid grid-cols-[auto_1fr] gap-4 py-5" key={benefit.title}>
+                <span className="mt-1 grid h-10 w-10 place-items-center rounded-md bg-[#f6e6d7] text-slate-700">
+                  <ArrowRight className="h-5 w-5" />
+                </span>
+                <div>
+                  <h2 className="text-xl font-semibold text-slate-950">{benefit.title}</h2>
+                  <p className="mt-2 text-sm font-medium leading-6 text-slate-500">{benefit.text}</p>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      </aside>
+            ))}
+          </div>
+        </aside>
+      ) : null}
 
-      <div className="min-w-0 transition-all duration-700 ease-out">
+      <div className="min-w-0">
         <div className={resultsMode && analysis ? "grid gap-5 lg:grid-cols-[0.9fr_1.1fr] lg:items-start" : "grid gap-10"}>
           <TripForm
             compact={resultsMode}
@@ -130,6 +129,7 @@ export function PlannerExperience({
 
         <div className={resultsMode && analysis ? "mt-5" : "mt-10"}>
           <CountryPlanSelector
+            bestChoiceData={bestChoiceData}
             destination={selectedDestination}
             endDate={tripDetails.endDate}
             onContinue={handleManualContinue}

@@ -7,6 +7,7 @@ import { ArrowRight, BadgePercent, Info } from "lucide-react";
 import type { DestinationOption, MarketingPlan } from "@/lib/destination-catalog";
 
 type CountryPlanSelectorProps = {
+  bestChoiceData?: string;
   destination: DestinationOption;
   onContinue?: (plan: MarketingPlan) => void;
   plans: MarketingPlan[];
@@ -15,14 +16,16 @@ type CountryPlanSelectorProps = {
   title?: string;
 };
 
-export function CountryPlanSelector({ destination, onContinue, plans, startDate, endDate, title }: CountryPlanSelectorProps) {
-  const initialIndex = Math.max(
+export function CountryPlanSelector({ bestChoiceData, destination, onContinue, plans, startDate, endDate, title }: CountryPlanSelectorProps) {
+  const bestChoiceIndex = Math.max(
     0,
-    plans.findIndex((plan) => plan.bestChoice)
+    plans.findIndex((plan) => matchesPlanData(plan.data, bestChoiceData)) >= 0
+      ? plans.findIndex((plan) => matchesPlanData(plan.data, bestChoiceData))
+      : plans.findIndex((plan) => plan.bestChoice)
   );
   const tripDays = tripLengthDays(startDate, endDate);
   const initialUnlimitedDays = nearestUnlimitedValidity(plans, tripDays);
-  const [selectedIndex, setSelectedIndex] = useState(initialIndex);
+  const [selectedIndex, setSelectedIndex] = useState(bestChoiceIndex);
   const [unlimitedDays, setUnlimitedDays] = useState(initialUnlimitedDays);
   const selectedPlan = plans[selectedIndex] ?? plans[0];
   const selectedDisplayPlan = planWithSelectedValidity(selectedPlan, unlimitedDays);
@@ -34,9 +37,9 @@ export function CountryPlanSelector({ destination, onContinue, plans, startDate,
   }, []);
 
   useEffect(() => {
-    setSelectedIndex(initialIndex);
+    setSelectedIndex(bestChoiceIndex);
     setUnlimitedDays(initialUnlimitedDays);
-  }, [destination.name, initialIndex, initialUnlimitedDays]);
+  }, [bestChoiceData, bestChoiceIndex, destination.name, initialUnlimitedDays]);
 
   const plannerHref = useMemo(() => {
     const params = new URLSearchParams({
@@ -84,6 +87,7 @@ export function CountryPlanSelector({ destination, onContinue, plans, startDate,
       <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {plans.map((plan, index) => {
           const isSelected = selectedIndex === index;
+          const isBestChoice = bestChoiceIndex === index;
           const displayPlan = planWithSelectedValidity(plan, unlimitedDays);
 
           return (
@@ -93,14 +97,14 @@ export function CountryPlanSelector({ destination, onContinue, plans, startDate,
               }`}
               key={`${plan.data}-${plan.days}`}
             >
-              {plan.bestChoice ? (
+              {isBestChoice ? (
                 <span className="absolute inset-x-0 top-0 rounded-t-lg bg-black py-2 text-center text-xs font-semibold text-white">
                   Best Choice
                 </span>
               ) : null}
               <input
                 checked={isSelected}
-                className={`h-4 w-4 accent-black ${plan.bestChoice ? "mt-8" : ""}`}
+                className={`h-4 w-4 accent-black ${isBestChoice ? "mt-8" : ""}`}
                 name="selectedPlan"
                 onChange={() => setSelectedIndex(index)}
                 type="radio"
@@ -160,6 +164,14 @@ function planWithSelectedValidity(plan: MarketingPlan, selectedDays: number) {
     days: selectedOption.days,
     price: selectedOption.price
   };
+}
+
+function matchesPlanData(planData: string, bestChoiceData?: string) {
+  if (!bestChoiceData) {
+    return false;
+  }
+
+  return planData.replace(/\s+/g, "").toLowerCase() === bestChoiceData.replace(/\s+/g, "").toLowerCase();
 }
 
 function nearestUnlimitedValidity(plans: MarketingPlan[], tripDays?: number) {
