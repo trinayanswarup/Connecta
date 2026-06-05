@@ -17,7 +17,7 @@ import {
   type UsageInput,
   type UsageLevel
 } from "@/lib/graphql";
-import { destinationOptions } from "@/lib/destination-catalog";
+import { destinationOptions, plansForDestination, type DestinationKind, type MarketingPlan } from "@/lib/destination-catalog";
 import { validateTripInput } from "@/lib/validations";
 
 const usageLabels: Array<[keyof UsageInput, string]> = [
@@ -86,7 +86,7 @@ export function TripForm({
     try {
       validateTripInput(input);
       const result = await analyzeTrip(input);
-      setAnalysis(result);
+      setAnalysis(scopeAnalysisToDestination(result, destination));
     } catch {
       setError("We could not find a plan right now. Please check your trip details and try again.");
     } finally {
@@ -285,5 +285,98 @@ function formatEnum(value: string) {
     .split("_")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
+}
+
+function scopeAnalysisToDestination(analysis: TripAnalysis, destination: string): TripAnalysis {
+  const scopedPlans = finitePlansForDestination(destination);
+
+  if (scopedPlans.length === 0) {
+    return analysis;
+  }
+
+  const destinationOption = destinationOptions.find(
+    (option) => option.name.toLowerCase() === destination.trim().toLowerCase()
+  );
+  const destinationName = destinationOption?.name ?? destination.trim();
+  const selectedPlan = bestPlanForRecommendation(scopedPlans, analysis.recommendedGb);
+  const alternatives = scopedPlans
+    .filter((plan) => plan.id !== selectedPlan.id)
+    .sort((first, second) => Math.abs(first.dataGb - analysis.recommendedGb) - Math.abs(second.dataGb - analysis.recommendedGb))
+    .slice(0, 3);
+
+  return {
+    ...analysis,
+    selectedPlan,
+    alternatives,
+    recommendation: `${selectedPlan.name} is the best fit for this trip: it covers the ${Math.round(
+      analysis.recommendedGb
+    )} GB recommended allowance with ${Math.round(selectedPlan.dataGb)} GB available for ${destinationName}.`
+  };
+}
+
+function finitePlansForDestination(destination: string) {
+  const destinationOption = destinationOptions.find(
+    (option) => option.name.toLowerCase() === destination.trim().toLowerCase()
+  );
+  const destinationName = destinationOption?.name ?? destination.trim();
+  const provider = providerForDestination(destinationOption?.kind);
+
+  return plansForDestination(destinationName)
+    .map((plan) => toPlanOption(plan, destinationName, provider))
+    .filter((plan): plan is PlanOptionFromMarketing => plan !== null)
+    .sort((first, second) => first.dataGb - second.dataGb);
+}
+
+type PlanOptionFromMarketing = TripAnalysis["selectedPlan"];
+
+function toPlanOption(plan: MarketingPlan, destination: string, provider: string): PlanOptionFromMarketing | null {
+  const dataGb = parseDataGb(plan.data);
+
+  if (dataGb === null) {
+    return null;
+  }
+
+  return {
+    id: `${destination.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${dataGb}gb`,
+    provider,
+    name: `${destination} ${dataGb}GB`,
+    priceUsd: parseUsd(plan.price),
+    dataGb,
+    validityDays: parseDays(plan.days),
+    tradeoff: "Best balance of price and safety margin."
+  };
+}
+
+function bestPlanForRecommendation(plans: PlanOptionFromMarketing[], recommendedGb: number) {
+  return plans.find((plan) => plan.dataGb >= recommendedGb) ?? plans[plans.length - 1];
+}
+
+function providerForDestination(kind?: DestinationKind) {
+  if (kind === "global") {
+    return "Connecta Global";
+  }
+  if (kind === "regional") {
+    return "Connecta Regional";
+  }
+
+  return "Connecta Local";
+}
+
+function parseDataGb(value: string) {
+  const match = value.match(/^(\d+(?:\.\d+)?)\s*GB$/i);
+
+  return match ? Number(match[1]) : null;
+}
+
+function parseDays(value: string) {
+  const match = value.match(/^(\d+)/);
+
+  return match ? Number(match[1]) : 30;
+}
+
+function parseUsd(value: string) {
+  const parsed = Number(value.replace(/[^0-9.]/g, ""));
+
+  return Number.isFinite(parsed) ? parsed : 0;
 }
 
