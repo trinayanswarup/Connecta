@@ -93,7 +93,7 @@ export function TripForm({
     try {
       validateTripInput(input);
       const result = await analyzeTrip(input);
-      const scopedResult = scopeAnalysisToDestination(result, destination);
+      const scopedResult = scopeAnalysisToDestination(result, input);
       setAnalysis(scopedResult);
       onAnalysisReady?.(scopedResult);
     } catch {
@@ -317,31 +317,138 @@ function formatEnum(value: string) {
     .join(" ");
 }
 
-function scopeAnalysisToDestination(analysis: TripAnalysis, destination: string): TripAnalysis {
+function scopeAnalysisToDestination(analysis: TripAnalysis, input: TripInput): TripAnalysis {
+  const destination = input.destination;
   const scopedPlans = finitePlansForDestination(destination);
+  const estimate = estimateUsageForInput(input);
 
   if (scopedPlans.length === 0) {
-    return analysis;
+    return {
+      ...analysis,
+      estimatedGb: estimate.estimatedGb,
+      recommendedGb: estimate.recommendedGb,
+      confidence: estimate.confidence,
+      usageBreakdown: estimate.usageBreakdown
+    };
   }
 
   const destinationOption = destinationOptions.find(
     (option) => option.name.toLowerCase() === destination.trim().toLowerCase()
   );
   const destinationName = destinationOption?.name ?? destination.trim();
-  const selectedPlan = bestPlanForRecommendation(scopedPlans, analysis.recommendedGb);
+  const selectedPlan = bestPlanForRecommendation(scopedPlans, estimate.recommendedGb);
   const alternatives = scopedPlans
     .filter((plan) => plan.id !== selectedPlan.id)
-    .sort((first, second) => Math.abs(first.dataGb - analysis.recommendedGb) - Math.abs(second.dataGb - analysis.recommendedGb))
+    .sort((first, second) => Math.abs(first.dataGb - estimate.recommendedGb) - Math.abs(second.dataGb - estimate.recommendedGb))
     .slice(0, 3);
 
   return {
     ...analysis,
+    estimatedGb: estimate.estimatedGb,
+    recommendedGb: estimate.recommendedGb,
+    confidence: estimate.confidence,
+    usageBreakdown: estimate.usageBreakdown,
     selectedPlan,
     alternatives,
     recommendation: `${selectedPlan.name} is the best fit for this trip: it covers the ${Math.round(
-      analysis.recommendedGb
+      estimate.recommendedGb
     )} GB recommended allowance with ${Math.round(selectedPlan.dataGb)} GB available for ${destinationName}.`
   };
+}
+
+function estimateUsageForInput(input: TripInput) {
+  const days = tripDays(input.startDate, input.endDate);
+  const travelerMultiplier = multiplierForTraveler(input.travelerType);
+  const businessMultiplier = input.travelerType === "BUSINESS" ? 1.25 : 1;
+
+  const usageBreakdown = {
+    maps: round1(dailyGb(input.usage.maps, 0.1, 0.25, 0.45) * days * travelerMultiplier),
+    streaming: round1(dailyGb(input.usage.streaming, 0.2, 0.9, 2.2) * days * travelerMultiplier),
+    socialMedia: round1(dailyGb(input.usage.socialMedia, 0.2, 0.7, 1.5) * days * travelerMultiplier),
+    videoCalls: round1(dailyGb(input.usage.videoCalls, 0.25, 1.1, 2.5) * days * travelerMultiplier * businessMultiplier),
+    hotspot: round1(dailyGb(input.usage.hotspot, 0.2, 1, 2.7) * days * travelerMultiplier),
+    work: round1(dailyGb(input.usage.work, 0.25, 0.8, 1.8) * days * travelerMultiplier * businessMultiplier)
+  };
+  const estimatedGb = round1(Object.values(usageBreakdown).reduce((sum, value) => sum + value, 0));
+  const recommendedGb = Math.ceil(estimatedGb * safetyMargin(input.travelerType, days));
+
+  return {
+    estimatedGb,
+    recommendedGb,
+    confidence: confidenceForInput(input, days),
+    usageBreakdown
+  };
+}
+
+function tripDays(startDate: string, endDate: string) {
+  const start = new Date(`${startDate}T00:00:00`);
+  const end = new Date(`${endDate}T00:00:00`);
+  const millisecondsPerDay = 24 * 60 * 60 * 1000;
+  const days = Math.floor((end.getTime() - start.getTime()) / millisecondsPerDay) + 1;
+
+  return Number.isFinite(days) && days > 0 ? days : 1;
+}
+
+function dailyGb(level: UsageLevel, light: number, moderate: number, heavy: number) {
+  if (level === "NONE") {
+    return 0;
+  }
+  if (level === "LIGHT") {
+    return light;
+  }
+  if (level === "HEAVY") {
+    return heavy;
+  }
+
+  return moderate;
+}
+
+function multiplierForTraveler(travelerType: TravelerType) {
+  if (travelerType === "COUPLE") {
+    return 1.55;
+  }
+  if (travelerType === "FAMILY") {
+    return 2.35;
+  }
+  if (travelerType === "BUSINESS") {
+    return 1.15;
+  }
+
+  return 1;
+}
+
+function safetyMargin(travelerType: TravelerType, days: number) {
+  let margin = 1.18;
+
+  if (days >= 10) {
+    margin += 0.07;
+  }
+  if (travelerType === "BUSINESS") {
+    margin += 0.05;
+  }
+
+  return margin;
+}
+
+function confidenceForInput(input: TripInput, days: number) {
+  let score = 0.86;
+
+  if (days > 14) {
+    score -= 0.05;
+  }
+  if (input.usage.hotspot === "HEAVY" || input.usage.videoCalls === "HEAVY") {
+    score -= 0.04;
+  }
+
+  return round2(Math.max(score, 0.72));
+}
+
+function round1(value: number) {
+  return Math.round(value * 10) / 10;
+}
+
+function round2(value: number) {
+  return Math.round(value * 100) / 100;
 }
 
 function finitePlansForDestination(destination: string) {
