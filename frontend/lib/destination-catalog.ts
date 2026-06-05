@@ -252,8 +252,12 @@ export function destinationHref(destination: string, params: Record<string, stri
     }
   });
 
-  const query = searchParams.toString();
-  return `/esim/${slugifyDestination(destination)}${query ? `?${query}` : ""}`;
+  if (destination) {
+    searchParams.set("destination", destination);
+  }
+
+  const plannerQuery = searchParams.toString();
+  return `/trip/new${plannerQuery ? `?${plannerQuery}` : ""}`;
 }
 
 export function findDestinationBySlug(slug: string) {

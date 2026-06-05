@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
-import { TripForm } from "@/components/TripForm";
+import { PlannerExperience } from "@/components/PlannerExperience";
 
 type NewTripPageProps = {
   searchParams?: Promise<{
@@ -57,7 +57,7 @@ export default async function NewTripPage({ searchParams }: NewTripPageProps) {
             </div>
           </div>
 
-          <TripForm
+          <PlannerExperience
             initialDestination={initialDestination}
             initialEndDate={initialEndDate}
             initialStartDate={initialStartDate}

@@ -44,12 +44,14 @@ type TripFormProps = {
   initialDestination?: string;
   initialStartDate?: string;
   initialEndDate?: string;
+  onTripDetailsChange?: (details: { destination: string; startDate: string; endDate: string }) => void;
 };
 
 export function TripForm({
   initialDestination = "Japan",
   initialStartDate = "2026-06-10",
-  initialEndDate = "2026-06-17"
+  initialEndDate = "2026-06-17",
+  onTripDetailsChange
 }: TripFormProps) {
   const [destination, setDestination] = useState(initialDestination);
   const [startDate, setStartDate] = useState(initialStartDate);
@@ -92,6 +94,16 @@ export function TripForm({
     };
   }
 
+  function updateTripDetails(nextDetails: { destination?: string; startDate?: string; endDate?: string }) {
+    const updatedDetails = {
+      destination: nextDetails.destination ?? destination,
+      startDate: nextDetails.startDate ?? startDate,
+      endDate: nextDetails.endDate ?? endDate
+    };
+
+    onTripDetailsChange?.(updatedDetails);
+  }
+
   return (
     <div className="grid gap-8" id="planner">
       <section className="relative overflow-hidden rounded-lg bg-[#fff4e8] p-4 shadow-[0_30px_100px_-76px_rgba(15,23,42,0.55)] sm:p-6">
@@ -112,7 +124,10 @@ export function TripForm({
                   className={inputClassName}
                   list="connecta-trip-destinations"
                   minLength={2}
-                  onChange={(event) => setDestination(event.target.value)}
+                  onChange={(event) => {
+                    setDestination(event.target.value);
+                    updateTripDetails({ destination: event.target.value });
+                  }}
                   required
                   value={destination}
                 />
@@ -126,7 +141,10 @@ export function TripForm({
               <Field icon={<CalendarDays className="h-4 w-4 text-orange-600" />} label="Start date">
                 <input
                   className={inputClassName}
-                  onChange={(event) => setStartDate(event.target.value)}
+                  onChange={(event) => {
+                    setStartDate(event.target.value);
+                    updateTripDetails({ startDate: event.target.value });
+                  }}
                   required
                   type="date"
                   value={startDate}
@@ -136,7 +154,10 @@ export function TripForm({
               <Field icon={<CalendarDays className="h-4 w-4 text-orange-600" />} label="End date">
                 <input
                   className={inputClassName}
-                  onChange={(event) => setEndDate(event.target.value)}
+                  onChange={(event) => {
+                    setEndDate(event.target.value);
+                    updateTripDetails({ endDate: event.target.value });
+                  }}
                   required
                   type="date"
                   value={endDate}

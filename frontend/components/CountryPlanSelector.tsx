@@ -11,9 +11,10 @@ type CountryPlanSelectorProps = {
   plans: MarketingPlan[];
   startDate?: string;
   endDate?: string;
+  title?: string;
 };
 
-export function CountryPlanSelector({ destination, plans, startDate, endDate }: CountryPlanSelectorProps) {
+export function CountryPlanSelector({ destination, plans, startDate, endDate, title }: CountryPlanSelectorProps) {
   const initialIndex = Math.max(
     0,
     plans.findIndex((plan) => plan.bestChoice)
@@ -52,7 +53,7 @@ export function CountryPlanSelector({ destination, plans, startDate, endDate }: 
     <section className="rounded-lg bg-white p-4 shadow-[0_24px_90px_-72px_rgba(15,23,42,0.5)] sm:p-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
-          Get an eSIM data plan for {destination.name}
+          {title ?? `Get an eSIM data plan for ${destination.name}`}
         </h2>
         <Link
           className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-slate-950 px-4 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-slate-800"
