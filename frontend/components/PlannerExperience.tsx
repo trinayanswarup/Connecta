@@ -1,17 +1,19 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 
 import { AgentStepsTrace } from "@/components/AgentStepsTrace";
 import { ConnectivityGuide } from "@/components/ConnectivityGuide";
 import { CountryPlanSelector } from "@/components/CountryPlanSelector";
-import { PlanComparison } from "@/components/PlanComparison";
+import { bestAlternativeForUsage, PlanComparison } from "@/components/PlanComparison";
 import { RecommendationCard } from "@/components/RecommendationCard";
 import { TripForm } from "@/components/TripForm";
 import { UsageBreakdown } from "@/components/UsageBreakdown";
 import { destinationOptions, plansForDestination, type DestinationKind, type MarketingPlan } from "@/lib/destination-catalog";
-import type { AgentStep, ConnectivityGuideResult, PlanOption, TripAnalysis, UsageBreakdownResult } from "@/lib/graphql";
+import { checkoutHrefForPlan } from "@/lib/checkout";
+import type { PlanOption, TripAnalysis } from "@/lib/graphql";
 
 type PlannerExperienceProps = {
   initialDestination?: string;
@@ -30,6 +32,7 @@ export function PlannerExperience({
   initialStartDate = "2026-06-10",
   initialEndDate = "2026-06-17"
 }: PlannerExperienceProps) {
+  const router = useRouter();
   const [tripDetails, setTripDetails] = useState<TripDetails>({
     destination: initialDestination,
     startDate: initialStartDate,
@@ -68,10 +71,12 @@ export function PlannerExperience({
   }
 
   function handleManualContinue(plan: MarketingPlan) {
-    setAnalysis(createManualAnalysis(plan, plans, selectedDestination.name, selectedDestination.kind));
+    const manualPlan = toPlanOption(plan, selectedDestination.name, selectedDestination.kind);
     setBestChoiceData(plan.data);
-    setResultsMode(true);
+    router.push(checkoutHrefForPlan(manualPlan, selectedDestination.name));
   }
+
+  const otherOption = analysis ? bestAlternativeForUsage(analysis.selectedPlan, analysis.alternatives) : null;
 
   return (
     <div
@@ -115,12 +120,21 @@ export function PlannerExperience({
             showResults={false}
           />
 
-          {resultsMode && analysis ? <RecommendationCard analysis={analysis} /> : null}
+          {resultsMode && analysis ? (
+            <RecommendationCard
+              analysis={analysis}
+              checkoutHref={checkoutHrefForPlan(analysis.selectedPlan, selectedDestination.name)}
+            />
+          ) : null}
         </div>
 
         {resultsMode && analysis ? (
           <div className="mt-5 grid gap-5 transition-all duration-700 ease-out">
-            <PlanComparison selected={analysis.selectedPlan} alternatives={analysis.alternatives} />
+            <PlanComparison
+              alternatives={analysis.alternatives}
+              checkoutHref={otherOption ? checkoutHrefForPlan(otherOption, selectedDestination.name) : undefined}
+              selected={analysis.selectedPlan}
+            />
             <UsageBreakdown breakdown={analysis.usageBreakdown} />
             {analysis.connectivityGuide ? <ConnectivityGuide guide={analysis.connectivityGuide} /> : null}
             <AgentStepsTrace steps={analysis.agentSteps} />
@@ -162,29 +176,6 @@ const plannerBenefits = [
   }
 ];
 
-function createManualAnalysis(plan: MarketingPlan, plans: MarketingPlan[], destination: string, kind: DestinationKind): TripAnalysis {
-  const selectedPlan = toPlanOption(plan, destination, kind);
-  const alternatives = plans
-    .map((candidate) => toPlanOption(candidate, destination, kind))
-    .filter((candidate) => candidate.id !== selectedPlan.id)
-    .sort((first, second) => Math.abs(first.dataGb - selectedPlan.dataGb) - Math.abs(second.dataGb - selectedPlan.dataGb))
-    .slice(0, 3);
-
-  return {
-    tripId: "manual-selection",
-    agentRunId: "manual-selection",
-    estimatedGb: Math.min(selectedPlan.dataGb, 12),
-    recommendedGb: selectedPlan.dataGb,
-    confidence: 1,
-    usageBreakdown: defaultBreakdown(selectedPlan.dataGb),
-    selectedPlan,
-    recommendation: `${selectedPlan.name} is selected for this trip, with ${selectedPlan.dataGb} GB available for ${destination}.`,
-    alternatives,
-    connectivityGuide: defaultConnectivityGuide,
-    agentSteps: manualSteps
-  };
-}
-
 function toPlanOption(plan: MarketingPlan, destination: string, kind: DestinationKind): PlanOption {
   const dataGb = parseDataGb(plan.data) ?? 50;
 
@@ -210,36 +201,6 @@ function providerForDestination(kind: DestinationKind) {
   return "Connecta Local";
 }
 
-function defaultBreakdown(dataGb: number): UsageBreakdownResult {
-  return {
-    maps: round1(dataGb * 0.18),
-    streaming: round1(dataGb * 0.28),
-    socialMedia: round1(dataGb * 0.22),
-    videoCalls: round1(dataGb * 0.14),
-    hotspot: round1(dataGb * 0.08),
-    work: round1(dataGb * 0.1)
-  };
-}
-
-const defaultConnectivityGuide: ConnectivityGuideResult = {
-  beforeDeparture: ["Install the eSIM app before leaving and keep your primary SIM active for account verification."],
-  airportSetup: ["Turn on the travel data plan after landing and run a quick connectivity check."],
-  offlineStrategy: ["Save maps, hotel details, and tickets offline before departure."],
-  backupInternet: ["Keep airport Wi-Fi and hotel Wi-Fi as fallback options."],
-  emergencyAccess: ["Keep roaming disabled until needed, then enable it only for emergency access."]
-};
-
-const manualSteps: AgentStep[] = [
-  {
-    name: "Plan optimization",
-    status: "COMPLETED",
-    durationMs: 1,
-    inputSummary: "Manual plan selection",
-    outputSummary: "Selected plan shown with nearby alternatives",
-    retries: 0
-  }
-];
-
 function parseDataGb(value: string) {
   const match = value.match(/^(\d+(?:\.\d+)?)\s*GB$/i);
 
@@ -256,8 +217,4 @@ function parseUsd(value: string) {
   const parsed = Number(value.replace(/[^0-9.]/g, ""));
 
   return Number.isFinite(parsed) ? parsed : 0;
-}
-
-function round1(value: number) {
-  return Math.round(value * 10) / 10;
 }

@@ -1,13 +1,15 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 import { CalendarDays, CheckCircle2, CircleDollarSign, SignalHigh } from "lucide-react";
 
 import type { TripAnalysis } from "@/lib/graphql";
 
 type RecommendationCardProps = {
   analysis: TripAnalysis;
+  checkoutHref?: string;
 };
 
-export function RecommendationCard({ analysis }: RecommendationCardProps) {
+export function RecommendationCard({ analysis, checkoutHref }: RecommendationCardProps) {
   return (
     <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-[0_28px_90px_-68px_rgba(15,23,42,0.55)]">
       <div className="grid gap-6 p-6 sm:p-8 lg:grid-cols-[1fr_0.62fr] lg:items-center">
@@ -18,6 +20,14 @@ export function RecommendationCard({ analysis }: RecommendationCardProps) {
           </div>
           <h2 className="mt-5 text-4xl font-semibold leading-tight text-slate-950">{analysis.selectedPlan.name}</h2>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">{analysis.recommendation}</p>
+          {checkoutHref ? (
+            <Link
+              className="mt-6 inline-flex h-11 items-center justify-center rounded-md bg-slate-950 px-4 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-slate-800"
+              href={checkoutHref}
+            >
+              Choose this plan
+            </Link>
+          ) : null}
         </div>
 
         <div className="rounded-lg border border-orange-100 bg-[#fff4e8] p-5 text-slate-950">

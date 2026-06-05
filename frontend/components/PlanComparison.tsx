@@ -1,11 +1,14 @@
+import Link from "next/link";
+
 import type { PlanOption } from "@/lib/graphql";
 
 type PlanComparisonProps = {
   selected: PlanOption;
   alternatives: PlanOption[];
+  checkoutHref?: string;
 };
 
-export function PlanComparison({ selected, alternatives }: PlanComparisonProps) {
+export function PlanComparison({ selected, alternatives, checkoutHref }: PlanComparisonProps) {
   const option = bestAlternativeForUsage(selected, alternatives);
 
   return (
@@ -33,6 +36,14 @@ export function PlanComparison({ selected, alternatives }: PlanComparisonProps) 
               <PlanMetric label="Price" value={`$${option.priceUsd.toFixed(2)}`} />
               <PlanMetric label="Valid" value={`${option.validityDays}d`} />
             </div>
+            {checkoutHref ? (
+              <Link
+                className="inline-flex h-9 items-center justify-center rounded-md border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-800 transition hover:border-orange-200 hover:bg-orange-50 md:self-end"
+                href={checkoutHref}
+              >
+                Choose
+              </Link>
+            ) : null}
           </div>
         </article>
       </div>
@@ -40,7 +51,7 @@ export function PlanComparison({ selected, alternatives }: PlanComparisonProps) 
   );
 }
 
-function bestAlternativeForUsage(selected: PlanOption, alternatives: PlanOption[]) {
+export function bestAlternativeForUsage(selected: PlanOption, alternatives: PlanOption[]) {
   const usableAlternatives = alternatives.filter((plan) => plan.id !== selected.id);
 
   if (usableAlternatives.length === 0) {

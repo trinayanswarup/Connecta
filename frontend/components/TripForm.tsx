@@ -6,7 +6,7 @@ import { AlertCircle, ArrowRight, CalendarDays, Loader2, MapPin, SignalHigh } fr
 
 import { AgentStepsTrace } from "@/components/AgentStepsTrace";
 import { ConnectivityGuide } from "@/components/ConnectivityGuide";
-import { PlanComparison } from "@/components/PlanComparison";
+import { bestAlternativeForUsage, PlanComparison } from "@/components/PlanComparison";
 import { RecommendationCard } from "@/components/RecommendationCard";
 import { UsageBreakdown } from "@/components/UsageBreakdown";
 import {
@@ -18,6 +18,7 @@ import {
   type UsageLevel
 } from "@/lib/graphql";
 import { destinationOptions, plansForDestination, type DestinationKind, type MarketingPlan } from "@/lib/destination-catalog";
+import { checkoutHrefForPlan } from "@/lib/checkout";
 import { validateTripInput } from "@/lib/validations";
 
 const usageLabels: Array<[keyof UsageInput, string]> = [
@@ -253,8 +254,15 @@ export function TripForm({
 
       {showResults && analysis ? (
         <div className="grid gap-5 scroll-mt-6" ref={resultsRef}>
-          <RecommendationCard analysis={analysis} />
-          <PlanComparison selected={analysis.selectedPlan} alternatives={analysis.alternatives} />
+          <RecommendationCard
+            analysis={analysis}
+            checkoutHref={checkoutHrefForPlan(analysis.selectedPlan, destination)}
+          />
+          <PlanComparison
+            alternatives={analysis.alternatives}
+            checkoutHref={checkoutHrefForPlan(bestAlternativeForUsage(analysis.selectedPlan, analysis.alternatives), destination)}
+            selected={analysis.selectedPlan}
+          />
           <UsageBreakdown breakdown={analysis.usageBreakdown} />
           {analysis.connectivityGuide ? <ConnectivityGuide guide={analysis.connectivityGuide} /> : null}
           <AgentStepsTrace steps={analysis.agentSteps} />
