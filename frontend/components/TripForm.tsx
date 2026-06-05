@@ -41,17 +41,23 @@ const initialUsage: UsageInput = {
 };
 
 type TripFormProps = {
+  compact?: boolean;
   initialDestination?: string;
   initialStartDate?: string;
   initialEndDate?: string;
+  onAnalysisReady?: (analysis: TripAnalysis) => void;
   onTripDetailsChange?: (details: { destination: string; startDate: string; endDate: string }) => void;
+  showResults?: boolean;
 };
 
 export function TripForm({
+  compact = false,
   initialDestination = "Japan",
   initialStartDate = "2026-06-10",
   initialEndDate = "2026-06-17",
-  onTripDetailsChange
+  onAnalysisReady,
+  onTripDetailsChange,
+  showResults = true
 }: TripFormProps) {
   const [destination, setDestination] = useState(initialDestination);
   const [startDate, setStartDate] = useState(initialStartDate);
@@ -86,7 +92,9 @@ export function TripForm({
     try {
       validateTripInput(input);
       const result = await analyzeTrip(input);
-      setAnalysis(scopeAnalysisToDestination(result, destination));
+      const scopedResult = scopeAnalysisToDestination(result, destination);
+      setAnalysis(scopedResult);
+      onAnalysisReady?.(scopedResult);
     } catch {
       setError("We could not find a plan right now. Please check your trip details and try again.");
     } finally {
@@ -115,10 +123,22 @@ export function TripForm({
 
   return (
     <div className="grid gap-8" id="planner">
-      <section className="relative overflow-hidden rounded-lg bg-[#fff4e8] p-4 shadow-[0_30px_100px_-76px_rgba(15,23,42,0.55)] sm:p-6">
-        <div className="pointer-events-none absolute -bottom-20 -right-16 h-64 w-64 rounded-full border border-orange-700/10" />
-        <div className="pointer-events-none absolute -bottom-10 right-16 h-44 w-80 rotate-[-18deg] rounded-[50%] border border-orange-700/10" />
-        <div className="relative rounded-lg bg-white p-5 shadow-[0_24px_76px_-62px_rgba(15,23,42,0.55)] sm:p-7">
+      <section
+        className={`relative overflow-hidden rounded-lg transition-all duration-500 ease-out ${
+          compact ? "border border-slate-200 bg-white p-5 shadow-sm sm:p-6" : "bg-[#fff4e8] p-4 shadow-[0_30px_100px_-76px_rgba(15,23,42,0.55)] sm:p-6"
+        }`}
+      >
+        {!compact ? (
+          <>
+            <div className="pointer-events-none absolute -bottom-20 -right-16 h-64 w-64 rounded-full border border-orange-700/10" />
+            <div className="pointer-events-none absolute -bottom-10 right-16 h-44 w-80 rotate-[-18deg] rounded-[50%] border border-orange-700/10" />
+          </>
+        ) : null}
+        <div
+          className={`relative rounded-lg transition-all duration-500 ease-out ${
+            compact ? "bg-white" : "bg-white p-5 shadow-[0_24px_76px_-62px_rgba(15,23,42,0.55)] sm:p-7"
+          }`}
+        >
           <div className="mb-7">
             <div>
               <p className="text-sm font-semibold text-orange-700">Connecta eSIM planner</p>
@@ -174,7 +194,8 @@ export function TripForm({
               </Field>
             </div>
 
-            <div className="rounded-lg bg-[#fbfaf7] p-5 ring-1 ring-slate-100">
+            {!compact ? (
+              <div className="rounded-lg bg-[#fbfaf7] p-5 ring-1 ring-slate-100">
               <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-slate-950">
                 <SignalHigh className="h-4 w-4 text-orange-700" />
                 How much data will you use?
@@ -193,6 +214,7 @@ export function TripForm({
                 ))}
               </div>
             </div>
+            ) : null}
 
             <button
               className="inline-flex h-14 items-center justify-center gap-2 rounded-md bg-slate-950 px-5 text-base font-semibold text-white transition hover:-translate-y-0.5 hover:bg-slate-800 disabled:cursor-not-allowed disabled:translate-y-0 disabled:bg-slate-300"
@@ -229,12 +251,12 @@ export function TripForm({
 
       {isSubmitting ? <LoadingState /> : null}
 
-      {analysis ? (
+      {showResults && analysis ? (
         <div className="grid gap-5 scroll-mt-6" ref={resultsRef}>
           <RecommendationCard analysis={analysis} />
-          {analysis.connectivityGuide ? <ConnectivityGuide guide={analysis.connectivityGuide} /> : null}
           <PlanComparison selected={analysis.selectedPlan} alternatives={analysis.alternatives} />
           <UsageBreakdown breakdown={analysis.usageBreakdown} />
+          {analysis.connectivityGuide ? <ConnectivityGuide guide={analysis.connectivityGuide} /> : null}
           <AgentStepsTrace steps={analysis.agentSteps} />
         </div>
       ) : null}

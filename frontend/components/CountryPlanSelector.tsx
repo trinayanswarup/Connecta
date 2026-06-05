@@ -8,13 +8,14 @@ import type { DestinationOption, MarketingPlan } from "@/lib/destination-catalog
 
 type CountryPlanSelectorProps = {
   destination: DestinationOption;
+  onContinue?: (plan: MarketingPlan) => void;
   plans: MarketingPlan[];
   startDate?: string;
   endDate?: string;
   title?: string;
 };
 
-export function CountryPlanSelector({ destination, plans, startDate, endDate, title }: CountryPlanSelectorProps) {
+export function CountryPlanSelector({ destination, onContinue, plans, startDate, endDate, title }: CountryPlanSelectorProps) {
   const initialIndex = Math.max(
     0,
     plans.findIndex((plan) => plan.bestChoice)
@@ -60,13 +61,24 @@ export function CountryPlanSelector({ destination, plans, startDate, endDate, ti
         <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
           {title ?? `Get an eSIM data plan for ${destination.name}`}
         </h2>
-        <Link
-          className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-slate-950 px-4 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-slate-800"
-          href={plannerHref}
-        >
-          Continue
-          <ArrowRight className="h-4 w-4" />
-        </Link>
+        {onContinue ? (
+          <button
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-slate-950 px-4 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-slate-800"
+            onClick={() => onContinue(selectedDisplayPlan)}
+            type="button"
+          >
+            Continue
+            <ArrowRight className="h-4 w-4" />
+          </button>
+        ) : (
+          <Link
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-slate-950 px-4 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-slate-800"
+            href={plannerHref}
+          >
+            Continue
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        )}
       </div>
 
       <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
