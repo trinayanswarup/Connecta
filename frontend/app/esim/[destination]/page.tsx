@@ -90,16 +90,8 @@ export default async function DestinationEsimPage({ params, searchParams }: Dest
             </div>
           </div>
 
-          <div className="relative min-h-[22rem] overflow-hidden rounded-lg bg-slate-950 p-5 text-white shadow-[0_34px_100px_-76px_rgba(15,23,42,0.75)] sm:p-7">
-            <div
-              aria-hidden="true"
-              className="absolute inset-0 opacity-25"
-              style={{
-                backgroundImage:
-                  "radial-gradient(circle at 20% 20%, rgba(233,79,19,0.35), transparent 28%), radial-gradient(circle at 80% 30%, rgba(255,244,232,0.22), transparent 24%)"
-              }}
-            />
-            <div className="relative z-10 ml-auto max-w-md rounded-lg bg-white p-5 text-slate-950 shadow-[0_30px_100px_-66px_rgba(15,23,42,0.85)]">
+          <div className="relative flex min-h-[22rem] overflow-hidden rounded-lg bg-slate-950 p-px shadow-[0_30px_90px_-72px_rgba(15,23,42,0.65)]">
+            <div className="relative z-10 flex flex-1 flex-col justify-center rounded-[7px] bg-white p-5 text-slate-950 sm:p-6">
               <div className="flex items-center justify-between">
                 <p className="text-sm font-semibold text-orange-700">Connecta eSIM</p>
                 <span className="rounded-full bg-[#fff4e8] px-3 py-1 text-xs font-semibold text-orange-700">Instant setup</span>

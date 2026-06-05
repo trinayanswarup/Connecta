@@ -109,7 +109,7 @@ export function CountryPlanSelector({ destination, plans, startDate, endDate }: 
               <span className="mt-4 block text-lg font-semibold text-slate-950">{displayPlan.price}</span>
               <span className="mt-2 inline-flex w-fit items-center gap-1 rounded-full bg-[#fff4d6] px-3 py-1 text-[11px] font-medium text-slate-800">
                 <BadgePercent className="h-3 w-3" />
-                3% in Saily credits
+                3% in Connecta credits
               </span>
             </label>
           );
