@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { CalendarDays, CheckCircle2, CircleDollarSign, Gauge, SignalHigh } from "lucide-react";
+import { CalendarDays, CheckCircle2, CircleDollarSign, SignalHigh } from "lucide-react";
 
 import type { TripAnalysis } from "@/lib/graphql";
 
@@ -14,14 +14,10 @@ export function RecommendationCard({ analysis }: RecommendationCardProps) {
         <div>
           <div className="inline-flex items-center gap-2 rounded-full bg-orange-50 px-3 py-1 text-sm font-semibold text-orange-700">
             <CheckCircle2 className="h-4 w-4" />
-            Best match for your trip
+            Recommended
           </div>
           <h2 className="mt-5 text-4xl font-semibold leading-tight text-slate-950">{analysis.selectedPlan.name}</h2>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">{analysis.recommendation}</p>
-          <div className="mt-5 inline-flex items-center gap-2 rounded-md bg-[#fff4e8] px-3 py-2 text-sm font-medium text-slate-700">
-            <Gauge className="h-4 w-4 text-orange-600" />
-            {Math.round(analysis.confidence * 100)}% match confidence
-          </div>
         </div>
 
         <div className="rounded-lg border border-orange-100 bg-[#fff4e8] p-5 text-slate-950">
