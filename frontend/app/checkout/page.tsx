@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2, CreditCard, ShieldCheck } from "lucide-react";
+import type { ReactNode } from "react";
+import { ArrowLeft, BadgePercent, CheckCircle2, ChevronDown, CreditCard, ShieldCheck, Smartphone } from "lucide-react";
 
 type CheckoutPageProps = {
   searchParams?: Promise<{
@@ -34,55 +35,90 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
           </span>
         </nav>
 
-        <section className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_23rem] lg:items-start">
-          <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-[0_24px_80px_-66px_rgba(15,23,42,0.45)] sm:p-8">
-            <p className="text-sm font-semibold text-orange-700">Checkout</p>
-            <h1 className="mt-3 text-4xl font-semibold tracking-tight text-slate-950">Review your eSIM plan</h1>
-            <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-600">
-              Review your plan before continuing. Your eSIM setup details will be ready after checkout.
-            </p>
+        <section className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_31rem] lg:items-start">
+          <div className="grid gap-6">
+            <section className="rounded-lg bg-white p-6 shadow-[0_24px_88px_-78px_rgba(15,23,42,0.42)] sm:p-8">
+              <h1 className="text-3xl font-semibold tracking-tight text-slate-950">Sign up or log in</h1>
+              <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+                <button className="inline-flex h-12 items-center justify-center gap-3 rounded-md bg-white px-6 text-sm font-semibold text-slate-950 shadow-[inset_0_0_0_1px_rgba(148,163,184,0.65)] transition hover:bg-slate-50" type="button">
+                  <span className="text-lg font-bold text-orange-700">G</span>
+                  Google
+                </button>
+                <button className="inline-flex h-12 items-center justify-center gap-3 rounded-md bg-white px-6 text-sm font-semibold text-slate-950 shadow-[inset_0_0_0_1px_rgba(148,163,184,0.65)] transition hover:bg-slate-50" type="button">
+                  <Smartphone className="h-5 w-5 fill-slate-950 text-slate-950" />
+                  Apple
+                </button>
+              </div>
+              <p className="mt-5 max-w-xl text-sm leading-6 text-slate-500">
+                We will use your account to send your eSIM setup details and keep your plan available after checkout.
+              </p>
+            </section>
 
-            <div className="mt-8 grid gap-3">
-              <CheckoutRow label="Destination" value={destination} />
-              <CheckoutRow label="Plan" value={plan} />
-              <CheckoutRow label="Provider" value={provider} />
-              <CheckoutRow label="Data" value={data} />
-              <CheckoutRow label="Validity" value={validity} />
-            </div>
+            <section className="rounded-lg bg-white p-6 shadow-[0_24px_88px_-78px_rgba(15,23,42,0.42)] sm:p-8">
+              <h2 className="text-3xl font-semibold tracking-tight text-slate-950">Select a payment method</h2>
+              <div className="mt-6 grid gap-3">
+                <PaymentMethod title="Credit or debit card">
+                  <span className="font-semibold text-blue-900">VISA</span>
+                  <span className="font-semibold text-orange-600">MC</span>
+                  <span className="font-semibold text-blue-700">AMEX</span>
+                </PaymentMethod>
+                <PaymentMethod title="Google Pay">
+                  <span className="rounded-md bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-700">G Pay</span>
+                </PaymentMethod>
+                <PaymentMethod title="PayPal">
+                  <span className="font-semibold text-blue-700">PayPal</span>
+                </PaymentMethod>
+              </div>
 
-            <button className="mt-8 inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-slate-950 px-5 text-sm font-semibold text-white shadow-[0_18px_54px_-38px_rgba(15,23,42,0.65)] transition hover:-translate-y-0.5 hover:bg-slate-800 sm:w-auto">
-              <CreditCard className="h-4 w-4" />
-              Continue to payment
-            </button>
+              <button className="mt-7 inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-slate-950 px-5 text-sm font-semibold text-white shadow-[0_18px_54px_-38px_rgba(15,23,42,0.65)] transition hover:-translate-y-0.5 hover:bg-slate-800 sm:w-auto">
+                <CreditCard className="h-4 w-4" />
+                Continue to payment
+              </button>
+            </section>
           </div>
 
-          <aside className="rounded-lg border border-orange-100 bg-[#fff4e8] p-5 text-slate-950 shadow-[0_24px_80px_-66px_rgba(15,23,42,0.45)] lg:sticky lg:top-24">
-            <p className="text-sm font-semibold text-orange-700">Order summary</p>
-            <div className="mt-4 text-sm text-slate-500">{provider}</div>
-            <h2 className="mt-2 text-2xl font-semibold">{plan}</h2>
-            <div className="mt-5 flex items-end justify-between gap-4 rounded-md bg-white p-4 ring-1 ring-orange-100/70">
+          <aside className="rounded-lg bg-white p-6 text-slate-950 shadow-[0_24px_88px_-78px_rgba(15,23,42,0.42)] lg:sticky lg:top-24">
+            <h2 className="text-3xl font-semibold tracking-tight">Order summary</h2>
+            <div className="mt-5 flex items-center gap-3 rounded-md bg-[#fbfaf7] px-4 py-3">
+              <span className="grid h-8 w-8 place-items-center rounded-md bg-orange-50 text-orange-700">
+                <Smartphone className="h-4 w-4" />
+              </span>
+              <span className="font-semibold">{destination}</span>
+            </div>
+            <div className="mt-5 grid gap-4 border-b border-slate-200 pb-5 text-sm">
+              <SummaryLine label="eSIM" value={plan} />
+              <SummaryLine label="Plan" value={data} />
+              <SummaryLine label="Type" value="Data only" />
+              <SummaryLine label="Duration" value={validity} />
+              <SummaryLine label="Provider" value={provider} />
+            </div>
+            <div className="mt-5 flex items-start justify-between gap-4">
               <div>
-                <div className="text-sm text-slate-500">Total</div>
-                <div className="mt-1 text-4xl font-semibold">${price}</div>
+                <p className="font-semibold">Total</p>
+                <button className="mt-3 text-sm text-slate-500 underline underline-offset-4" type="button">
+                  Connecta credits
+                </button>
               </div>
-              <span className="rounded-md bg-orange-50 px-3 py-1 text-sm font-semibold text-orange-700">{data}</span>
+              <div className="text-right">
+                <p className="text-xl font-semibold">US${price}</p>
+                <span className="mt-3 inline-flex items-center gap-1 rounded-md bg-[#fff4d6] px-2.5 py-1 text-xs font-semibold text-orange-800">
+                  <BadgePercent className="h-3 w-3" />
+                  + US${creditValue(price)}
+                </span>
+              </div>
             </div>
-            <div className="mt-5 grid gap-3 text-sm text-slate-700">
-              <span className="flex items-center gap-2">
-                <ShieldCheck className="h-4 w-4 text-orange-700" />
-                Secure checkout
-              </span>
-              <span className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-orange-700" />
-                Install before departure
-              </span>
-              <span className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-orange-700" />
-                Keep your regular number
-              </span>
+            <div className="mt-6 grid gap-2 sm:grid-cols-2">
+              <button className="h-10 rounded-md bg-slate-50 px-3 text-sm font-semibold text-slate-950 transition hover:bg-orange-50" type="button">
+                Got a coupon?
+              </button>
+              <button className="h-10 rounded-md bg-slate-50 px-3 text-sm font-semibold text-slate-950 transition hover:bg-orange-50" type="button">
+                Got credits?
+              </button>
             </div>
-            <div className="mt-5 rounded-md bg-white/70 p-3 text-xs leading-5 text-slate-600 ring-1 ring-orange-100/70">
-              No roaming surprises. Install your eSIM before you fly and keep your regular SIM available.
+            <div className="mt-6 grid gap-3 text-sm text-slate-700">
+              <TrustLine icon={<ShieldCheck className="h-4 w-4" />} text="Secure checkout" />
+              <TrustLine icon={<CheckCircle2 className="h-4 w-4" />} text="Install before departure" />
+              <TrustLine icon={<CheckCircle2 className="h-4 w-4" />} text="Keep your regular number" />
             </div>
           </aside>
         </section>
@@ -91,13 +127,47 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
   );
 }
 
-function CheckoutRow({ label, value }: { label: string; value: string }) {
+function PaymentMethod({ children, title }: { children: ReactNode; title: string }) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-md border border-slate-200 bg-white px-4 py-3.5">
-      <span className="text-sm text-slate-500">{label}</span>
-      <span className="text-right text-sm font-semibold text-slate-950">{value}</span>
+    <button
+      className="flex min-h-14 w-full items-center justify-between gap-4 rounded-md bg-white px-5 text-left shadow-[inset_0_0_0_1px_rgba(148,163,184,0.45)] transition hover:bg-slate-50 hover:shadow-[inset_0_0_0_1px_rgba(234,88,12,0.28)]"
+      type="button"
+    >
+      <span className="flex min-w-0 items-center gap-4">
+        <span className="text-base font-semibold text-slate-950">{title}</span>
+        <span className="flex flex-wrap items-center gap-2 text-xs">{children}</span>
+      </span>
+      <ChevronDown className="h-4 w-4 shrink-0 text-slate-500" />
+    </button>
+  );
+}
+
+function SummaryLine({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <span className="text-slate-500">{label}</span>
+      <span className="text-right font-semibold text-slate-950">{value}</span>
     </div>
   );
+}
+
+function TrustLine({ icon, text }: { icon: ReactNode; text: string }) {
+  return (
+    <span className="flex items-center gap-2">
+      <span className="text-orange-700">{icon}</span>
+      {text}
+    </span>
+  );
+}
+
+function creditValue(price: string) {
+  const parsed = Number(price);
+
+  if (!Number.isFinite(parsed)) {
+    return "0.00";
+  }
+
+return (parsed * 0.03).toFixed(2);
 }
 
 function cleanParam(value: string | undefined, fallback: string) {
