@@ -12,17 +12,17 @@ export function PlanComparison({ selected, alternatives, checkoutHref }: PlanCom
   const option = bestAlternativeForUsage(selected, alternatives);
 
   return (
-    <section className="rounded-[1.5rem] bg-white p-5 shadow-[0_24px_86px_-72px_rgba(15,23,42,0.55)] ring-1 ring-slate-200/80 sm:p-6">
+    <section className="rounded-lg bg-white p-5 shadow-[0_24px_86px_-72px_rgba(15,23,42,0.55)] ring-1 ring-slate-200/80 sm:p-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h2 className="text-2xl font-semibold text-slate-950">Other option</h2>
           <p className="mt-2 text-sm text-slate-500">One more plan that may suit your usage.</p>
         </div>
-        <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-600">1 option</span>
+        <span className="rounded-md bg-slate-100 px-3 py-1 text-sm font-medium text-slate-600">1 option</span>
       </div>
 
       <div className="mt-5 grid gap-3">
-        <article className="rounded-[1.25rem] bg-[#fbfaf7] p-4 ring-1 ring-slate-200/80 transition-shadow duration-200 hover:ring-orange-200">
+        <article className="rounded-md bg-[#fbfaf7] p-4 ring-1 ring-slate-200/80 transition-shadow duration-200 hover:ring-orange-200">
           <div className="grid gap-5 md:grid-cols-[1fr_auto_auto] md:items-center">
             <div>
               <div className="flex flex-wrap items-center gap-2">
@@ -38,7 +38,7 @@ export function PlanComparison({ selected, alternatives, checkoutHref }: PlanCom
             </div>
             {checkoutHref ? (
               <Link
-                className="inline-flex h-10 items-center justify-center rounded-full bg-white px-4 text-sm font-semibold text-slate-800 shadow-sm ring-1 ring-slate-200 transition-colors duration-200 hover:bg-orange-50 hover:ring-orange-200"
+                className="inline-flex h-10 items-center justify-center rounded-md bg-white px-4 text-sm font-semibold text-slate-800 shadow-sm ring-1 ring-slate-200 transition-colors duration-200 hover:bg-orange-50 hover:ring-orange-200"
                 href={checkoutHref}
               >
                 Choose
@@ -72,7 +72,7 @@ export function bestAlternativeForUsage(selected: PlanOption, alternatives: Plan
 
 function PlanMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-[0.9rem] bg-white p-3 ring-1 ring-slate-200/80">
+    <div className="rounded-md bg-white p-3 ring-1 ring-slate-200/80">
       <div className="text-xs text-slate-500">{label}</div>
       <div className="mt-1 font-semibold text-slate-950">{value}</div>
     </div>

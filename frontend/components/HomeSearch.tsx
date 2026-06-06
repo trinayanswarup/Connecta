@@ -43,7 +43,7 @@ export function HomeSearch({ defaultDestination = "Japan", variant = "horizontal
           className={
             isHero
               ? "flex min-h-14 items-center gap-3 rounded-md border border-slate-200 bg-white px-4 shadow-[0_18px_50px_-42px_rgba(15,23,42,0.55)]"
-              : "flex min-h-14 items-center gap-3 rounded-full bg-[#fbfaf7] px-4 ring-1 ring-slate-200/80 transition focus-within:ring-4 focus-within:ring-orange-100"
+              : "flex min-h-14 items-center gap-3 rounded-md bg-[#fbfaf7] px-4 ring-1 ring-slate-200/80 transition focus-within:ring-4 focus-within:ring-orange-100"
           }
         >
           <MapPin className="h-4 w-4 shrink-0 text-orange-600" />
@@ -72,7 +72,7 @@ export function HomeSearch({ defaultDestination = "Japan", variant = "horizontal
           className={
             isHero
               ? "flex min-h-14 items-center gap-3 rounded-md border border-slate-200 bg-white px-4 shadow-[0_18px_50px_-42px_rgba(15,23,42,0.55)]"
-              : "flex min-h-14 items-center gap-3 rounded-full bg-[#fbfaf7] px-4 ring-1 ring-slate-200/80 transition focus-within:ring-4 focus-within:ring-orange-100"
+              : "flex min-h-14 items-center gap-3 rounded-md bg-[#fbfaf7] px-4 ring-1 ring-slate-200/80 transition focus-within:ring-4 focus-within:ring-orange-100"
           }
         >
           <CalendarDays className="h-4 w-4 shrink-0 text-slate-400" />
@@ -93,7 +93,7 @@ export function HomeSearch({ defaultDestination = "Japan", variant = "horizontal
           className={
             isHero
               ? "flex min-h-14 items-center gap-3 rounded-md border border-slate-200 bg-white px-4 shadow-[0_18px_50px_-42px_rgba(15,23,42,0.55)]"
-              : "flex min-h-14 items-center gap-3 rounded-full bg-[#fbfaf7] px-4 ring-1 ring-slate-200/80 transition focus-within:ring-4 focus-within:ring-orange-100"
+              : "flex min-h-14 items-center gap-3 rounded-md bg-[#fbfaf7] px-4 ring-1 ring-slate-200/80 transition focus-within:ring-4 focus-within:ring-orange-100"
           }
         >
           <CalendarDays className="h-4 w-4 shrink-0 text-slate-400" />
@@ -111,12 +111,12 @@ export function HomeSearch({ defaultDestination = "Japan", variant = "horizontal
       <button
         className={
           isHero
-            ? "inline-flex h-14 items-center justify-center gap-2 rounded-full bg-[#e94f13] px-5 text-base font-semibold text-white shadow-[0_18px_44px_-32px_rgba(217,76,13,0.45)] transition-colors duration-200 hover:bg-[#f26822] sm:col-span-2"
-            : "inline-flex h-14 cursor-pointer items-center justify-center gap-2 rounded-full bg-slate-950 px-6 text-sm font-semibold text-white shadow-[0_18px_50px_-34px_rgba(15,23,42,0.7)] transition-colors duration-200 hover:bg-slate-800"
+            ? "inline-flex h-14 items-center justify-center gap-2 rounded-md bg-[#e94f13] px-5 text-base font-semibold text-white shadow-[0_18px_44px_-32px_rgba(217,76,13,0.45)] transition-colors duration-200 hover:bg-[#f26822] sm:col-span-2"
+            : "inline-flex h-14 min-w-[10rem] cursor-pointer items-center justify-center gap-2 rounded-md bg-slate-950 px-6 text-sm font-semibold text-white shadow-[0_18px_50px_-34px_rgba(15,23,42,0.7)] transition-colors duration-200 hover:bg-slate-800"
         }
         type="submit"
       >
-        {isHero ? "Search plan" : "Find my plan"}
+        <span className="whitespace-nowrap">{isHero ? "Search plan" : "Find my plan"}</span>
         <ArrowRight className="h-4 w-4" />
       </button>
     </form>

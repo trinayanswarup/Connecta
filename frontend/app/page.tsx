@@ -98,7 +98,7 @@ export default function HomePage() {
           </a>
         </nav>
         <Link
-          className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_50px_-34px_rgba(15,23,42,0.75)] transition-colors duration-200 hover:bg-slate-800"
+          className="inline-flex items-center justify-center gap-2 rounded-md bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_50px_-34px_rgba(15,23,42,0.75)] transition-colors duration-200 hover:bg-slate-800"
           href="/trip/new"
         >
           Find my plan
@@ -107,7 +107,7 @@ export default function HomePage() {
       </header>
 
       <section className="mx-auto max-w-[94rem] px-4 pb-8 pt-4 sm:px-6 lg:px-8">
-        <div className="relative grid min-h-[34rem] overflow-hidden rounded-[2rem] bg-white shadow-[0_34px_120px_-92px_rgba(15,23,42,0.55)] lg:grid-cols-[0.58fr_0.42fr]">
+        <div className="relative grid min-h-[34rem] overflow-hidden rounded-lg bg-white shadow-[0_34px_120px_-92px_rgba(15,23,42,0.55)] lg:grid-cols-[0.58fr_0.42fr]">
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 opacity-[0.38]"
@@ -126,14 +126,14 @@ export default function HomePage() {
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Link
-                className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-slate-950 px-6 text-sm font-semibold text-white shadow-[0_20px_60px_-36px_rgba(15,23,42,0.8)] transition-colors duration-200 hover:bg-slate-800"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-md bg-slate-950 px-6 text-sm font-semibold text-white shadow-[0_20px_60px_-36px_rgba(15,23,42,0.8)] transition-colors duration-200 hover:bg-slate-800"
                 href="#plan-finder"
               >
                 Find my plan
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                className="inline-flex h-12 items-center justify-center rounded-full border border-slate-200 bg-white px-6 text-sm font-semibold text-slate-800 transition-colors duration-200 hover:border-orange-200 hover:bg-orange-50"
+                className="inline-flex h-12 items-center justify-center rounded-md border border-slate-200 bg-white px-6 text-sm font-semibold text-slate-800 transition-colors duration-200 hover:border-orange-200 hover:bg-orange-50"
                 href="#destinations"
               >
                 Browse destinations
@@ -156,13 +156,13 @@ export default function HomePage() {
               }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-white via-white/5 to-[#eaf4ff]/20 lg:bg-gradient-to-r lg:from-white/10 lg:via-transparent lg:to-white/0" />
-            <div className="absolute bottom-0 left-0 right-0 h-20 rounded-t-[50%] bg-[#fbfaf7]" />
+            <div className="absolute bottom-0 left-0 right-0 h-20 rounded-t-md bg-[#fbfaf7]" />
           </div>
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-5 py-12 sm:px-8" id="plan-finder">
-        <div className="grid gap-8 rounded-[1.75rem] bg-white p-6 shadow-[0_28px_90px_-76px_rgba(15,23,42,0.55)] sm:p-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-center">
+        <div className="grid gap-8 rounded-lg bg-white p-6 shadow-[0_28px_90px_-76px_rgba(15,23,42,0.55)] sm:p-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-center">
           <div>
             <p className="text-sm font-semibold text-orange-700">Find my plan</p>
             <h2 className="mt-3 text-3xl font-semibold leading-tight text-slate-950">Start with your destination and dates.</h2>
@@ -222,7 +222,7 @@ export default function HomePage() {
           </div>
           <div className="mt-10 grid gap-5 md:grid-cols-3">
             {steps.map((step, index) => (
-              <article className="rounded-[1.25rem] bg-white p-6 shadow-[0_22px_70px_-60px_rgba(15,23,42,0.45)]" key={step.title}>
+              <article className="rounded-md bg-white p-6 shadow-[0_22px_70px_-60px_rgba(15,23,42,0.45)]" key={step.title}>
                 <div className="flex items-center justify-between">
                   <span className="grid h-11 w-11 place-items-center rounded-md bg-orange-50 text-orange-700">{step.icon}</span>
                   <span className="text-sm font-semibold text-slate-400">0{index + 1}</span>
@@ -253,7 +253,7 @@ export default function HomePage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-5 pb-20 sm:px-8">
-        <div className="grid gap-6 rounded-[1.75rem] bg-slate-950 p-7 text-white shadow-[0_28px_90px_-70px_rgba(15,23,42,0.8)] sm:p-9 lg:grid-cols-[1fr_auto] lg:items-center">
+        <div className="grid gap-6 rounded-lg bg-slate-950 p-7 text-white shadow-[0_28px_90px_-70px_rgba(15,23,42,0.8)] sm:p-9 lg:grid-cols-[1fr_auto] lg:items-center">
           <div>
             <h2 className="text-4xl font-semibold">Ready to choose a travel eSIM?</h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-white/70">
@@ -261,7 +261,7 @@ export default function HomePage() {
             </p>
           </div>
           <Link
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-[#fff4e8] px-5 py-3 text-sm font-semibold text-slate-950 transition-colors duration-200 hover:bg-white"
+            className="inline-flex items-center justify-center gap-2 rounded-md bg-[#fff4e8] px-5 py-3 text-sm font-semibold text-slate-950 transition-colors duration-200 hover:bg-white"
             href="/trip/new"
           >
             Find my plan
@@ -275,7 +275,7 @@ export default function HomePage() {
 
 function InfoTile({ icon, title, text }: { icon: ReactNode; title: string; text: string }) {
   return (
-    <article className="rounded-[1.25rem] bg-white p-6 shadow-[0_18px_60px_-52px_rgba(15,23,42,0.45)] ring-1 ring-slate-200/80 transition-shadow duration-200 hover:ring-orange-200">
+    <article className="rounded-md bg-white p-6 shadow-[0_18px_60px_-52px_rgba(15,23,42,0.45)] ring-1 ring-slate-200/80 transition-shadow duration-200 hover:ring-orange-200">
       <span className="grid h-11 w-11 place-items-center rounded-md bg-orange-50 text-orange-700">{icon}</span>
       <h3 className="mt-8 text-lg font-semibold text-slate-950">{title}</h3>
       <p className="mt-3 text-sm leading-6 text-slate-600">{text}</p>

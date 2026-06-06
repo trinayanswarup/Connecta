@@ -28,7 +28,7 @@ export default async function NewTripPage({ searchParams }: NewTripPageProps) {
             <ArrowLeft className="h-4 w-4" />
             Connecta
           </Link>
-          <span className="rounded-full bg-white px-4 py-2 text-xs font-medium text-slate-600 shadow-[0_14px_42px_-34px_rgba(15,23,42,0.65)] ring-1 ring-slate-200/80">
+          <span className="rounded-md bg-white px-4 py-2 text-xs font-medium text-slate-600 shadow-[0_14px_42px_-34px_rgba(15,23,42,0.65)] ring-1 ring-slate-200/80">
             Travel data plans
           </span>
         </nav>

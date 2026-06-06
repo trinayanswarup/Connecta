@@ -52,7 +52,7 @@ export default async function DestinationEsimPage({ params, searchParams }: Dest
           Connecta
         </Link>
         <Link
-          className="hidden rounded-full border border-orange-100 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-orange-200 hover:bg-orange-50 sm:inline-flex"
+          className="hidden rounded-md border border-orange-100 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-orange-200 hover:bg-orange-50 sm:inline-flex"
           href="/trip/new"
         >
           Travel data planner
@@ -94,7 +94,7 @@ export default async function DestinationEsimPage({ params, searchParams }: Dest
             <div className="relative z-10 flex flex-1 flex-col justify-center rounded-[7px] bg-white p-5 text-slate-950 sm:p-6">
               <div className="flex items-center justify-between">
                 <p className="text-sm font-semibold text-orange-700">Connecta eSIM</p>
-                <span className="rounded-full bg-[#fff4e8] px-3 py-1 text-xs font-semibold text-orange-700">Instant setup</span>
+                <span className="rounded-md bg-[#fff4e8] px-3 py-1 text-xs font-semibold text-orange-700">Instant setup</span>
               </div>
               <h2 className="mt-5 text-3xl font-semibold">{destination.name} Explorer</h2>
               <p className="mt-2 text-sm leading-6 text-slate-500">Choose data, confirm dates, and prepare setup before departure.</p>

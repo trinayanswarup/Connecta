@@ -29,7 +29,7 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
             <ArrowLeft className="h-4 w-4" />
             Back to planner
           </Link>
-          <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 shadow-sm">
+          <span className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 shadow-sm">
             Secure checkout
           </span>
         </nav>
@@ -64,7 +64,7 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
                 <div className="text-sm text-slate-500">Total</div>
                 <div className="mt-1 text-4xl font-semibold">${price}</div>
               </div>
-              <span className="rounded-full bg-orange-50 px-3 py-1 text-sm font-semibold text-orange-700">{data}</span>
+              <span className="rounded-md bg-orange-50 px-3 py-1 text-sm font-semibold text-orange-700">{data}</span>
             </div>
             <div className="mt-5 grid gap-3 text-sm text-slate-700">
               <span className="flex items-center gap-2">

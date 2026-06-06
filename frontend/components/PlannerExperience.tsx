@@ -94,8 +94,8 @@ export function PlannerExperience({
           </p>
           <div className="mt-10 grid gap-4">
             {plannerBenefits.map((benefit) => (
-              <div className="grid grid-cols-[auto_1fr] gap-4 rounded-[1.25rem] bg-white/70 p-4 shadow-[0_16px_56px_-48px_rgba(15,23,42,0.45)] ring-1 ring-slate-200/70" key={benefit.title}>
-                <span className="mt-1 grid h-11 w-11 place-items-center rounded-full bg-orange-50 text-orange-700">
+              <div className="grid grid-cols-[auto_1fr] gap-4 rounded-md bg-white/70 p-4 shadow-[0_16px_56px_-48px_rgba(15,23,42,0.45)] ring-1 ring-slate-200/70" key={benefit.title}>
+                <span className="mt-1 grid h-11 w-11 place-items-center rounded-md bg-orange-50 text-orange-700">
                   {benefit.icon}
                 </span>
                 <div>
@@ -124,6 +124,7 @@ export function PlannerExperience({
             <RecommendationCard
               analysis={analysis}
               checkoutHref={checkoutHrefForPlan(analysis.selectedPlan, selectedDestination.name)}
+              manualChoiceHref="#choose-yourself"
             />
           ) : null}
         </div>
@@ -141,7 +142,7 @@ export function PlannerExperience({
           </div>
         ) : null}
 
-        <div className={resultsMode && analysis ? "mt-6" : "mt-12"}>
+        <div className={`${resultsMode && analysis ? "mt-6" : "mt-12"} scroll-mt-6`} id="choose-yourself">
           <CountryPlanSelector
             bestChoiceData={bestChoiceData}
             destination={selectedDestination}

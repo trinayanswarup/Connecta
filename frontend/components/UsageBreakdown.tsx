@@ -16,7 +16,7 @@ export function UsageBreakdown({ breakdown }: { breakdown: UsageBreakdownResult 
   const maxValue = Math.max(...labels.map(([key]) => breakdown[key]), 1);
 
   return (
-    <section className="rounded-[1.5rem] bg-white p-5 shadow-[0_22px_80px_-70px_rgba(15,23,42,0.5)] ring-1 ring-slate-200/80 sm:p-6">
+    <section className="rounded-lg bg-white p-5 shadow-[0_22px_80px_-70px_rgba(15,23,42,0.5)] ring-1 ring-slate-200/80 sm:p-6">
       <h2 className="text-2xl font-semibold text-slate-950">Your expected data use</h2>
       <p className="mt-2 text-sm leading-6 text-slate-500">A simple estimate for your selected trip dates.</p>
       <div className="mt-6 grid gap-4">
@@ -33,8 +33,8 @@ export function UsageBreakdown({ breakdown }: { breakdown: UsageBreakdownResult 
                 </div>
                 <span className="font-medium text-slate-950">{value.toFixed(1)} GB</span>
               </div>
-              <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
-                <div className="h-full rounded-full bg-orange-500" style={{ width }} />
+              <div className="h-1.5 overflow-hidden rounded-md bg-slate-100">
+                <div className="h-full rounded-md bg-orange-500" style={{ width }} />
               </div>
             </div>
           );

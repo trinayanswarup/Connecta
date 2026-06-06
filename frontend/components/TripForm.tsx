@@ -125,19 +125,19 @@ export function TripForm({
   return (
     <div className="grid gap-8" id="planner">
       <section
-        className={`relative overflow-hidden rounded-[1.75rem] ${
+        className={`relative overflow-hidden rounded-lg ${
           compact
-            ? "bg-white p-5 shadow-[0_18px_70px_-58px_rgba(15,23,42,0.55)] ring-1 ring-slate-200/80 sm:p-6"
+            ? "bg-white p-5 shadow-[0_18px_70px_-58px_rgba(15,23,42,0.55)] ring-1 ring-slate-200/80"
             : "bg-white p-6 shadow-[0_28px_100px_-78px_rgba(15,23,42,0.55)] sm:p-8"
         }`}
       >
-        <div
-          className="relative"
-        >
-          <div className="mb-8">
+        <div className="relative">
+          <div className={compact ? "mb-5" : "mb-8"}>
             <div>
-              <p className="text-sm font-semibold text-orange-700">Find my plan</p>
-              <h2 className="mt-2 text-3xl font-semibold leading-tight text-slate-950">Build your travel eSIM plan</h2>
+              <p className="text-sm font-semibold text-orange-700">{compact ? "Trip details" : "Find my plan"}</p>
+              <h2 className={`${compact ? "mt-2 text-2xl" : "mt-2 text-3xl"} font-semibold leading-tight text-slate-950`}>
+                {compact ? "Refine your search" : "Build your travel eSIM plan"}
+              </h2>
               {!compact ? (
                 <p className="mt-3 text-sm leading-6 text-slate-500">
                   A few details help us compare data, price, validity, and destination fit.
@@ -146,8 +146,8 @@ export function TripForm({
             </div>
           </div>
 
-          <form className="grid gap-7" onSubmit={handleSubmit}>
-            <div className="grid gap-4 lg:grid-cols-[1.16fr_1.64fr]">
+          <form className={compact ? "grid gap-5" : "grid gap-7"} onSubmit={handleSubmit}>
+            <div className={compact ? "grid gap-4" : "grid gap-4 lg:grid-cols-[1.16fr_1.64fr]"}>
               <Field icon={<MapPin className="h-4 w-4 text-orange-600" />} label="Where are you traveling?">
                 <input
                   className={inputClassName}
@@ -200,7 +200,7 @@ export function TripForm({
             </div>
 
             {!compact ? (
-              <div className="rounded-[1.25rem] bg-[#fbfaf7] p-5 ring-1 ring-slate-100 sm:p-6">
+              <div className="rounded-md bg-[#fbfaf7] p-5 ring-1 ring-slate-100 sm:p-6">
                 <div className="mb-5 flex items-center gap-2 text-sm font-semibold text-slate-950">
                   <SignalHigh className="h-4 w-4 text-orange-700" />
                   How will you use data?
@@ -222,7 +222,7 @@ export function TripForm({
             ) : null}
 
             <button
-              className="inline-flex h-14 cursor-pointer items-center justify-center gap-2 rounded-full bg-slate-950 px-5 text-base font-semibold text-white shadow-[0_18px_54px_-36px_rgba(15,23,42,0.72)] transition-colors duration-200 hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none"
+              className={`${compact ? "h-11 w-full min-w-[11rem] justify-self-start text-sm sm:w-auto" : "h-14 text-base"} inline-flex cursor-pointer items-center justify-center gap-2 rounded-md bg-slate-950 px-5 font-semibold text-white shadow-[0_18px_54px_-36px_rgba(15,23,42,0.72)] transition-colors duration-200 hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none`}
               disabled={isSubmitting}
               type="submit"
             >
@@ -233,7 +233,7 @@ export function TripForm({
                 </>
               ) : (
                 <>
-                  Find my plan
+                  {compact ? "Update plan" : "Find my plan"}
                   <ArrowRight className="h-4 w-4" />
                 </>
               )}
@@ -277,7 +277,7 @@ export function TripForm({
 }
 
 const inputClassName =
-  "w-full min-w-0 rounded-full border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-orange-300 focus:ring-4 focus:ring-orange-50";
+  "w-full min-w-0 rounded-md border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-orange-300 focus:ring-4 focus:ring-orange-50";
 
 function Field({ children, icon, label }: { children: ReactNode; icon?: ReactNode; label: string }) {
   return (
