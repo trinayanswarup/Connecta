@@ -34,12 +34,12 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
           </span>
         </nav>
 
-        <section className="grid gap-6 lg:grid-cols-[1fr_24rem] lg:items-start">
-          <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-[0_24px_80px_-64px_rgba(15,23,42,0.5)] sm:p-8">
+        <section className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_23rem] lg:items-start">
+          <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-[0_24px_80px_-66px_rgba(15,23,42,0.45)] sm:p-8">
             <p className="text-sm font-semibold text-orange-700">Checkout</p>
             <h1 className="mt-3 text-4xl font-semibold tracking-tight text-slate-950">Review your eSIM plan</h1>
             <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-600">
-              Confirm the plan details before continuing to payment. Payment processing can be connected here when checkout is ready.
+              Review your plan before continuing. Your eSIM setup details will be ready after checkout.
             </p>
 
             <div className="mt-8 grid gap-3">
@@ -50,16 +50,17 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
               <CheckoutRow label="Validity" value={validity} />
             </div>
 
-            <button className="mt-8 inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-slate-950 px-5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-slate-800 sm:w-auto">
+            <button className="mt-8 inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-slate-950 px-5 text-sm font-semibold text-white shadow-[0_18px_54px_-38px_rgba(15,23,42,0.65)] transition hover:-translate-y-0.5 hover:bg-slate-800 sm:w-auto">
               <CreditCard className="h-4 w-4" />
               Continue to payment
             </button>
           </div>
 
-          <aside className="rounded-lg border border-orange-100 bg-[#fff4e8] p-5 text-slate-950 shadow-[0_24px_80px_-64px_rgba(15,23,42,0.5)]">
-            <div className="text-sm text-slate-500">{provider}</div>
+          <aside className="rounded-lg border border-orange-100 bg-[#fff4e8] p-5 text-slate-950 shadow-[0_24px_80px_-66px_rgba(15,23,42,0.45)] lg:sticky lg:top-24">
+            <p className="text-sm font-semibold text-orange-700">Order summary</p>
+            <div className="mt-4 text-sm text-slate-500">{provider}</div>
             <h2 className="mt-2 text-2xl font-semibold">{plan}</h2>
-            <div className="mt-5 flex items-end justify-between gap-4 rounded-lg bg-white p-4">
+            <div className="mt-5 flex items-end justify-between gap-4 rounded-md bg-white p-4 ring-1 ring-orange-100/70">
               <div>
                 <div className="text-sm text-slate-500">Total</div>
                 <div className="mt-1 text-4xl font-semibold">${price}</div>
@@ -68,13 +69,20 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
             </div>
             <div className="mt-5 grid gap-3 text-sm text-slate-700">
               <span className="flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4 text-orange-700" />
+                Secure checkout
+              </span>
+              <span className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-orange-700" />
                 Install before departure
               </span>
               <span className="flex items-center gap-2">
-                <ShieldCheck className="h-4 w-4 text-orange-700" />
+                <CheckCircle2 className="h-4 w-4 text-orange-700" />
                 Keep your regular number
               </span>
+            </div>
+            <div className="mt-5 rounded-md bg-white/70 p-3 text-xs leading-5 text-slate-600 ring-1 ring-orange-100/70">
+              No roaming surprises. Install your eSIM before you fly and keep your regular SIM available.
             </div>
           </aside>
         </section>
@@ -85,7 +93,7 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
 
 function CheckoutRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-md border border-slate-200 bg-[#fbfaf7] px-4 py-3">
+    <div className="flex items-center justify-between gap-4 rounded-md border border-slate-200 bg-white px-4 py-3.5">
       <span className="text-sm text-slate-500">{label}</span>
       <span className="text-right text-sm font-semibold text-slate-950">{value}</span>
     </div>

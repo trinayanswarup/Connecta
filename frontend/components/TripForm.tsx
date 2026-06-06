@@ -127,8 +127,8 @@ export function TripForm({
       <section
         className={`relative overflow-hidden rounded-lg ${
           compact
-            ? "bg-white p-5 shadow-[0_18px_70px_-58px_rgba(15,23,42,0.55)] ring-1 ring-slate-200/80"
-            : "bg-white p-6 shadow-[0_28px_100px_-78px_rgba(15,23,42,0.55)] sm:p-8"
+            ? "bg-white p-5 shadow-[0_18px_64px_-58px_rgba(15,23,42,0.45)] ring-1 ring-slate-200/70"
+            : "bg-white p-6 shadow-[0_28px_96px_-80px_rgba(15,23,42,0.48)] ring-1 ring-slate-200/60 sm:p-8"
         }`}
       >
         <div className="relative">
@@ -140,7 +140,7 @@ export function TripForm({
               </h2>
               {!compact ? (
                 <p className="mt-3 text-sm leading-6 text-slate-500">
-                  A few details help us compare data, price, validity, and destination fit.
+                  A few trip details help us show plans that fit where you are going.
                 </p>
               ) : null}
             </div>
@@ -203,7 +203,7 @@ export function TripForm({
               <div className="rounded-md bg-[#fbfaf7] p-5 ring-1 ring-slate-100 sm:p-6">
                 <div className="mb-5 flex items-center gap-2 text-sm font-semibold text-slate-950">
                   <SignalHigh className="h-4 w-4 text-orange-700" />
-                  How will you use data?
+                  What will you use data for?
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {usageLabels.map(([key, label]) => (
@@ -297,8 +297,8 @@ function LoadingState() {
       <div className="flex items-center gap-3">
         <Loader2 className="h-4 w-4 animate-spin" />
         <div>
-          <div className="font-medium">Finding your best plan</div>
-          <p className="mt-1 text-orange-700">Checking your trip needs and preparing a simple recommendation.</p>
+          <div className="font-medium">Finding plans for your trip</div>
+          <p className="mt-1 text-orange-700">Comparing data, validity, and price for your destination.</p>
         </div>
       </div>
     </section>
@@ -323,8 +323,8 @@ function formatEnum(value: string) {
 
 function scopeAnalysisToDestination(analysis: TripAnalysis, input: TripInput): TripAnalysis {
   const destination = input.destination;
-  const scopedPlans = finitePlansForDestination(destination);
   const estimate = estimateUsageForInput(input);
+  const scopedPlans = plansForTripRecommendation(destination, tripDays(input.startDate, input.endDate));
 
   if (scopedPlans.length === 0) {
     return {
@@ -343,8 +343,9 @@ function scopeAnalysisToDestination(analysis: TripAnalysis, input: TripInput): T
   const selectedPlan = bestPlanForRecommendation(scopedPlans, estimate.recommendedGb);
   const alternatives = scopedPlans
     .filter((plan) => plan.id !== selectedPlan.id)
-    .sort((first, second) => Math.abs(first.dataGb - estimate.recommendedGb) - Math.abs(second.dataGb - estimate.recommendedGb))
+    .sort((first, second) => recommendationDistance(first, estimate.recommendedGb) - recommendationDistance(second, estimate.recommendedGb))
     .slice(0, 3);
+  const selectedData = selectedPlan.dataLabel ?? `${Math.round(selectedPlan.dataGb)} GB`;
 
   return {
     ...analysis,
@@ -354,9 +355,7 @@ function scopeAnalysisToDestination(analysis: TripAnalysis, input: TripInput): T
     usageBreakdown: estimate.usageBreakdown,
     selectedPlan,
     alternatives,
-    recommendation: `${selectedPlan.name} is the best fit for this trip: it covers the ${Math.round(
-      estimate.recommendedGb
-    )} GB recommended allowance with ${Math.round(selectedPlan.dataGb)} GB available for ${destinationName}.`
+    recommendation: recommendationForPlan(selectedPlan, estimate.recommendedGb, selectedData, destinationName)
   };
 }
 
@@ -455,7 +454,7 @@ function round2(value: number) {
   return Math.round(value * 100) / 100;
 }
 
-function finitePlansForDestination(destination: string) {
+function plansForTripRecommendation(destination: string, days: number) {
   const destinationOption = destinationOptions.find(
     (option) => option.name.toLowerCase() === destination.trim().toLowerCase()
   );
@@ -463,33 +462,72 @@ function finitePlansForDestination(destination: string) {
   const provider = providerForDestination(destinationOption?.kind);
 
   return plansForDestination(destinationName)
-    .map((plan) => toPlanOption(plan, destinationName, provider))
+    .map((plan) => toPlanOption(plan, destinationName, provider, days))
     .filter((plan): plan is PlanOptionFromMarketing => plan !== null)
     .sort((first, second) => first.dataGb - second.dataGb);
 }
 
 type PlanOptionFromMarketing = TripAnalysis["selectedPlan"];
 
-function toPlanOption(plan: MarketingPlan, destination: string, provider: string): PlanOptionFromMarketing | null {
+function toPlanOption(plan: MarketingPlan, destination: string, provider: string, days?: number): PlanOptionFromMarketing | null {
+  const displayPlan = planWithRecommendedValidity(plan, days);
   const dataGb = parseDataGb(plan.data);
+  const unlimited = isUnlimitedPlan(plan.data);
 
-  if (dataGb === null) {
+  if (dataGb === null && !unlimited) {
     return null;
   }
+  const displayData = dataGb === null ? plan.data.trim() : `${dataGb}GB`;
 
   return {
-    id: `${destination.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${dataGb}gb`,
+    id: `${destination.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${displayData.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
     provider,
-    name: `${destination} ${dataGb}GB`,
-    priceUsd: parseUsd(plan.price),
-    dataGb,
-    validityDays: parseDays(plan.days),
-    tradeoff: "Best balance of price and safety margin."
+    name: `${destination} ${displayData}`,
+    priceUsd: parseUsd(displayPlan.price),
+    dataGb: dataGb ?? Number.MAX_SAFE_INTEGER,
+    dataLabel: dataGb === null ? plan.data.trim() : undefined,
+    validityDays: parseDays(displayPlan.days),
+    tradeoff: "A practical mix of data, validity, and price for this trip."
+  };
+}
+
+function planWithRecommendedValidity(plan: MarketingPlan, days?: number) {
+  if (!plan.validityOptions?.length || !days) {
+    return plan;
+  }
+
+  const selectedOption =
+    plan.validityOptions.find((option) => option.dayCount >= days) ?? plan.validityOptions[plan.validityOptions.length - 1];
+
+  return {
+    ...plan,
+    days: selectedOption.days,
+    price: selectedOption.price
   };
 }
 
 function bestPlanForRecommendation(plans: PlanOptionFromMarketing[], recommendedGb: number) {
   return plans.find((plan) => plan.dataGb >= recommendedGb) ?? plans[plans.length - 1];
+}
+
+function recommendationDistance(plan: PlanOptionFromMarketing, recommendedGb: number) {
+  if (isUnlimitedPlan(plan.dataLabel)) {
+    return recommendedGb;
+  }
+
+  return Math.abs(plan.dataGb - recommendedGb);
+}
+
+function recommendationForPlan(plan: PlanOptionFromMarketing, recommendedGb: number, selectedData: string, destinationName: string) {
+  if (isUnlimitedPlan(plan.dataLabel)) {
+    return `${plan.name} is the safer fit for this trip. Your trip could use around ${Math.round(
+      recommendedGb
+    )} GB, so unlimited data gives you more room for ${destinationName}.`;
+  }
+
+  return `${plan.name} is a strong fit for this trip. It covers the ${Math.round(
+    recommendedGb
+  )} GB we would set aside for your dates, with ${selectedData} available for ${destinationName}.`;
 }
 
 function providerForDestination(kind?: DestinationKind) {
@@ -507,6 +545,10 @@ function parseDataGb(value: string) {
   const match = value.match(/^(\d+(?:\.\d+)?)\s*GB$/i);
 
   return match ? Number(match[1]) : null;
+}
+
+function isUnlimitedPlan(value?: string) {
+  return value?.toLowerCase().includes("unlimited") ?? false;
 }
 
 function parseDays(value: string) {

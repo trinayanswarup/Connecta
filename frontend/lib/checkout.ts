@@ -1,5 +1,6 @@
 export type CheckoutPlan = {
   dataGb: number;
+  dataLabel?: string;
   name: string;
   priceUsd: number;
   provider: string;
@@ -8,7 +9,7 @@ export type CheckoutPlan = {
 
 export function checkoutHrefForPlan(plan: CheckoutPlan, destination: string) {
   const params = new URLSearchParams({
-    data: `${plan.dataGb} GB`,
+    data: plan.dataLabel ?? `${plan.dataGb} GB`,
     destination,
     plan: plan.name,
     price: plan.priceUsd.toFixed(2),

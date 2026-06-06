@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import {
   ArrowRight,
+  BadgeCheck,
   Globe2,
   LifeBuoy,
   Plane,
@@ -49,7 +50,7 @@ const steps = [
   {
     icon: <SignalHigh className="h-5 w-5" />,
     title: "Compare clear options",
-    text: "Connecta checks price, allowance, validity, and destination fit."
+    text: "See data, validity, and price in a way that is easy to compare."
   },
   {
     icon: <Smartphone className="h-5 w-5" />,
@@ -79,35 +80,37 @@ const benefits = [
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-[#fbfaf7] text-slate-950">
-      <header className="mx-auto flex max-w-7xl items-center justify-between px-5 py-6 sm:px-8">
-        <Link className="flex items-center gap-3" href="/">
-          <span className="grid h-10 w-10 place-items-center rounded-md bg-slate-950 text-sm font-bold text-white shadow-[0_18px_42px_-28px_rgba(15,23,42,0.65)]">
-            C
-          </span>
-          <span className="text-xl font-semibold">Connecta</span>
-        </Link>
-        <nav className="hidden items-center gap-6 text-sm font-medium text-slate-600 lg:flex">
-          <a className="transition hover:text-slate-950" href="#destinations">
-            Destinations
-          </a>
-          <a className="transition hover:text-slate-950" href="#how-it-works">
-            How it works
-          </a>
-          <a className="transition hover:text-slate-950" href="#trust">
-            Benefits
-          </a>
-        </nav>
-        <Link
-          className="inline-flex items-center justify-center gap-2 rounded-md bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_50px_-34px_rgba(15,23,42,0.75)] transition-colors duration-200 hover:bg-slate-800"
-          href="/trip/new"
-        >
-          Find my plan
-          <ArrowRight className="hidden h-4 w-4 sm:block" />
-        </Link>
+      <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-[#fbfaf7]/90 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-[100rem] items-center justify-between px-5 py-4 sm:px-8">
+          <Link className="flex items-center gap-3" href="/">
+            <span className="grid h-10 w-10 place-items-center rounded-md bg-slate-950 text-sm font-bold text-white shadow-[0_18px_42px_-28px_rgba(15,23,42,0.65)]">
+              C
+            </span>
+            <span className="text-xl font-semibold">Connecta</span>
+          </Link>
+          <nav className="hidden items-center gap-8 text-sm font-medium text-slate-600 lg:flex">
+            <a className="transition hover:text-slate-950" href="#destinations">
+              Destinations
+            </a>
+            <a className="transition hover:text-slate-950" href="#how-it-works">
+              How it works
+            </a>
+            <a className="transition hover:text-slate-950" href="#trust">
+              Benefits
+            </a>
+          </nav>
+          <Link
+            className="inline-flex items-center justify-center gap-2 rounded-md bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_50px_-34px_rgba(15,23,42,0.75)] transition-colors duration-200 hover:bg-slate-800"
+            href="/trip/new"
+          >
+            Find my plan
+            <ArrowRight className="hidden h-4 w-4 sm:block" />
+          </Link>
+        </div>
       </header>
 
-      <section className="mx-auto max-w-[94rem] px-4 pb-8 pt-4 sm:px-6 lg:px-8">
-        <div className="relative grid min-h-[34rem] overflow-hidden rounded-lg bg-white shadow-[0_34px_120px_-92px_rgba(15,23,42,0.55)] lg:grid-cols-[0.58fr_0.42fr]">
+      <section className="mx-auto max-w-[94rem] px-4 pb-10 pt-4 sm:px-6 lg:px-8">
+        <div className="relative grid min-h-[34rem] overflow-hidden rounded-lg bg-white shadow-[0_34px_110px_-92px_rgba(15,23,42,0.5)] lg:grid-cols-[0.58fr_0.42fr]">
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 opacity-[0.38]"
@@ -139,10 +142,19 @@ export default function HomePage() {
                 Browse destinations
               </Link>
             </div>
-            <div className="mt-10 grid max-w-xl gap-4 text-sm font-medium text-slate-600 sm:grid-cols-3">
-              <span>Keep your number</span>
-              <span>Avoid roaming surprises</span>
-              <span>Setup before departure</span>
+            <div className="mt-10 grid max-w-2xl gap-3 text-sm font-medium text-slate-600 sm:grid-cols-3">
+              <span className="inline-flex items-center gap-2">
+                <BadgeCheck className="h-4 w-4 text-orange-700" />
+                Keep your number
+              </span>
+              <span className="inline-flex items-center gap-2">
+                <BadgeCheck className="h-4 w-4 text-orange-700" />
+                Avoid roaming surprises
+              </span>
+              <span className="inline-flex items-center gap-2">
+                <BadgeCheck className="h-4 w-4 text-orange-700" />
+                Setup before departure
+              </span>
             </div>
           </div>
 
@@ -157,31 +169,43 @@ export default function HomePage() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-white via-white/5 to-[#eaf4ff]/20 lg:bg-gradient-to-r lg:from-white/10 lg:via-transparent lg:to-white/0" />
             <div className="absolute bottom-0 left-0 right-0 h-20 rounded-t-md bg-[#fbfaf7]" />
+            <div className="absolute bottom-8 left-6 right-6 grid gap-3 sm:left-auto sm:w-72">
+              <div className="rounded-md bg-white/90 p-4 shadow-[0_22px_60px_-42px_rgba(15,23,42,0.55)] ring-1 ring-white/70 backdrop-blur">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-orange-700">Popular now</p>
+                    <p className="mt-1 text-lg font-semibold text-slate-950">Japan 20GB</p>
+                  </div>
+                  <span className="rounded-md bg-orange-50 px-3 py-1 text-sm font-semibold text-orange-700">$39.99</span>
+                </div>
+                <p className="mt-3 text-sm leading-5 text-slate-600">30 days of travel data with setup before departure.</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 py-12 sm:px-8" id="plan-finder">
-        <div className="grid gap-8 rounded-lg bg-white p-6 shadow-[0_28px_90px_-76px_rgba(15,23,42,0.55)] sm:p-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-center">
+      <section className="mx-auto max-w-7xl px-5 py-14 sm:px-8" id="plan-finder">
+        <div className="grid gap-10 rounded-lg bg-white p-7 shadow-[0_28px_86px_-78px_rgba(15,23,42,0.48)] ring-1 ring-slate-200/70 sm:p-9 lg:grid-cols-[0.68fr_1.32fr] lg:items-center">
           <div>
             <p className="text-sm font-semibold text-orange-700">Find my plan</p>
             <h2 className="mt-3 text-3xl font-semibold leading-tight text-slate-950">Start with your destination and dates.</h2>
             <p className="mt-4 text-sm leading-6 text-slate-600">
-              We will help you compare plans that work where you are going.
+              Enter your destination and dates. We will keep the plan choices simple.
             </p>
           </div>
           <HomeSearch />
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-10 px-5 py-14 sm:px-8" id="destinations">
+      <section className="mx-auto grid max-w-7xl gap-11 px-5 py-16 sm:px-8" id="destinations">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-sm font-semibold text-orange-700">Popular destinations</p>
             <h2 className="mt-2 text-4xl font-semibold text-slate-950">Travel data for places people love.</h2>
           </div>
           <p className="max-w-lg text-sm leading-6 text-slate-600">
-            Pick a destination, then choose manually or let Connecta recommend a plan for your trip.
+            Pick a destination, then choose a plan yourself or start with a guided match.
           </p>
         </div>
 
@@ -202,7 +226,7 @@ export default function HomePage() {
         <DestinationDirectory destinations={destinationOptions} />
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-8 px-5 py-20 sm:px-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-center">
+      <section className="mx-auto grid max-w-7xl gap-10 px-5 py-24 sm:px-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-center">
         <div>
           <p className="text-sm font-semibold text-orange-700">What is an eSIM?</p>
           <h2 className="mt-2 text-4xl font-semibold leading-tight text-slate-950">A digital SIM for travel data, without the counter queue.</h2>
@@ -214,7 +238,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="bg-[#fff4e8] py-20" id="how-it-works">
+      <section className="bg-[#fff4e8] py-24" id="how-it-works">
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
           <div className="max-w-3xl">
             <p className="text-sm font-semibold text-orange-700">How it works</p>
@@ -222,7 +246,7 @@ export default function HomePage() {
           </div>
           <div className="mt-10 grid gap-5 md:grid-cols-3">
             {steps.map((step, index) => (
-              <article className="rounded-md bg-white p-6 shadow-[0_22px_70px_-60px_rgba(15,23,42,0.45)]" key={step.title}>
+              <article className="rounded-md bg-white p-6 shadow-[0_18px_62px_-58px_rgba(15,23,42,0.38)] ring-1 ring-orange-100/40" key={step.title}>
                 <div className="flex items-center justify-between">
                   <span className="grid h-11 w-11 place-items-center rounded-md bg-orange-50 text-orange-700">{step.icon}</span>
                   <span className="text-sm font-semibold text-slate-400">0{index + 1}</span>
@@ -235,13 +259,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 py-20 sm:px-8" id="trust">
+      <section className="mx-auto max-w-7xl px-5 py-24 sm:px-8" id="trust">
         <div className="grid gap-8 lg:grid-cols-[0.86fr_1.14fr] lg:items-start">
           <div>
             <p className="text-sm font-semibold text-orange-700">Benefits</p>
             <h2 className="mt-2 text-4xl font-semibold leading-tight text-slate-950">Built to feel clear before you buy.</h2>
             <p className="mt-4 text-sm leading-6 text-slate-600">
-              Connecta balances travel discovery with calm recommendation clarity, so the final choice feels easy to trust.
+              Compare your options with clear plan details, simple setup guidance, and no roaming surprises.
             </p>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
@@ -253,11 +277,11 @@ export default function HomePage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-5 pb-20 sm:px-8">
-        <div className="grid gap-6 rounded-lg bg-slate-950 p-7 text-white shadow-[0_28px_90px_-70px_rgba(15,23,42,0.8)] sm:p-9 lg:grid-cols-[1fr_auto] lg:items-center">
+        <div className="grid gap-6 rounded-lg bg-slate-950 p-8 text-white shadow-[0_28px_90px_-70px_rgba(15,23,42,0.8)] sm:p-10 lg:grid-cols-[1fr_auto] lg:items-center">
           <div>
             <h2 className="text-4xl font-semibold">Ready to choose a travel eSIM?</h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-white/70">
-              Share your destination and data habits. Connecta will return a plan, alternatives, and a setup guide.
+              Share your destination and data needs. We will show a clear plan and simple setup guidance.
             </p>
           </div>
           <Link
@@ -275,7 +299,7 @@ export default function HomePage() {
 
 function InfoTile({ icon, title, text }: { icon: ReactNode; title: string; text: string }) {
   return (
-    <article className="rounded-md bg-white p-6 shadow-[0_18px_60px_-52px_rgba(15,23,42,0.45)] ring-1 ring-slate-200/80 transition-shadow duration-200 hover:ring-orange-200">
+    <article className="rounded-md bg-white p-6 shadow-[0_16px_54px_-52px_rgba(15,23,42,0.36)] ring-1 ring-slate-200/70 transition-shadow duration-200 hover:ring-orange-200">
       <span className="grid h-11 w-11 place-items-center rounded-md bg-orange-50 text-orange-700">{icon}</span>
       <h3 className="mt-8 text-lg font-semibold text-slate-950">{title}</h3>
       <p className="mt-3 text-sm leading-6 text-slate-600">{text}</p>

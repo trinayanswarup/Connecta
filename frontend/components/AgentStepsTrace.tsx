@@ -4,11 +4,11 @@ import type { AgentStep } from "@/lib/graphql";
 
 export function AgentStepsTrace({ steps }: { steps: AgentStep[] }) {
   return (
-    <details className="group rounded-md bg-white p-5 shadow-[0_18px_70px_-62px_rgba(15,23,42,0.45)] ring-1 ring-slate-200/80 sm:p-6">
+    <details className="group rounded-md bg-white p-5 shadow-[0_14px_58px_-56px_rgba(15,23,42,0.34)] ring-1 ring-slate-200/70 sm:p-6">
       <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
         <div>
-          <h2 className="text-lg font-semibold text-slate-950">How we chose this plan</h2>
-          <p className="mt-1.5 text-sm text-slate-500">A quick look at the checks behind your recommendation.</p>
+          <h2 className="text-lg font-semibold text-slate-950">Why this plan fits</h2>
+          <p className="mt-1.5 text-sm text-slate-500">A quick summary of the match for your trip.</p>
         </div>
         <ChevronDown className="h-5 w-5 shrink-0 text-slate-400 transition group-open:rotate-180" />
       </summary>
@@ -37,7 +37,7 @@ function friendlyStepName(name: string) {
     case "Plan optimization":
       return "Compared matching plans";
     case "Recommendation summary":
-      return "Prepared the recommendation";
+      return "Summarized the plan";
     case "AI guide generation":
       return "Prepared setup guidance";
     case "Save trip":
@@ -54,13 +54,13 @@ function friendlyStepSummary(name: string) {
     case "Plan optimization":
       return "We compared plan size, price, validity, and destination fit.";
     case "Recommendation summary":
-      return "We turned the plan match into a simple recommendation.";
+      return "We summarized the plan in plain language.";
     case "AI guide generation":
       return "We prepared practical setup steps for before and during your trip.";
     case "Save trip":
-      return "Your recommendation is available in this session.";
+      return "Your plan details are ready in this session.";
     default:
-      return "This check helped shape the final recommendation.";
+      return "This helped shape the final plan details.";
   }
 }
 

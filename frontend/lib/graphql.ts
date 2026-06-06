@@ -31,6 +31,7 @@ export type PlanOption = {
   name: string;
   priceUsd: number;
   dataGb: number;
+  dataLabel?: string;
   validityDays: number;
   tradeoff: string;
 };

@@ -7,7 +7,7 @@
   --foreground: 222 36% 12%;
   --muted: 220 14% 94%;
   --border: 220 18% 88%;
-  --primary: 173 74% 31%;
+  --primary: 222 47% 11%;
   --accent: 18 93% 62%;
 }
 
@@ -28,7 +28,7 @@ html {
 }
 
 ::selection {
-  background: rgba(20, 184, 166, 0.18);
+  background: rgba(234, 88, 12, 0.18);
   color: #0f172a;
 }
 

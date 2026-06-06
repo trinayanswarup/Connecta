@@ -43,7 +43,7 @@ export function HomeSearch({ defaultDestination = "Japan", variant = "horizontal
           className={
             isHero
               ? "flex min-h-14 items-center gap-3 rounded-md border border-slate-200 bg-white px-4 shadow-[0_18px_50px_-42px_rgba(15,23,42,0.55)]"
-              : "flex min-h-14 items-center gap-3 rounded-md bg-[#fbfaf7] px-4 ring-1 ring-slate-200/80 transition focus-within:ring-4 focus-within:ring-orange-100"
+              : "flex min-h-14 items-center gap-3 rounded-md bg-white px-4 ring-1 ring-slate-200/80 transition focus-within:ring-4 focus-within:ring-orange-100"
           }
         >
           <MapPin className="h-4 w-4 shrink-0 text-orange-600" />
@@ -72,7 +72,7 @@ export function HomeSearch({ defaultDestination = "Japan", variant = "horizontal
           className={
             isHero
               ? "flex min-h-14 items-center gap-3 rounded-md border border-slate-200 bg-white px-4 shadow-[0_18px_50px_-42px_rgba(15,23,42,0.55)]"
-              : "flex min-h-14 items-center gap-3 rounded-md bg-[#fbfaf7] px-4 ring-1 ring-slate-200/80 transition focus-within:ring-4 focus-within:ring-orange-100"
+              : "flex min-h-14 items-center gap-3 rounded-md bg-white px-4 ring-1 ring-slate-200/80 transition focus-within:ring-4 focus-within:ring-orange-100"
           }
         >
           <CalendarDays className="h-4 w-4 shrink-0 text-slate-400" />
@@ -93,7 +93,7 @@ export function HomeSearch({ defaultDestination = "Japan", variant = "horizontal
           className={
             isHero
               ? "flex min-h-14 items-center gap-3 rounded-md border border-slate-200 bg-white px-4 shadow-[0_18px_50px_-42px_rgba(15,23,42,0.55)]"
-              : "flex min-h-14 items-center gap-3 rounded-md bg-[#fbfaf7] px-4 ring-1 ring-slate-200/80 transition focus-within:ring-4 focus-within:ring-orange-100"
+              : "flex min-h-14 items-center gap-3 rounded-md bg-white px-4 ring-1 ring-slate-200/80 transition focus-within:ring-4 focus-within:ring-orange-100"
           }
         >
           <CalendarDays className="h-4 w-4 shrink-0 text-slate-400" />

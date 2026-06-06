@@ -8,6 +8,7 @@ import type { DestinationOption, MarketingPlan } from "@/lib/destination-catalog
 
 type CountryPlanSelectorProps = {
   bestChoiceData?: string;
+  bestChoiceValidityDays?: number;
   destination: DestinationOption;
   onContinue?: (plan: MarketingPlan) => void;
   plans: MarketingPlan[];
@@ -16,7 +17,16 @@ type CountryPlanSelectorProps = {
   title?: string;
 };
 
-export function CountryPlanSelector({ bestChoiceData, destination, onContinue, plans, startDate, endDate, title }: CountryPlanSelectorProps) {
+export function CountryPlanSelector({
+  bestChoiceData,
+  bestChoiceValidityDays,
+  destination,
+  onContinue,
+  plans,
+  startDate,
+  endDate,
+  title
+}: CountryPlanSelectorProps) {
   const bestChoiceIndex = Math.max(
     0,
     plans.findIndex((plan) => matchesPlanData(plan.data, bestChoiceData)) >= 0
@@ -24,7 +34,11 @@ export function CountryPlanSelector({ bestChoiceData, destination, onContinue, p
       : plans.findIndex((plan) => plan.bestChoice)
   );
   const tripDays = tripLengthDays(startDate, endDate);
-  const initialUnlimitedDays = nearestUnlimitedValidity(plans, tripDays);
+  const bestChoicePlan = plans[bestChoiceIndex];
+  const initialUnlimitedDays =
+    bestChoicePlan?.validityOptions && bestChoiceValidityDays
+      ? bestChoiceValidityDays
+      : nearestUnlimitedValidity(plans, tripDays);
   const [selectedIndex, setSelectedIndex] = useState(bestChoiceIndex);
   const [unlimitedDays, setUnlimitedDays] = useState(initialUnlimitedDays);
   const selectedPlan = plans[selectedIndex] ?? plans[0];
@@ -39,7 +53,7 @@ export function CountryPlanSelector({ bestChoiceData, destination, onContinue, p
   useEffect(() => {
     setSelectedIndex(bestChoiceIndex);
     setUnlimitedDays(initialUnlimitedDays);
-  }, [bestChoiceData, bestChoiceIndex, destination.name, initialUnlimitedDays]);
+  }, [bestChoiceData, bestChoiceIndex, bestChoiceValidityDays, destination.name, initialUnlimitedDays]);
 
   const plannerHref = useMemo(() => {
     const params = new URLSearchParams({
@@ -59,11 +73,14 @@ export function CountryPlanSelector({ bestChoiceData, destination, onContinue, p
   }, [destination.name, endDate, selectedDisplayPlan.data, selectedDisplayPlan.days, startDate]);
 
   return (
-    <section className="rounded-lg bg-white p-5 shadow-[0_24px_86px_-72px_rgba(15,23,42,0.55)] ring-1 ring-slate-200/80 sm:p-6">
+    <section className="rounded-lg bg-white p-5 shadow-[0_24px_82px_-74px_rgba(15,23,42,0.48)] ring-1 ring-slate-200/70 sm:p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
-          {title ?? `Get an eSIM data plan for ${destination.name}`}
-        </h2>
+        <div>
+          <p className="text-sm font-semibold text-orange-700">Available plans</p>
+          <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">
+            {title ?? `Get an eSIM data plan for ${destination.name}`}
+          </h2>
+        </div>
         {onContinue ? (
           <button
             className="inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded-md bg-slate-950 px-5 text-sm font-semibold text-white shadow-[0_16px_46px_-32px_rgba(15,23,42,0.7)] transition-colors duration-200 hover:bg-slate-800"
@@ -92,19 +109,19 @@ export function CountryPlanSelector({ bestChoiceData, destination, onContinue, p
 
           return (
             <label
-              className={`relative flex min-h-[176px] cursor-pointer flex-col rounded-md bg-white p-4 text-left shadow-[inset_0_0_0_1px_rgba(226,232,240,0.95)] transition-shadow duration-200 hover:shadow-[inset_0_0_0_1px_rgba(251,146,60,0.42),0_18px_60px_-52px_rgba(15,23,42,0.5)] ${
-                isSelected ? "shadow-[inset_0_0_0_1px_rgba(15,23,42,0.95),0_18px_64px_-54px_rgba(15,23,42,0.58)]" : ""
+              className={`relative flex min-h-[176px] cursor-pointer flex-col rounded-md bg-white p-4 text-left shadow-[inset_0_0_0_1px_rgba(226,232,240,0.9)] transition duration-200 hover:-translate-y-0.5 hover:shadow-[inset_0_0_0_1px_rgba(251,146,60,0.38),0_16px_52px_-48px_rgba(15,23,42,0.42)] ${
+                isSelected ? "bg-[#fffaf6] shadow-[inset_0_0_0_2px_rgba(234,88,12,0.8),0_20px_64px_-54px_rgba(15,23,42,0.52)]" : ""
               }`}
               key={`${plan.data}-${plan.days}`}
             >
               {isBestChoice ? (
-                <span className="absolute right-4 top-4 rounded-md bg-orange-50 px-3 py-1 text-xs font-semibold text-orange-700">
-                  Best Choice
+                <span className="absolute right-4 top-4 rounded-md bg-orange-50 px-2.5 py-1 text-xs font-medium text-orange-700">
+                  Best match
                 </span>
               ) : null}
               <input
                 checked={isSelected}
-                className="h-4 w-4 accent-black"
+                className="h-4 w-4 accent-orange-700"
                 name="selectedPlan"
                 onChange={() => setSelectedIndex(index)}
                 type="radio"
@@ -129,7 +146,7 @@ export function CountryPlanSelector({ bestChoiceData, destination, onContinue, p
                 <span className="mt-3 block text-base text-slate-500">{displayPlan.days}</span>
               )}
               <span className="mt-4 block text-lg font-semibold text-slate-950">{displayPlan.price}</span>
-              <span className="mt-2 inline-flex w-fit items-center gap-1 rounded-md bg-[#fff4d6] px-3 py-1 text-[11px] font-medium text-slate-800">
+              <span className="mt-2 inline-flex w-fit items-center gap-1 rounded-md bg-[#fff4d6] px-2.5 py-1 text-[11px] font-medium text-slate-700">
                 <BadgePercent className="h-3 w-3" />
                 3% in Connecta credits
               </span>

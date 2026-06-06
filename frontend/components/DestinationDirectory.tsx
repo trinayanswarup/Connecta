@@ -56,7 +56,7 @@ export function DestinationDirectory({ destinations }: DestinationDirectoryProps
   const isFullDirectory = isSearching || activeFilter === "all";
 
   return (
-    <section className="rounded-lg bg-white p-5 shadow-[0_24px_90px_-78px_rgba(15,23,42,0.55)] sm:p-8">
+    <section className="rounded-lg bg-white p-5 shadow-[0_24px_82px_-78px_rgba(15,23,42,0.44)] ring-1 ring-slate-200/60 sm:p-8">
       <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-sm font-semibold text-orange-700">Destination finder</p>
@@ -65,8 +65,8 @@ export function DestinationDirectory({ destinations }: DestinationDirectoryProps
           </h2>
           <p className="mt-3 max-w-xl text-sm leading-6 text-slate-500">
             {isFullDirectory
-              ? "Every destination includes multiple data sizes, validity windows, and prices."
-              : "Start with 9 popular countries, or search any country, region, or global plan."}
+              ? "Browse destinations with clear data sizes, validity, and prices."
+              : "Start with popular countries, or search any country, region, or global plan."}
           </p>
         </div>
         <div className="flex min-h-12 min-w-0 items-center gap-3 rounded-md bg-[#fbfaf7] px-4 ring-1 ring-slate-200/80 transition focus-within:ring-4 focus-within:ring-orange-100 sm:min-w-80">
@@ -110,7 +110,7 @@ export function DestinationDirectory({ destinations }: DestinationDirectoryProps
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {visibleDestinations.map((destination) => (
           <Link
-            className="group relative min-h-32 overflow-hidden rounded-md bg-white p-5 shadow-[inset_0_0_0_1px_rgba(226,232,240,0.95),0_16px_44px_-38px_rgba(15,23,42,0.55)] transition-shadow duration-200 hover:shadow-[inset_0_0_0_1px_rgba(251,146,60,0.38),0_22px_70px_-48px_rgba(15,23,42,0.55)]"
+            className="group relative min-h-32 overflow-hidden rounded-md bg-white p-5 shadow-[inset_0_0_0_1px_rgba(226,232,240,0.9),0_14px_38px_-36px_rgba(15,23,42,0.38)] transition-shadow duration-200 hover:shadow-[inset_0_0_0_1px_rgba(251,146,60,0.34),0_18px_56px_-46px_rgba(15,23,42,0.42)]"
             href={destinationHref(destination.name)}
             key={destination.name}
           >

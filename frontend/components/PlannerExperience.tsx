@@ -40,6 +40,7 @@ export function PlannerExperience({
   });
   const [analysis, setAnalysis] = useState<TripAnalysis | null>(null);
   const [bestChoiceData, setBestChoiceData] = useState<string | undefined>(undefined);
+  const [bestChoiceValidityDays, setBestChoiceValidityDays] = useState<number | undefined>(undefined);
   const [resultsMode, setResultsMode] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
 
@@ -66,13 +67,15 @@ export function PlannerExperience({
 
   function handleAnalysisReady(nextAnalysis: TripAnalysis) {
     setAnalysis(nextAnalysis);
-    setBestChoiceData(`${nextAnalysis.selectedPlan.dataGb} GB`);
+    setBestChoiceData(nextAnalysis.selectedPlan.dataLabel ?? `${nextAnalysis.selectedPlan.dataGb} GB`);
+    setBestChoiceValidityDays(nextAnalysis.selectedPlan.validityDays);
     setResultsMode(true);
   }
 
   function handleManualContinue(plan: MarketingPlan) {
     const manualPlan = toPlanOption(plan, selectedDestination.name, selectedDestination.kind);
     setBestChoiceData(plan.data);
+    setBestChoiceValidityDays(parseDays(plan.days));
     router.push(checkoutHrefForPlan(manualPlan, selectedDestination.name));
   }
 
@@ -85,16 +88,16 @@ export function PlannerExperience({
     >
       {!resultsMode ? (
         <aside className="pt-3 lg:sticky lg:top-8">
-          <p className="text-sm font-semibold text-orange-700">Plan your travel data</p>
+          <p className="text-sm font-semibold text-orange-700">Travel data, made simple</p>
           <h1 className="mt-4 max-w-2xl text-4xl font-semibold leading-[1.04] text-slate-950 sm:text-5xl">
             Find a plan that feels right before you land.
           </h1>
           <p className="mt-6 max-w-xl text-base leading-8 text-slate-600">
-            Tell us where you are going and how you use data. We will keep the choice simple, clear, and ready before departure.
+            Tell us where you are going and what you need. We will keep the choices simple, clear, and ready before departure.
           </p>
           <div className="mt-10 grid gap-4">
             {plannerBenefits.map((benefit) => (
-              <div className="grid grid-cols-[auto_1fr] gap-4 rounded-md bg-white/70 p-4 shadow-[0_16px_56px_-48px_rgba(15,23,42,0.45)] ring-1 ring-slate-200/70" key={benefit.title}>
+              <div className="grid grid-cols-[auto_1fr] gap-4 rounded-md bg-white/80 p-4 shadow-[0_14px_46px_-44px_rgba(15,23,42,0.36)] ring-1 ring-slate-200/60" key={benefit.title}>
                 <span className="mt-1 grid h-11 w-11 place-items-center rounded-md bg-orange-50 text-orange-700">
                   {benefit.icon}
                 </span>
@@ -109,7 +112,7 @@ export function PlannerExperience({
       ) : null}
 
       <div className="min-w-0">
-        <div className={resultsMode && analysis ? "grid gap-5 lg:grid-cols-[0.78fr_1.22fr] lg:items-start" : "grid gap-10"}>
+        <div className={resultsMode && analysis ? "grid gap-6 lg:grid-cols-[0.78fr_1.22fr] lg:items-start" : "grid gap-10"}>
           <TripForm
             compact={resultsMode}
             initialDestination={initialDestination}
@@ -130,7 +133,7 @@ export function PlannerExperience({
         </div>
 
         {resultsMode && analysis ? (
-          <div className="mt-6 grid gap-6">
+          <div className="mt-7 grid gap-7">
             <PlanComparison
               alternatives={analysis.alternatives}
               checkoutHref={otherOption ? checkoutHrefForPlan(otherOption, selectedDestination.name) : undefined}
@@ -145,12 +148,13 @@ export function PlannerExperience({
         <div className={`${resultsMode && analysis ? "mt-6" : "mt-12"} scroll-mt-6`} id="choose-yourself">
           <CountryPlanSelector
             bestChoiceData={bestChoiceData}
+            bestChoiceValidityDays={bestChoiceValidityDays}
             destination={selectedDestination}
             endDate={tripDetails.endDate}
             onContinue={handleManualContinue}
             plans={plans}
             startDate={tripDetails.startDate}
-            title={`Choose it yourself: ${selectedDestination.name} eSIM`}
+            title={`Choose your own ${selectedDestination.name} eSIM`}
           />
         </div>
       </div>
@@ -172,7 +176,7 @@ const plannerBenefits = [
   {
     icon: <CheckCircle2 className="h-5 w-5" />,
     title: "Compare plans clearly",
-    text: "Get a best match with alternatives when you want options."
+    text: "Start with a clear match, then compare more plans when you want options."
   },
   {
     icon: <Globe2 className="h-5 w-5" />,
@@ -181,18 +185,32 @@ const plannerBenefits = [
   }
 ];
 
-function toPlanOption(plan: MarketingPlan, destination: string, kind: DestinationKind): PlanOption {
-  const dataGb = parseDataGb(plan.data) ?? 50;
+type ManualPlanOption = PlanOption & {
+  dataLabel?: string;
+};
+
+function toPlanOption(plan: MarketingPlan, destination: string, kind: DestinationKind): ManualPlanOption {
+  const dataGb = parseDataGb(plan.data);
+  const displayData = displayDataLabel(plan.data, dataGb);
 
   return {
-    id: `${destination.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${dataGb}gb-${parseDays(plan.days)}`,
+    id: `${destination.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${displayData.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${parseDays(plan.days)}`,
     provider: providerForDestination(kind),
-    name: `${destination} ${dataGb}GB`,
+    name: `${destination} ${displayData}`,
     priceUsd: parseUsd(plan.price),
-    dataGb,
+    dataGb: dataGb ?? 50,
+    dataLabel: plan.data,
     validityDays: parseDays(plan.days),
-    tradeoff: "Best balance of price and safety margin."
+    tradeoff: "A practical mix of data, validity, and price for this trip."
   };
+}
+
+function displayDataLabel(data: string, dataGb: number | null) {
+  if (dataGb !== null) {
+    return `${dataGb}GB`;
+  }
+
+  return data.trim();
 }
 
 function providerForDestination(kind: DestinationKind) {

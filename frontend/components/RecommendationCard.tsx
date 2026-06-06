@@ -11,9 +11,11 @@ type RecommendationCardProps = {
 };
 
 export function RecommendationCard({ analysis, checkoutHref, manualChoiceHref }: RecommendationCardProps) {
+  const selectedData = analysis.selectedPlan.dataLabel ?? `${analysis.selectedPlan.dataGb} GB`;
+
   return (
-    <section className="overflow-hidden rounded-lg bg-white shadow-[0_30px_100px_-78px_rgba(15,23,42,0.6)] ring-1 ring-slate-200/80">
-      <div className="grid gap-7 p-6 sm:p-7 xl:grid-cols-[minmax(0,1fr)_18rem] xl:items-start">
+    <section className="overflow-hidden rounded-lg bg-white shadow-[0_30px_96px_-80px_rgba(15,23,42,0.52)] ring-1 ring-slate-200/70">
+      <div className="grid gap-8 p-6 sm:p-8 xl:grid-cols-[minmax(0,1fr)_18rem] xl:items-start">
         <div>
           <div className="inline-flex items-center gap-2 rounded-md bg-orange-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-orange-700">
             <CheckCircle2 className="h-4 w-4" />
@@ -52,7 +54,7 @@ export function RecommendationCard({ analysis, checkoutHref, manualChoiceHref }:
               <div className="mt-1 text-sm text-slate-500">{analysis.selectedPlan.validityDays} days included</div>
             </div>
             <div className="rounded-md bg-white px-3 py-2 text-sm font-semibold leading-tight text-orange-700 shadow-sm ring-1 ring-orange-100">
-              {analysis.selectedPlan.dataGb} GB
+              {selectedData}
             </div>
           </div>
           <div className="my-4 h-px bg-orange-200/60" />
@@ -61,7 +63,7 @@ export function RecommendationCard({ analysis, checkoutHref, manualChoiceHref }:
       </div>
 
       <div className="grid gap-3 border-t border-slate-100 bg-[#fbfaf7] p-4 sm:grid-cols-3 sm:p-5">
-        <PlanFact icon={<SignalHigh className="h-4 w-4" />} label="Data included" value={`${analysis.selectedPlan.dataGb} GB`} />
+        <PlanFact icon={<SignalHigh className="h-4 w-4" />} label="Data included" value={selectedData} />
         <PlanFact icon={<CalendarDays className="h-4 w-4" />} label="Valid for" value={`${analysis.selectedPlan.validityDays} days`} />
         <PlanFact icon={<CircleDollarSign className="h-4 w-4" />} label="Total price" value={`$${analysis.selectedPlan.priceUsd.toFixed(2)}`} />
       </div>
