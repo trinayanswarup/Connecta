@@ -24,10 +24,10 @@ export function DestinationBrowseCard({
   } as CSSProperties;
 
   return (
-    <article className="group h-full min-h-[380px] w-full" style={style}>
+    <article className="group h-full min-h-[390px] w-full" style={style}>
       <Link
         aria-label={`Explore travel data options for ${location}`}
-        className="relative block h-full overflow-hidden rounded-lg shadow-[0_24px_80px_-56px_hsl(var(--theme-color)/0.72)] transition-shadow duration-300 ease-out hover:shadow-[0_30px_96px_-58px_hsl(var(--theme-color)/0.82)]"
+        className="relative block h-full overflow-hidden rounded-lg shadow-[0_26px_90px_-66px_hsl(var(--theme-color)/0.72)] transition duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_34px_108px_-66px_hsl(var(--theme-color)/0.78)]"
         href={href}
       >
         <div
@@ -47,7 +47,7 @@ export function DestinationBrowseCard({
           </h3>
           <p className="mt-1 text-sm font-medium text-white/80">{stats}</p>
 
-          <div className="mt-8 flex items-center justify-between rounded-md bg-white/15 px-4 py-3 text-white backdrop-blur-md ring-1 ring-white/20 transition-colors duration-200 group-hover:bg-white/20">
+          <div className="mt-9 flex items-center gap-2 text-white transition-colors duration-200 group-hover:text-orange-100">
             <span className="text-sm font-semibold">Browse destination</span>
             <ArrowRight className="h-4 w-4" />
           </div>

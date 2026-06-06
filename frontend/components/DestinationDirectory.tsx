@@ -56,20 +56,20 @@ export function DestinationDirectory({ destinations }: DestinationDirectoryProps
   const isFullDirectory = isSearching || activeFilter === "all";
 
   return (
-    <section className="rounded-lg bg-white p-5 shadow-[0_24px_82px_-78px_rgba(15,23,42,0.44)] ring-1 ring-slate-200/60 sm:p-8">
-      <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+    <section className="rounded-lg bg-white/90 p-6 shadow-[0_26px_100px_-88px_rgba(15,23,42,0.42)] sm:p-9">
+      <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-sm font-semibold text-orange-700">Destination finder</p>
           <h2 className="mt-2 text-3xl font-semibold leading-tight text-slate-950">
             {isFullDirectory ? "Explore every country and region" : "Popular eSIM destinations"}
           </h2>
-          <p className="mt-3 max-w-xl text-sm leading-6 text-slate-500">
+          <p className="mt-4 max-w-xl text-base leading-7 text-slate-500">
             {isFullDirectory
               ? "Browse destinations with clear data sizes, validity, and prices."
               : "Start with popular countries, or search any country, region, or global plan."}
           </p>
         </div>
-        <div className="flex min-h-12 min-w-0 items-center gap-3 rounded-md bg-[#fbfaf7] px-4 ring-1 ring-slate-200/80 transition focus-within:ring-4 focus-within:ring-orange-100 sm:min-w-80">
+        <div className="flex min-h-12 min-w-0 items-center gap-3 rounded-md bg-[#fbfaf7] px-4 shadow-[inset_0_0_0_1px_rgba(226,232,240,0.72)] transition focus-within:shadow-[inset_0_0_0_1px_rgba(234,88,12,0.32),0_0_0_4px_rgba(255,237,213,0.72)] sm:min-w-80">
           <Search className="h-4 w-4 shrink-0 text-slate-400" />
           <input
             className="min-w-0 flex-1 bg-transparent text-sm text-slate-950 outline-none placeholder:text-slate-400"
@@ -83,15 +83,15 @@ export function DestinationDirectory({ destinations }: DestinationDirectoryProps
         </div>
       </div>
 
-      <div className="mt-7 flex flex-wrap gap-2.5">
+      <div className="mt-8 flex flex-wrap gap-2.5">
         {filters.map((filter) => {
           const isActive = activeFilter === filter.value;
           return (
             <button
-              className={`inline-flex cursor-pointer items-center gap-2 rounded-md border px-4 py-2.5 text-sm font-semibold transition-colors duration-200 ${
+              className={`inline-flex cursor-pointer items-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold transition-colors duration-200 ${
                 isActive
-                  ? "border-slate-950 bg-slate-950 text-white"
-                  : "border-slate-200 bg-white text-slate-700 hover:border-orange-200 hover:bg-orange-50"
+                  ? "bg-slate-950 text-white"
+                  : "bg-slate-50 text-slate-700 hover:bg-orange-50 hover:text-orange-800"
               }`}
               key={filter.value}
               onClick={() => {
@@ -107,10 +107,10 @@ export function DestinationDirectory({ destinations }: DestinationDirectoryProps
         })}
       </div>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-9 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {visibleDestinations.map((destination) => (
           <Link
-            className="group relative min-h-32 overflow-hidden rounded-md bg-white p-5 shadow-[inset_0_0_0_1px_rgba(226,232,240,0.9),0_14px_38px_-36px_rgba(15,23,42,0.38)] transition-shadow duration-200 hover:shadow-[inset_0_0_0_1px_rgba(251,146,60,0.34),0_18px_56px_-46px_rgba(15,23,42,0.42)]"
+            className="group relative min-h-32 overflow-hidden rounded-md bg-[#fbfaf7] p-5 shadow-[inset_0_0_0_1px_rgba(226,232,240,0.62)] transition duration-200 hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_18px_58px_-50px_rgba(15,23,42,0.38)]"
             href={destinationHref(destination.name)}
             key={destination.name}
           >
@@ -125,7 +125,7 @@ export function DestinationDirectory({ destinations }: DestinationDirectoryProps
               </span>
               <ArrowRight className="mt-8 h-4 w-4 text-slate-400 transition-colors duration-200 group-hover:text-orange-700" />
             </div>
-            <div className="absolute bottom-0 right-0 h-16 w-44 rounded-tl-md bg-slate-50/80" />
+            <div className="absolute bottom-0 right-0 h-16 w-44 rounded-tl-md bg-white/60" />
           </Link>
         ))}
       </div>
@@ -137,9 +137,9 @@ export function DestinationDirectory({ destinations }: DestinationDirectoryProps
       ) : null}
 
       {!isFullDirectory ? (
-        <div className="mt-7 flex justify-center border-t border-slate-100 pt-7">
+        <div className="mt-8 flex justify-center border-t border-slate-100 pt-8">
           <button
-            className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-md border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-800 transition-colors duration-200 hover:border-orange-200 hover:bg-orange-50"
+            className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-md bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_54px_-38px_rgba(15,23,42,0.62)] transition-colors duration-200 hover:bg-slate-800"
             onClick={() => {
               setActiveFilter("all");
               setPage(1);

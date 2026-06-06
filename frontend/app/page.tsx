@@ -109,17 +109,17 @@ export default function HomePage() {
         </div>
       </header>
 
-      <section className="mx-auto max-w-[94rem] px-4 pb-10 pt-4 sm:px-6 lg:px-8">
-        <div className="relative grid min-h-[34rem] overflow-hidden rounded-lg bg-white shadow-[0_34px_110px_-92px_rgba(15,23,42,0.5)] lg:grid-cols-[0.58fr_0.42fr]">
+      <section className="mx-auto max-w-[94rem] px-4 pb-14 pt-5 sm:px-6 lg:px-8">
+        <div className="relative grid min-h-[36rem] overflow-hidden rounded-lg bg-white shadow-[0_32px_120px_-104px_rgba(15,23,42,0.52)] lg:grid-cols-[0.58fr_0.42fr]">
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 opacity-[0.38]"
+            className="pointer-events-none absolute inset-0 opacity-[0.24]"
             style={{
               backgroundImage:
                 "repeating-radial-gradient(ellipse at 12% 10%, transparent 0 70px, rgba(15,23,42,0.045) 71px 72px, transparent 73px 144px)"
             }}
           />
-          <div className="relative z-10 flex flex-col justify-center px-6 py-16 sm:px-10 lg:px-14 xl:px-20">
+          <div className="relative z-10 flex flex-col justify-center px-6 py-20 sm:px-10 lg:px-14 xl:px-20">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-orange-700">Travel data, ready when you land</p>
             <h1 className="mt-7 max-w-4xl text-5xl font-semibold leading-[1.03] text-slate-950 sm:text-6xl lg:text-[4.15rem] xl:text-[4.9rem]">
               Stay connected without the roaming panic.
@@ -142,7 +142,7 @@ export default function HomePage() {
                 Browse destinations
               </Link>
             </div>
-            <div className="mt-10 grid max-w-2xl gap-3 text-sm font-medium text-slate-600 sm:grid-cols-3">
+            <div className="mt-12 grid max-w-2xl gap-4 text-sm font-medium text-slate-600 sm:grid-cols-3">
               <span className="inline-flex items-center gap-2">
                 <BadgeCheck className="h-4 w-4 text-orange-700" />
                 Keep your number
@@ -169,8 +169,8 @@ export default function HomePage() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-white via-white/5 to-[#eaf4ff]/20 lg:bg-gradient-to-r lg:from-white/10 lg:via-transparent lg:to-white/0" />
             <div className="absolute bottom-0 left-0 right-0 h-20 rounded-t-md bg-[#fbfaf7]" />
-            <div className="absolute bottom-8 left-6 right-6 grid gap-3 sm:left-auto sm:w-72">
-              <div className="rounded-md bg-white/90 p-4 shadow-[0_22px_60px_-42px_rgba(15,23,42,0.55)] ring-1 ring-white/70 backdrop-blur">
+            <div className="absolute bottom-9 left-6 right-6 grid gap-3 sm:left-auto sm:w-72">
+              <div className="rounded-md bg-white/90 p-4 shadow-[0_24px_70px_-48px_rgba(15,23,42,0.5)] backdrop-blur">
                 <div className="flex items-center justify-between gap-4">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-wide text-orange-700">Popular now</p>
@@ -185,31 +185,28 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 py-14 sm:px-8" id="plan-finder">
-        <div className="grid gap-10 rounded-lg bg-white p-7 shadow-[0_28px_86px_-78px_rgba(15,23,42,0.48)] ring-1 ring-slate-200/70 sm:p-9 lg:grid-cols-[0.68fr_1.32fr] lg:items-center">
+      <section className="mx-auto max-w-7xl px-5 py-16 sm:px-8" id="plan-finder">
+        <div className="grid gap-12 rounded-lg bg-white/90 p-7 shadow-[0_30px_110px_-94px_rgba(15,23,42,0.42)] sm:p-10 lg:grid-cols-[13rem_1fr] lg:items-center xl:grid-cols-[15rem_1fr]">
           <div>
             <p className="text-sm font-semibold text-orange-700">Find my plan</p>
-            <h2 className="mt-3 text-3xl font-semibold leading-tight text-slate-950">Start with your destination and dates.</h2>
-            <p className="mt-4 text-sm leading-6 text-slate-600">
-              Enter your destination and dates. We will keep the plan choices simple.
-            </p>
+            <h2 className="mt-3 text-2xl font-semibold leading-tight text-slate-950 xl:text-3xl">Start with your trip.</h2>
           </div>
           <HomeSearch />
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-11 px-5 py-16 sm:px-8" id="destinations">
+      <section className="mx-auto grid max-w-7xl gap-14 px-5 py-20 sm:px-8" id="destinations">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-sm font-semibold text-orange-700">Popular destinations</p>
-            <h2 className="mt-2 text-4xl font-semibold text-slate-950">Travel data for places people love.</h2>
+            <h2 className="mt-3 max-w-3xl text-4xl font-semibold leading-tight text-slate-950">Travel data for places people love.</h2>
           </div>
-          <p className="max-w-lg text-sm leading-6 text-slate-600">
+          <p className="max-w-lg text-base leading-7 text-slate-600">
             Pick a destination, then choose a plan yourself or start with a guided match.
           </p>
         </div>
 
-        <div className="grid gap-5 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-3">
           {popularDestinations.map((destination) => (
             <DestinationBrowseCard
               flag={destination.flag}
@@ -226,32 +223,32 @@ export default function HomePage() {
         <DestinationDirectory destinations={destinationOptions} />
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-10 px-5 py-24 sm:px-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-center">
+      <section className="mx-auto grid max-w-7xl gap-14 px-5 py-24 sm:px-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-center">
         <div>
           <p className="text-sm font-semibold text-orange-700">What is an eSIM?</p>
-          <h2 className="mt-2 text-4xl font-semibold leading-tight text-slate-950">A digital SIM for travel data, without the counter queue.</h2>
+          <h2 className="mt-3 text-4xl font-semibold leading-tight text-slate-950">A digital SIM for travel data, without the counter queue.</h2>
         </div>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-5 md:grid-cols-3">
           <InfoTile icon={<Smartphone className="h-5 w-5" />} title="No plastic SIM" text="Install the plan digitally on supported phones." />
           <InfoTile icon={<Wifi className="h-5 w-5" />} title="Keep your number" text="Use travel data while your regular SIM stays available." />
           <InfoTile icon={<Globe2 className="h-5 w-5" />} title="Made for trips" text="Pick a destination, validity, and data amount that match your stay." />
         </div>
       </section>
 
-      <section className="bg-[#fff4e8] py-24" id="how-it-works">
+      <section className="bg-[#fff4e8] py-28" id="how-it-works">
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
           <div className="max-w-3xl">
             <p className="text-sm font-semibold text-orange-700">How it works</p>
-            <h2 className="mt-2 text-4xl font-semibold text-slate-950">Find your plan in three calm steps</h2>
+            <h2 className="mt-3 text-4xl font-semibold leading-tight text-slate-950">Find your plan in three calm steps</h2>
           </div>
-          <div className="mt-10 grid gap-5 md:grid-cols-3">
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
             {steps.map((step, index) => (
-              <article className="rounded-md bg-white p-6 shadow-[0_18px_62px_-58px_rgba(15,23,42,0.38)] ring-1 ring-orange-100/40" key={step.title}>
+              <article className="rounded-md bg-white/90 p-7 shadow-[0_22px_78px_-66px_rgba(15,23,42,0.34)]" key={step.title}>
                 <div className="flex items-center justify-between">
                   <span className="grid h-11 w-11 place-items-center rounded-md bg-orange-50 text-orange-700">{step.icon}</span>
                   <span className="text-sm font-semibold text-slate-400">0{index + 1}</span>
                 </div>
-                <h3 className="mt-8 text-xl font-semibold text-slate-950">{step.title}</h3>
+                <h3 className="mt-9 text-xl font-semibold text-slate-950">{step.title}</h3>
                 <p className="mt-3 text-sm leading-6 text-slate-600">{step.text}</p>
               </article>
             ))}
@@ -259,16 +256,16 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 py-24 sm:px-8" id="trust">
-        <div className="grid gap-8 lg:grid-cols-[0.86fr_1.14fr] lg:items-start">
+      <section className="mx-auto max-w-7xl px-5 py-28 sm:px-8" id="trust">
+        <div className="grid gap-12 lg:grid-cols-[0.86fr_1.14fr] lg:items-start">
           <div>
             <p className="text-sm font-semibold text-orange-700">Benefits</p>
-            <h2 className="mt-2 text-4xl font-semibold leading-tight text-slate-950">Built to feel clear before you buy.</h2>
-            <p className="mt-4 text-sm leading-6 text-slate-600">
+            <h2 className="mt-3 text-4xl font-semibold leading-tight text-slate-950">Built to feel clear before you buy.</h2>
+            <p className="mt-5 text-base leading-7 text-slate-600">
               Compare your options with clear plan details, simple setup guidance, and no roaming surprises.
             </p>
           </div>
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-5 md:grid-cols-3">
             {benefits.map((benefit) => (
               <InfoTile icon={benefit.icon} key={benefit.title} text={benefit.text} title={benefit.title} />
             ))}
@@ -276,11 +273,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 pb-20 sm:px-8">
-        <div className="grid gap-6 rounded-lg bg-slate-950 p-8 text-white shadow-[0_28px_90px_-70px_rgba(15,23,42,0.8)] sm:p-10 lg:grid-cols-[1fr_auto] lg:items-center">
+      <section className="mx-auto max-w-7xl px-5 pb-24 pt-4 sm:px-8">
+        <div className="grid gap-7 rounded-lg bg-slate-950 p-9 text-white shadow-[0_30px_104px_-76px_rgba(15,23,42,0.8)] sm:p-12 lg:grid-cols-[1fr_auto] lg:items-center">
           <div>
             <h2 className="text-4xl font-semibold">Ready to choose a travel eSIM?</h2>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-white/70">
+            <p className="mt-4 max-w-2xl text-base leading-7 text-white/70">
               Share your destination and data needs. We will show a clear plan and simple setup guidance.
             </p>
           </div>
@@ -299,9 +296,9 @@ export default function HomePage() {
 
 function InfoTile({ icon, title, text }: { icon: ReactNode; title: string; text: string }) {
   return (
-    <article className="rounded-md bg-white p-6 shadow-[0_16px_54px_-52px_rgba(15,23,42,0.36)] ring-1 ring-slate-200/70 transition-shadow duration-200 hover:ring-orange-200">
+    <article className="rounded-md bg-white/90 p-7 shadow-[0_20px_72px_-64px_rgba(15,23,42,0.34)] transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_28px_82px_-62px_rgba(15,23,42,0.4)]">
       <span className="grid h-11 w-11 place-items-center rounded-md bg-orange-50 text-orange-700">{icon}</span>
-      <h3 className="mt-8 text-lg font-semibold text-slate-950">{title}</h3>
+      <h3 className="mt-9 text-lg font-semibold text-slate-950">{title}</h3>
       <p className="mt-3 text-sm leading-6 text-slate-600">{text}</p>
     </article>
   );
