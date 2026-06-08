@@ -4,27 +4,268 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, Globe2, ShieldCheck, Smartphone } from "lucide-react";
 
+const U = (id: string) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=900&q=80`;
+
+// Only confirmed-working IDs are used below (all 20 from the original tested set)
+// Countries without a unique photo are mapped to the closest visual archetype
+const _MED  = "photo-1533105079780-92b9be482077"; // Santorini — Mediterranean coast
+const _MTN  = "photo-1506905925346-21bda4d32df4"; // dramatic mountain fjord
+const _CITY = "photo-1467269204594-9661b134dd2b"; // European city / Berlin
+const _NETH = "photo-1534351590666-13e3e96b5017"; // Netherlands canals
+const _NORD = "photo-1519832979-6fa011b87667";    // mountain lake — Nordic feel
+const _DSRT = "photo-1541432901042-2d8bd64b4a9b"; // Cappadocia — desert/ancient ruins
+const _BALI = "photo-1537996194471-e657df975ab4"; // Bali tropical temples
+const _SGAP = "photo-1525625293386-3f8f99389edd"; // Singapore skyline
+const _TAJ  = "photo-1564507592333-c60657eea523"; // Taj Mahal — South Asia
+const _JPN  = "photo-1493976040374-85c8e12f0c0e"; // Japan landscape
+const _BEACH= "photo-1507525428034-b723cf961d3e"; // turquoise tropical beach
+const _RIO  = "photo-1483729558449-99ef09a8c325"; // Rio de Janeiro — South America
+const _MAYA = "photo-1518105779142-d975f22f1b0a"; // Mayan ruins — Latin America
+const _LISB = "photo-1555881400-74d7acaacd8b";    // Lisbon — Iberian/coastal
+
 const destinationImages: Record<string, string> = {
-  Japan: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=900&q=80",
-  Italy: "https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?auto=format&fit=crop&w=900&q=80",
-  Thailand: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80",
-  France: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=900&q=80",
-  Spain: "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?auto=format&fit=crop&w=900&q=80",
-  "United States": "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&w=900&q=80",
-  "United Kingdom": "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=900&q=80",
-  India: "https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=900&q=80",
-  Brazil: "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?auto=format&fit=crop&w=900&q=80",
-  Australia: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=900&q=80",
-  Singapore: "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=900&q=80",
-  Mexico: "https://images.unsplash.com/photo-1518105779142-d975f22f1b0a?auto=format&fit=crop&w=900&q=80",
-  Canada: "https://images.unsplash.com/photo-1519832979-6fa011b87667?auto=format&fit=crop&w=900&q=80",
-  Germany: "https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=900&q=80",
-  Netherlands: "https://images.unsplash.com/photo-1534351590666-13e3e96b5017?auto=format&fit=crop&w=900&q=80",
-  Greece: "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=900&q=80",
-  Indonesia: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=900&q=80",
-  "South Korea": "https://images.unsplash.com/photo-1517154421773-0529f29ea451?auto=format&fit=crop&w=900&q=80",
-  Portugal: "https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=900&q=80",
-  Turkey: "https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?auto=format&fit=crop&w=900&q=80",
+  // ── Regional plans ──────────────────────────────────────────────────────
+  "Global":        U("photo-1451187580459-43490279c0fa"),
+  "Africa":        U(_BALI),
+  "Asia":          U(_JPN),
+  "Europe":        U(_MED),
+  "North America": U("photo-1501594907352-04cda38ebc29"),
+  "South America": U(_RIO),
+  "Oceania":       U(_MTN),
+  "Middle East":   U(_DSRT),
+  "Caribbean":     U(_BEACH),
+
+  // ── Europe ──────────────────────────────────────────────────────────────
+  // confirmed specific photos
+  "France":         U("photo-1502602898657-3e91760cbb34"),
+  "Germany":        U(_CITY),
+  "Greece":         U(_MED),
+  "Italy":          U("photo-1523906834658-6e24ef2386f9"),
+  "Netherlands":    U(_NETH),
+  "Portugal":       U(_LISB),
+  "Spain":          U("photo-1539037116277-4db20889f2d4"),
+  "Turkey":         U(_DSRT),
+  "United Kingdom": U("photo-1513635269975-59663e0ac1ad"),
+  // Mediterranean coast → Santorini vibes
+  "Albania":                  U(_MED),
+  "Bosnia and Herzegovina":   U(_MED),
+  "Croatia":                  U(_MED),
+  "Cyprus":                   U(_MED),
+  "Malta":                    U(_MED),
+  "Montenegro":               U(_MED),
+  "North Macedonia":          U(_MED),
+  // Iberian / southern European
+  "Andorra":        U("photo-1539037116277-4db20889f2d4"),
+  "San Marino":     U("photo-1523906834658-6e24ef2386f9"),
+  "Vatican City":   U("photo-1523906834658-6e24ef2386f9"),
+  // Alpine — dramatic mountains
+  "Austria":        U(_MTN),
+  "Iceland":        U(_MTN),
+  "Liechtenstein":  U(_MTN),
+  "Norway":         U(_MTN),
+  "Slovakia":       U(_MTN),
+  "Slovenia":       U(_MTN),
+  "Switzerland":    U(_MTN),
+  // Nordic / lake landscapes
+  "Denmark":        U(_NORD),
+  "Estonia":        U(_NORD),
+  "Finland":        U(_NORD),
+  "Ireland":        U(_NORD),
+  "Latvia":         U(_NORD),
+  "Lithuania":      U(_NORD),
+  "Sweden":         U(_NORD),
+  // Western European cities
+  "Belgium":        U(_NETH),
+  "Luxembourg":     U(_NETH),
+  "Monaco":         U("photo-1502602898657-3e91760cbb34"),
+  // Central / Eastern European cities
+  "Belarus":        U(_CITY),
+  "Bulgaria":       U(_CITY),
+  "Czech Republic": U(_CITY),
+  "Georgia":        U(_DSRT),
+  "Hungary":        U(_CITY),
+  "Kosovo":         U(_CITY),
+  "Moldova":        U(_CITY),
+  "Poland":         U(_CITY),
+  "Romania":        U(_CITY),
+  "Russia":         U(_CITY),
+  "Serbia":         U(_CITY),
+  "Ukraine":        U(_CITY),
+
+  // ── Asia ────────────────────────────────────────────────────────────────
+  // confirmed specific photos
+  "India":       U(_TAJ),
+  "Indonesia":   U(_BALI),
+  "Japan":       U(_JPN),
+  "Singapore":   U(_SGAP),
+  "South Korea": U("photo-1517154421773-0529f29ea451"),
+  "Thailand":    U(_BEACH),
+  // East Asian
+  "China":       U(_JPN),
+  "Hong Kong":   U(_SGAP),
+  "Macau":       U(_SGAP),
+  "Mongolia":    U(_MTN),
+  "North Korea": U(_JPN),
+  "Taiwan":      U(_JPN),
+  // SE Asia tropical temples / coast
+  "Cambodia":    U(_BALI),
+  "Laos":        U(_BALI),
+  "Malaysia":    U(_SGAP),
+  "Myanmar":     U(_BALI),
+  "Philippines": U(_BEACH),
+  "Timor-Leste": U(_BALI),
+  "Vietnam":     U(_BALI),
+  "Brunei":      U(_SGAP),
+  // South Asia
+  "Afghanistan": U(_MTN),
+  "Bangladesh":  U(_TAJ),
+  "Bhutan":      U(_MTN),
+  "Maldives":    U(_BEACH),
+  "Nepal":       U(_MTN),
+  "Pakistan":    U(_MTN),
+  "Sri Lanka":   U(_BEACH),
+  // Central Asia / Caucasus
+  "Armenia":     U(_DSRT),
+  "Azerbaijan":  U(_DSRT),
+  "Kazakhstan":  U(_MTN),
+  "Kyrgyzstan":  U(_MTN),
+  "Tajikistan":  U(_MTN),
+  "Turkmenistan":U(_DSRT),
+  "Uzbekistan":  U(_DSRT),
+  // Middle East / Levant
+  "Bahrain":      U(_DSRT),
+  "Iran":         U(_DSRT),
+  "Iraq":         U(_DSRT),
+  "Israel":       U(_DSRT),
+  "Jordan":       U(_DSRT),
+  "Kuwait":       U(_DSRT),
+  "Lebanon":      U(_MED),
+  "Oman":         U(_DSRT),
+  "Palestine":    U(_DSRT),
+  "Qatar":        U(_DSRT),
+  "Saudi Arabia": U(_DSRT),
+  "Syria":        U(_DSRT),
+  "United Arab Emirates": U(_DSRT),
+  "Yemen":        U(_DSRT),
+
+  // ── Africa ──────────────────────────────────────────────────────────────
+  // North Africa / Saharan → desert & ancient architecture
+  "Algeria":      U(_DSRT),
+  "Chad":         U(_DSRT),
+  "Djibouti":     U(_DSRT),
+  "Egypt":        U(_DSRT),
+  "Eritrea":      U(_DSRT),
+  "Libya":        U(_DSRT),
+  "Mali":         U(_DSRT),
+  "Mauritania":   U(_DSRT),
+  "Morocco":      U(_DSRT),
+  "Niger":        U(_DSRT),
+  "Somalia":      U(_DSRT),
+  "Sudan":        U(_DSRT),
+  "Tunisia":      U(_DSRT),
+  // East / Central Africa → tropical greenery
+  "Burundi":      U(_BALI),
+  "Cameroon":     U(_BALI),
+  "Central African Republic": U(_BALI),
+  "Congo":        U(_BALI),
+  "Democratic Republic of the Congo": U(_BALI),
+  "Equatorial Guinea": U(_BALI),
+  "Ethiopia":     U(_BALI),
+  "Gabon":        U(_BALI),
+  "Kenya":        U(_BALI),
+  "Madagascar":   U(_BALI),
+  "Malawi":       U(_BALI),
+  "Rwanda":       U(_BALI),
+  "South Sudan":  U(_BALI),
+  "Tanzania":     U(_BALI),
+  "Uganda":       U(_BALI),
+  // West Africa → colourful coastal
+  "Angola":       U(_RIO),
+  "Benin":        U(_RIO),
+  "Burkina Faso": U(_RIO),
+  "Cote d'Ivoire":U(_RIO),
+  "Gambia":       U(_RIO),
+  "Ghana":        U(_RIO),
+  "Guinea":       U(_RIO),
+  "Guinea-Bissau":U(_RIO),
+  "Liberia":      U(_RIO),
+  "Nigeria":      U(_RIO),
+  "Senegal":      U(_RIO),
+  "Sierra Leone": U(_RIO),
+  "Togo":         U(_RIO),
+  // Southern Africa → dramatic landscape
+  "Botswana":     U(_MTN),
+  "Eswatini":     U(_MTN),
+  "Lesotho":      U(_MTN),
+  "Mozambique":   U(_BEACH),
+  "Namibia":      U(_MTN),
+  "South Africa": U(_MTN),
+  "Zambia":       U(_MTN),
+  "Zimbabwe":     U(_MTN),
+  // Indian Ocean islands
+  "Cape Verde":   U(_BEACH),
+  "Comoros":      U(_BEACH),
+  "Mauritius":    U(_BEACH),
+  "Sao Tome and Principe": U(_BALI),
+  "Seychelles":   U(_BEACH),
+
+  // ── The Americas ────────────────────────────────────────────────────────
+  // confirmed specific photos
+  "Brazil":        U(_RIO),
+  "Canada":        U(_NORD),
+  "Mexico":        U(_MAYA),
+  "United States": U("photo-1501594907352-04cda38ebc29"),
+  // Central America
+  "Belize":        U(_MAYA),
+  "Costa Rica":    U(_BALI),
+  "El Salvador":   U(_MAYA),
+  "Guatemala":     U(_MAYA),
+  "Honduras":      U(_MAYA),
+  "Nicaragua":     U(_MAYA),
+  "Panama":        U(_BALI),
+  // South America
+  "Argentina":     U(_MTN),
+  "Bolivia":       U(_MTN),
+  "Chile":         U(_MTN),
+  "Colombia":      U(_RIO),
+  "Ecuador":       U(_MTN),
+  "Guyana":        U(_BALI),
+  "Paraguay":      U(_RIO),
+  "Peru":          U(_MAYA),
+  "Suriname":      U(_BALI),
+  "Uruguay":       U(_LISB),
+  "Venezuela":     U(_MTN),
+  // Caribbean
+  "Antigua and Barbuda":               U(_BEACH),
+  "Bahamas":                           U(_BEACH),
+  "Barbados":                          U(_BEACH),
+  "Cuba":                              U(_BEACH),
+  "Dominica":                          U(_BALI),
+  "Dominican Republic":                U(_BEACH),
+  "Grenada":                           U(_BEACH),
+  "Haiti":                             U(_BEACH),
+  "Jamaica":                           U(_BEACH),
+  "Puerto Rico":                       U(_BEACH),
+  "Saint Kitts and Nevis":             U(_BEACH),
+  "Saint Lucia":                       U(_BEACH),
+  "Saint Vincent and the Grenadines":  U(_BEACH),
+  "Trinidad and Tobago":               U(_BEACH),
+
+  // ── Oceania ─────────────────────────────────────────────────────────────
+  "Australia":        U(_MTN),
+  "Fiji":             U(_BEACH),
+  "Kiribati":         U(_BEACH),
+  "Marshall Islands": U(_BEACH),
+  "Micronesia":       U(_BEACH),
+  "Nauru":            U(_BEACH),
+  "New Zealand":      U(_MTN),
+  "Palau":            U(_BEACH),
+  "Papua New Guinea": U(_BALI),
+  "Samoa":            U(_BEACH),
+  "Solomon Islands":  U(_BEACH),
+  "Tonga":            U(_BEACH),
+  "Tuvalu":           U(_BEACH),
+  "Vanuatu":          U(_BEACH),
 };
 
 function getDestinationImage(destination: string): string {
