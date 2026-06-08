@@ -24,10 +24,10 @@ export function DestinationBrowseCard({
   } as CSSProperties;
 
   return (
-    <article className="group h-full min-h-[390px] w-full" style={style}>
+    <article className="group h-full min-h-[420px] w-full" style={style}>
       <Link
         aria-label={`Explore travel data options for ${location}`}
-        className="relative block h-full overflow-hidden rounded-lg shadow-[0_26px_90px_-66px_hsl(var(--theme-color)/0.72)] transition duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_34px_108px_-66px_hsl(var(--theme-color)/0.78)]"
+        className="relative block h-full overflow-hidden rounded-2xl shadow-[0_26px_90px_-66px_hsl(var(--theme-color)/0.72)] transition duration-300 ease-out hover:scale-[1.02] hover:shadow-[0_34px_108px_-66px_hsl(var(--theme-color)/0.78)]"
         href={href}
       >
         <div

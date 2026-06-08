@@ -4,6 +4,36 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, Globe2, ShieldCheck, Smartphone } from "lucide-react";
 
+const destinationImages: Record<string, string> = {
+  Japan: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=900&q=80",
+  Italy: "https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?auto=format&fit=crop&w=900&q=80",
+  Thailand: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80",
+  France: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=900&q=80",
+  Spain: "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?auto=format&fit=crop&w=900&q=80",
+  "United States": "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&w=900&q=80",
+  "United Kingdom": "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=900&q=80",
+  India: "https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=900&q=80",
+  Brazil: "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?auto=format&fit=crop&w=900&q=80",
+  Australia: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=900&q=80",
+  Singapore: "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=900&q=80",
+  Mexico: "https://images.unsplash.com/photo-1518105779142-d975f22f1b0a?auto=format&fit=crop&w=900&q=80",
+  Canada: "https://images.unsplash.com/photo-1519832979-6fa011b87667?auto=format&fit=crop&w=900&q=80",
+  Germany: "https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=900&q=80",
+  Netherlands: "https://images.unsplash.com/photo-1534351590666-13e3e96b5017?auto=format&fit=crop&w=900&q=80",
+  Greece: "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=900&q=80",
+  Indonesia: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=900&q=80",
+  "South Korea": "https://images.unsplash.com/photo-1517154421773-0529f29ea451?auto=format&fit=crop&w=900&q=80",
+  Portugal: "https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=900&q=80",
+  Turkey: "https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?auto=format&fit=crop&w=900&q=80",
+};
+
+function getDestinationImage(destination: string): string {
+  return (
+    destinationImages[destination] ??
+    "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=900&q=80"
+  );
+}
+
 import { AgentStepsTrace } from "@/components/AgentStepsTrace";
 import { ConnectivityGuide } from "@/components/ConnectivityGuide";
 import { CountryPlanSelector } from "@/components/CountryPlanSelector";
@@ -87,26 +117,34 @@ export function PlannerExperience({
       ref={resultsRef}
     >
       {!resultsMode ? (
-        <aside className="pt-3 lg:sticky lg:top-8">
-          <p className="text-sm font-semibold text-orange-700">Travel data, made simple</p>
-          <h1 className="mt-4 max-w-2xl text-4xl font-semibold leading-[1.04] text-slate-950 sm:text-5xl">
-            Find a plan that feels right before you land.
-          </h1>
-          <p className="mt-6 max-w-xl text-base leading-8 text-slate-600">
-            Tell us where you are going and what you need. We will keep the choices simple, clear, and ready before departure.
-          </p>
-          <div className="mt-10 grid gap-4">
-            {plannerBenefits.map((benefit) => (
-              <div className="grid grid-cols-[auto_1fr] gap-4 rounded-md bg-white/80 p-4 shadow-[0_14px_46px_-44px_rgba(15,23,42,0.36)] ring-1 ring-slate-200/60" key={benefit.title}>
-                <span className="mt-1 grid h-11 w-11 place-items-center rounded-md bg-orange-50 text-orange-700">
-                  {benefit.icon}
-                </span>
-                <div>
-                  <h2 className="text-base font-semibold text-slate-950">{benefit.title}</h2>
-                  <p className="mt-1.5 text-sm leading-6 text-slate-500">{benefit.text}</p>
-                </div>
+        <aside className="lg:sticky lg:top-8">
+          <div className="group relative min-h-[540px] overflow-hidden rounded-2xl">
+            <div
+              className="absolute inset-0 bg-cover bg-center transition-all duration-700"
+              style={{ backgroundImage: `url(${getDestinationImage(tripDetails.destination)})` }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/92 via-slate-950/40 to-slate-950/10" />
+            <div className="absolute left-6 top-6">
+              <span className="inline-flex items-center rounded-full bg-white/15 px-3 py-1.5 text-xs font-semibold uppercase tracking-widest text-white backdrop-blur-sm">
+                Travel data, made simple
+              </span>
+            </div>
+            <div className="absolute bottom-0 left-0 right-0 bg-transparent p-7 backdrop-blur-sm transition-all duration-500 group-hover:bg-black/40">
+              <h1 className="text-4xl font-bold leading-tight text-white sm:text-5xl">
+                {tripDetails.destination}
+              </h1>
+              <p className="mt-2 text-sm text-white/75">Your eSIM, ready before you land.</p>
+              <div className="mt-6 grid gap-3">
+                {plannerBenefits.map((benefit) => (
+                  <div className="flex items-center gap-3" key={benefit.title}>
+                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-white/20 text-white backdrop-blur-sm">
+                      {benefit.icon}
+                    </span>
+                    <span className="text-sm font-semibold text-white">{benefit.title}</span>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
         </aside>
       ) : null}

@@ -23,28 +23,28 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
   const price = cleanPrice(params?.price);
 
   return (
-    <main className="min-h-screen bg-[#fbfaf7] px-5 py-6 text-slate-950 sm:px-8">
+    <main className="min-h-screen bg-[#FAFAF8] px-5 py-6 text-slate-950 sm:px-8">
       <div className="mx-auto max-w-5xl">
         <nav className="mb-10 flex items-center justify-between border-b border-slate-200/80 pb-5">
           <Link className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-slate-950" href="/trip/new">
             <ArrowLeft className="h-4 w-4" />
             Back to planner
           </Link>
-          <span className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 shadow-sm">
+          <span className="rounded-full border border-slate-200 bg-white px-4 py-1.5 text-xs font-semibold text-slate-600 shadow-sm">
             Secure checkout
           </span>
         </nav>
 
         <section className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_31rem] lg:items-start">
           <div className="grid gap-6">
-            <section className="rounded-lg bg-white p-6 shadow-[0_24px_88px_-78px_rgba(15,23,42,0.42)] sm:p-8">
-              <h1 className="text-3xl font-semibold tracking-tight text-slate-950">Sign up or log in</h1>
-              <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-                <button className="inline-flex h-12 items-center justify-center gap-3 rounded-md bg-white px-6 text-sm font-semibold text-slate-950 shadow-[inset_0_0_0_1px_rgba(148,163,184,0.65)] transition hover:bg-slate-50" type="button">
-                  <span className="text-lg font-bold text-orange-700">G</span>
+            <section className="rounded-2xl bg-white p-6 shadow-[0_24px_88px_-78px_rgba(15,23,42,0.42)] sm:p-8">
+              <h1 className="text-3xl font-bold tracking-tight text-slate-950">Sign up or log in</h1>
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                <button className="inline-flex h-12 items-center justify-center gap-3 rounded-2xl bg-white px-6 text-sm font-semibold text-slate-950 shadow-[inset_0_0_0_1px_rgba(148,163,184,0.65)] transition hover:bg-slate-50" type="button">
+                  <span className="text-lg font-bold text-orange-600">G</span>
                   Google
                 </button>
-                <button className="inline-flex h-12 items-center justify-center gap-3 rounded-md bg-white px-6 text-sm font-semibold text-slate-950 shadow-[inset_0_0_0_1px_rgba(148,163,184,0.65)] transition hover:bg-slate-50" type="button">
+                <button className="inline-flex h-12 items-center justify-center gap-3 rounded-2xl bg-white px-6 text-sm font-semibold text-slate-950 shadow-[inset_0_0_0_1px_rgba(148,163,184,0.65)] transition hover:bg-slate-50" type="button">
                   <Smartphone className="h-5 w-5 fill-slate-950 text-slate-950" />
                   Apple
                 </button>
@@ -54,8 +54,8 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
               </p>
             </section>
 
-            <section className="rounded-lg bg-white p-6 shadow-[0_24px_88px_-78px_rgba(15,23,42,0.42)] sm:p-8">
-              <h2 className="text-3xl font-semibold tracking-tight text-slate-950">Select a payment method</h2>
+            <section className="rounded-2xl bg-white p-6 shadow-[0_24px_88px_-78px_rgba(15,23,42,0.42)] sm:p-8">
+              <h2 className="text-3xl font-bold tracking-tight text-slate-950">Select a payment method</h2>
               <div className="mt-6 grid gap-3">
                 <PaymentMethod title="Credit or debit card">
                   <span className="font-semibold text-blue-900">VISA</span>
@@ -63,24 +63,24 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
                   <span className="font-semibold text-blue-700">AMEX</span>
                 </PaymentMethod>
                 <PaymentMethod title="Google Pay">
-                  <span className="rounded-md bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-700">G Pay</span>
+                  <span className="rounded-full bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700">G Pay</span>
                 </PaymentMethod>
                 <PaymentMethod title="PayPal">
                   <span className="font-semibold text-blue-700">PayPal</span>
                 </PaymentMethod>
               </div>
 
-              <button className="mt-7 inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-slate-950 px-5 text-sm font-semibold text-white shadow-[0_18px_54px_-38px_rgba(15,23,42,0.65)] transition hover:-translate-y-0.5 hover:bg-slate-800 sm:w-auto">
+              <button className="mt-8 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-slate-950 px-5 text-sm font-semibold text-white shadow-[0_18px_54px_-38px_rgba(15,23,42,0.65)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-800" type="button">
                 <CreditCard className="h-4 w-4" />
                 Continue to payment
               </button>
             </section>
           </div>
 
-          <aside className="rounded-lg bg-white p-6 text-slate-950 shadow-[0_24px_88px_-78px_rgba(15,23,42,0.42)] lg:sticky lg:top-24">
-            <h2 className="text-3xl font-semibold tracking-tight">Order summary</h2>
-            <div className="mt-5 flex items-center gap-3 rounded-md bg-[#fbfaf7] px-4 py-3">
-              <span className="grid h-8 w-8 place-items-center rounded-md bg-orange-50 text-orange-700">
+          <aside className="rounded-2xl bg-slate-50 p-6 text-slate-950 shadow-[0_24px_88px_-78px_rgba(15,23,42,0.42)] ring-1 ring-slate-100 lg:sticky lg:top-24">
+            <h2 className="text-2xl font-bold tracking-tight">Order summary</h2>
+            <div className="mt-5 flex items-center gap-3 rounded-xl bg-white px-4 py-3 shadow-sm ring-1 ring-slate-100">
+              <span className="grid h-9 w-9 place-items-center rounded-xl bg-orange-50 text-orange-600">
                 <Smartphone className="h-4 w-4" />
               </span>
               <span className="font-semibold">{destination}</span>
@@ -94,31 +94,33 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
             </div>
             <div className="mt-5 flex items-start justify-between gap-4">
               <div>
-                <p className="font-semibold">Total</p>
+                <p className="font-bold">Total</p>
                 <button className="mt-3 text-sm text-slate-500 underline underline-offset-4" type="button">
                   Connecta credits
                 </button>
               </div>
               <div className="text-right">
-                <p className="text-xl font-semibold">US${price}</p>
-                <span className="mt-3 inline-flex items-center gap-1 rounded-md bg-[#fff4d6] px-2.5 py-1 text-xs font-semibold text-orange-800">
+                <p className="text-xl font-bold">US${price}</p>
+                <span className="mt-3 inline-flex items-center gap-1 rounded-full bg-[#fff4d6] px-3 py-1 text-xs font-semibold text-orange-800">
                   <BadgePercent className="h-3 w-3" />
                   + US${creditValue(price)}
                 </span>
               </div>
             </div>
             <div className="mt-6 grid gap-2 sm:grid-cols-2">
-              <button className="h-10 rounded-md bg-slate-50 px-3 text-sm font-semibold text-slate-950 transition hover:bg-orange-50" type="button">
+              <button className="h-10 rounded-xl bg-white px-3 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-orange-50" type="button">
                 Got a coupon?
               </button>
-              <button className="h-10 rounded-md bg-slate-50 px-3 text-sm font-semibold text-slate-950 transition hover:bg-orange-50" type="button">
+              <button className="h-10 rounded-xl bg-white px-3 text-sm font-semibold text-slate-950 ring-1 ring-slate-200 transition hover:bg-orange-50" type="button">
                 Got credits?
               </button>
             </div>
-            <div className="mt-6 grid gap-3 text-sm text-slate-700">
-              <TrustLine icon={<ShieldCheck className="h-4 w-4" />} text="Secure checkout" />
-              <TrustLine icon={<CheckCircle2 className="h-4 w-4" />} text="Install before departure" />
-              <TrustLine icon={<CheckCircle2 className="h-4 w-4" />} text="Keep your regular number" />
+            <div className="mt-6 rounded-xl bg-white p-4 ring-1 ring-slate-100">
+              <div className="grid gap-3 text-sm text-slate-600">
+                <TrustLine icon={<ShieldCheck className="h-4 w-4" />} text="Secure checkout" />
+                <TrustLine icon={<CheckCircle2 className="h-4 w-4" />} text="Install before departure" />
+                <TrustLine icon={<CheckCircle2 className="h-4 w-4" />} text="Keep your regular number" />
+              </div>
             </div>
           </aside>
         </section>
@@ -130,7 +132,7 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
 function PaymentMethod({ children, title }: { children: ReactNode; title: string }) {
   return (
     <button
-      className="flex min-h-14 w-full items-center justify-between gap-4 rounded-md bg-white px-5 text-left shadow-[inset_0_0_0_1px_rgba(148,163,184,0.45)] transition hover:bg-slate-50 hover:shadow-[inset_0_0_0_1px_rgba(234,88,12,0.28)]"
+      className="flex min-h-14 w-full items-center justify-between gap-4 rounded-2xl bg-white px-5 text-left shadow-[inset_0_0_0_1px_rgba(148,163,184,0.45)] transition hover:bg-slate-50 hover:shadow-[inset_0_0_0_1px_rgba(234,88,12,0.28)]"
       type="button"
     >
       <span className="flex min-w-0 items-center gap-4">
@@ -154,7 +156,7 @@ function SummaryLine({ label, value }: { label: string; value: string }) {
 function TrustLine({ icon, text }: { icon: ReactNode; text: string }) {
   return (
     <span className="flex items-center gap-2">
-      <span className="text-orange-700">{icon}</span>
+      <span className="text-orange-600">{icon}</span>
       {text}
     </span>
   );
@@ -167,7 +169,7 @@ function creditValue(price: string) {
     return "0.00";
   }
 
-return (parsed * 0.03).toFixed(2);
+  return (parsed * 0.03).toFixed(2);
 }
 
 function cleanParam(value: string | undefined, fallback: string) {
