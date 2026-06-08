@@ -1,239 +1,379 @@
-# Connecta Product Requirements Document
+# Connecta — Product Requirements Document
 
 ## Product Summary
 
-Connecta is a premium consumer travel eSIM planning product. It helps travelers choose a destination or regional plan, understand likely data needs, compare plan options, and receive a practical setup guide before departure.
+Connecta is a premium consumer travel eSIM planner. Travelers describe their trip — destination, dates, and how they use their phone — and Connecta recommends the right eSIM plan, explains the reasoning, and gives a practical setup guide.
 
-The product should feel like a real travel connectivity company rather than a technical demo, admin dashboard, or AI-agent interface. The frontend experience is inspired by the product flow patterns of leading eSIM brands such as Holafly and Airalo, while the visual polish follows a clean premium SaaS/product website direction: strong typography, generous whitespace, rounded cards, soft pastel sections, and subtle motion.
+The product has two input modes:
+
+- **Form planner** — structured destination, date, and usage inputs
+- **Natural language chat agent** — user types freely and an AI agent parses intent, extracts structured inputs, and calls the same recommendation engine
+
+Both modes are powered by the same Go GraphQL backend. The AI enhances the experience but never overrides the deterministic recommendation engine.
+
+Connecta should feel like a real premium travel connectivity brand — calm, clean, trustworthy — not a developer tool or AI demo. Visual references: Saily, Holafly, Airalo.
+
+---
 
 ## Problem
 
-Travelers often face confusing mobile connectivity choices:
+Travelers face confusing mobile connectivity choices:
 
-- Roaming can be expensive and unpredictable.
-- Airport SIM counters add friction after arrival.
-- Plan sizes, validity windows, and country coverage are hard to compare.
-- Setup steps are often unclear until the user is already traveling.
-- Existing comparison flows can feel too technical or cluttered.
+- Roaming is expensive and unpredictable
+- Airport SIM counters add friction after arrival
+- Plan sizes, validity windows, and country coverage are hard to compare
+- Setup instructions are unclear until you're already abroad
+- Most comparison flows are too technical or cluttered
 
-Connecta solves this by turning trip details and usage patterns into a clear travel eSIM recommendation with alternatives and setup guidance.
+Connecta solves this by turning trip details and usage habits into a clear eSIM recommendation, with alternatives and a step-by-step setup guide.
+
+---
 
 ## Target Users
 
-### Primary
+**Primary**
 
-- Leisure travelers planning trips abroad.
-- Solo travelers and couples who need reliable data for maps, messaging, rides, and social apps.
-- Remote workers and business travelers who need hotspot, video calls, and work reliability.
+- Leisure travelers planning trips abroad
+- Solo travelers and couples who need data for maps, messaging, and social apps
+- Remote workers and business travelers who need hotspot, video calls, and reliability
 
-### Secondary
+**Secondary**
 
-- Families planning shared travel connectivity.
-- Multi-country travelers who need regional or global plans.
-- Recruiters and reviewers evaluating the project as a full-stack product build.
+- Families planning shared travel connectivity
+- Multi-country travelers who need regional or global plans
+
+---
 
 ## Product Goals
 
-- Present Connecta as a premium consumer eSIM/travel connectivity brand.
-- Provide a clear destination-first product flow.
-- Preserve the existing backend recommendation engine and GraphQL flow.
-- Keep technical implementation details hidden from customer-facing UI.
-- Offer destination browsing, country/regional/global plan discovery, plan cards, recommendation results, alternatives, usage breakdown, and setup guidance.
-- Maintain a polished frontend that feels production-ready.
+1. Present Connecta as a premium consumer eSIM brand
+2. Provide a destination-first, travel-emotional product flow
+3. Give travelers two ways to plan: a structured form and a natural language chat agent
+4. Make the AI reasoning visible but collapsible — not the focus
+5. Persist trip history to Supabase
+6. Deploy with a live URL before applying to any internship
+
+---
 
 ## Non-Goals
 
-- Do not build a dashboard or admin panel.
-- Do not expose backend, GraphQL, agent, trace, or engineering language in customer-facing copy.
-- Do not replace backend recommendation logic with static frontend plan cards.
-- Do not copy Holafly, Airalo, Cleaq, or any third-party code, branding, logos, or proprietary assets.
-- Do not introduce complex infrastructure such as Kubernetes, Kafka, Terraform, or microservices for the MVP.
+- No user authentication for MVP (anonymous session-based history is enough)
+- No Kubernetes, Kafka, Terraform, or microservices
+- No copying of Holafly, Airalo, or Saily code, branding, or assets
+- No engineering/AI terminology visible to users ("GraphQL", "Groq", "agent", "mutation", "LLM")
+- No replacing the deterministic backend recommendation engine with AI
 
-## User Journey
+---
 
-### 1. Homepage Discovery
+## Complete Feature Set
 
-The homepage should communicate the emotional travel value first:
+### 1. Homepage
 
-- Strong travel-focused hero headline.
-- Short support copy about staying connected abroad.
-- Primary CTA: find a plan.
-- Secondary CTA: browse destinations.
-- Travel visual area, not a dashboard preview.
+A premium travel-focused landing page. Not a SaaS dashboard.
 
-Below the hero, the user sees a compact planner/search section:
+**Hero section**
 
-- Destination input.
-- Travel dates.
-- CTA to find a plan.
+- Strong travel headline (e.g. "Stay connected anywhere in the world")
+- Short support copy about no roaming, no plastic SIMs
+- Primary CTA: "Find my plan" → `/trip/new`
+- Secondary CTA: "Browse destinations" → scrolls to destination directory
+- Travel visual, not a product screenshot
 
-The homepage also includes:
+**Compact planner strip below hero**
 
-- Popular destination image cards.
-- Expandable all-destinations directory.
-- Country, regional, and global destination options.
-- Static plan cards showing multiple plan sizes.
-- What is an eSIM section.
-- How it works in three steps.
-- Benefits and trust cards.
-- Final planning CTA.
+- Destination input (autocomplete from catalog)
+- Start date / end date
+- CTA: "Get recommendation" → `/trip/new?destination=...&startDate=...&endDate=...`
 
-### 2. Destination Browsing
+**Popular destinations**
 
-Users can browse:
+- Image cards for 8–10 popular destinations
+- Each links to `/trip/new?destination=...`
 
-- Popular destinations.
-- Global plan.
-- Continent and regional plans, including Africa, Asia, Europe, North America, South America, Oceania, Middle East, and Caribbean.
-- Country-level plans.
+**Destination directory**
 
-Each destination or region should imply multiple available plans with examples such as:
+- Searchable/filterable list of all destinations
+- Grouped: Global, Regional (Africa, Asia, Europe, Americas, Oceania, Middle East, Caribbean), Countries
+- Each destination shows example plan prices
 
-- 1 GB / 7 days / US$8.99
-- 2 GB / 15 days / US$16.49
-- 5 GB / 60 days / US$33.99
-- 10 GB / 180 days / US$56.99
-- 20 GB / 365 days / US$66.99
-- 50 GB / 365 days / US$129.99
+**Static plan cards**
 
-These plan cards are marketing examples. The actual recommendation still comes from the backend.
+- Example plans per destination: 1 GB / 5 GB / 10 GB / 20 GB
+- Show data, validity, price
+- These are marketing examples — actual recommendation comes from backend
 
-### 3. Planner Page
+**eSIM explainer**
 
-The planner page should use a premium consumer layout:
+- "What is an eSIM?" — 3–4 sentences, consumer language
 
-- Informational hero on the left.
-- Benefit rows with icons and separators.
-- No right-side dashboard panel.
-- No mock recommendation panel in the hero.
-- No giant bordered form card.
+**How it works**
 
-Planner inputs should be compact and approachable:
+- 3 steps: Choose destination → Get recommendation → Activate and travel
+- Icons, short copy
 
-- Destination, backed by the destination catalog.
-- Start date.
-- End date.
-- Usage levels for maps, streaming, social media, video calls, hotspot, and work.
-- CTA button.
+**Trust / benefits**
 
-Usage levels should be concrete and user-controlled:
+- 200+ destinations, instant activation, no roaming fees, works with your existing number
+- Social proof or trust signals
 
-- None.
-- Light.
-- Moderate.
-- Heavy.
+**Final CTA**
+
+- "Plan your trip" → `/trip/new`
+
+---
+
+### 2. Planner Page — Form Mode
+
+**URL:** `/trip/new`
+
+**Layout:** Premium consumer layout — not a SaaS form card.
+
+- Left column: informational hero with benefit rows
+- Right column: compact planner form
+
+**Inputs:**
+
+- Destination (text input backed by catalog autocomplete)
+- Start date
+- End date
+- Usage levels per activity: Maps, Streaming, Social media, Video calls, Hotspot, Work
+- Each level: None / Light / Moderate / Heavy
+- Traveler type: inferred from usage (no separate field for consumers)
+- Optional: budget
+
+**Query param prefill:** Parse `destination`, `startDate`, `endDate` from URL and prefill inputs.
+
+**Submission:** Calls `analyzeTrip` GraphQL mutation → renders results below the form.
+
+---
+
+### 3. Planner Page — Chat Agent Mode
+
+**Tab switcher on the planner page:** "Plan my trip" (form) | "Ask AI" (chat)
+
+**Chat UI:**
+
+- Single text input: "Describe your trip..."
+- Example prompts shown before first message
+- Messages displayed as conversation bubbles
+- Typing indicator while AI processes
+
+**Agent flow:**
+
+1. User types: _"Going to Thailand for 2 weeks in July, I use Maps a lot and stream music"_
+2. Frontend sends to `POST /api/chat`
+3. API route calls Groq with extraction prompt
+4. Groq returns structured `TripInput` JSON
+5. If complete → frontend calls `analyzeTrip` mutation → renders recommendation
+6. If incomplete → AI asks a clarification question ("What dates are you travelling?")
+
+**After recommendation:**
+
+- Same recommendation card as form mode
+- Same agent steps panel
+- Option to adjust inputs and re-run
+
+**Consumer language only.** Never display "GraphQL", "Groq", "agent", "mutation", or "LLM".
+
+---
 
 ### 4. Recommendation Results
 
-After submission, Connecta calls the existing GraphQL `analyzeTrip` flow and renders:
+Displayed below the planner (both modes).
 
-- Best match recommendation.
-- Selected plan details.
-- Setup guide.
-- Alternative plans.
-- Usage breakdown.
-- Collapsible recommendation process.
+**Best match card**
 
-The recommendation process stays hidden/collapsible and uses consumer-facing language.
+- Plan name, provider, data (GB), validity (days), price (USD)
+- AI-enhanced recommendation text explaining why this plan fits
+- "Select this plan" CTA → checkout
 
-## Functional Requirements
+**Alternative plans**
 
-### Homepage
+- 2–3 alternatives as smaller cards
+- Each shows name, data, price, tradeoff note
 
-- Render premium travel hero with no planner form inside the hero.
-- Render a compact planner below hero.
-- Destination search must navigate to `/trip/new?destination=...`.
-- Dates should prefill `/trip/new` when included.
-- Popular destination cards must link to `/trip/new?destination=...`.
-- Destination directory must support country, regional, and global options.
-- Destination directory should support search/filter behavior.
-- Static plan cards should show multiple data/price/validity combinations.
+**Usage breakdown**
 
-### Planner Page
+- Visual breakdown of estimated data per activity
+- Total estimated GB vs recommended GB (with safety buffer)
 
-- Parse `destination`, `startDate`, and `endDate` from query params.
-- Prefill planner inputs when query params are present.
-- Preserve the GraphQL mutation flow through `analyzeTrip`.
-- Preserve `TripInput`, `TripAnalysis`, selected plan, alternatives, usage breakdown, and setup guide.
-- Allow users to choose detailed usage levels per activity.
-- Infer traveler type from usage when the simplified consumer form does not expose traveler type directly.
-- Render results below the planner.
+**Setup guide**
 
-### Destination Catalog
+- Before departure, airport setup, offline strategy, backup internet, emergency access
+- 1–3 bullet points each
+- Enhanced by Groq when API key is configured
 
-- Provide frontend-only destination constants for global, regional, and country entries.
-- Provide frontend-only marketing plan examples.
-- Reuse catalog options in home search, destination directory, and planner datalist.
+**Collapsible agent steps panel**
 
-## Design Requirements
+- "How Connecta decided this" — collapsed by default
+- Shows each step: Usage estimation → Plan optimisation → AI guide generation
+- Each step shows name, status (completed/skipped/failed), duration, summary
+- Consumer language: "Estimated your data needs", not "UsageEstimator.Estimate()"
 
-- Light mode only.
-- Ivory/white base.
-- Soft mint, blue, and peach section bands.
-- Deep navy text.
-- Teal, blue, and coral accents.
-- Rounded premium cards.
-- Subtle shadows.
-- Smooth hover interactions.
-- Generous whitespace.
-- Strong typography.
-- Consumer travel product feel.
+---
 
-Avoid:
+### 5. Destination Pages
 
-- Dashboard styling.
-- Dense enterprise form blocks.
-- Engineering terminology.
-- Overly dark technical panels.
-- Card-within-card clutter.
+**URL:** `/esim/[destination]`
 
-## Technical Requirements
+- Destination name and region
+- Available plan sizes with prices (from catalog)
+- Coverage information
+- CTA: "Plan my trip to [destination]" → `/trip/new?destination=...`
 
-### Frontend
+---
 
-- Next.js app router.
-- TypeScript strict mode.
-- Tailwind styling.
-- Lucide icons.
-- Components should remain small and composable.
-- New frontend-only catalog data should live in `frontend/lib/destination-catalog.ts`.
+### 6. Trip History
 
-### Backend
+**URL:** `/history`
 
-- Go backend.
-- GraphQL API.
-- Resolver layer remains thin.
-- Business logic remains in services.
-- Recommendation engine remains deterministic with optional AI enhancement.
-- No backend schema changes required for the frontend redesign.
+- List of past trip analyses saved to Supabase
+- Each entry: destination, dates, selected plan, recommendation summary
+- Click to expand full recommendation
+- Persisted anonymously (no auth required for MVP)
+
+---
+
+### 7. Checkout Page
+
+**URL:** `/checkout`
+
+- Summary of selected plan
+- Data, validity, price
+- Trust points: instant activation, works on arrival, cancel anytime
+- "Proceed" CTA (placeholder — no real payment for MVP)
+
+---
+
+## AI Architecture
+
+### Groq — Recommendation Enhancement
+
+**When:** After the deterministic engine picks a plan.
+**What it does:** Rewrites the recommendation text and connectivity guide in better natural language.
+**What it never does:** Changes the selected plan, price, data amount, or estimate.
+**Fallback:** If `GROQ_API_KEY` is empty or Groq fails, the deterministic text is used. The app never breaks.
+**Model:** `llama-3.3-70b-versatile`
+
+### Groq — Natural Language Extraction (Chat Agent)
+
+**When:** User submits a message in chat mode.
+**What it does:** Extracts `TripInput` fields from free-form text.
+**Output:** Structured JSON matching the `TripInput` GraphQL type.
+**Fallback:** If extraction is incomplete, returns a clarification question.
+**Model:** `llama-3.3-70b-versatile`
+
+---
+
+## Backend Architecture
+
+```
+analyzeTrip mutation
+  → TripService.AnalyzeTrip()
+    → UsageEstimator.Estimate()          deterministic
+    → PlanOptimizer.Optimize()           deterministic
+    → recommendationText()               deterministic fallback
+    → GroqClient.EnhanceTripRecommendation()   optional
+  → TripRepository.SaveAnalysis()        Supabase
+  → returns TripAnalysis + AgentSteps
+```
+
+**GraphQL schema:** `backend/graph/schema.graphqls` — source of truth.
+**Domain types:** `backend/internal/domain/domain.go`
+**Supabase schema:** `supabase/schema.sql` — apply once, no migrations needed for MVP.
+
+---
+
+## Design System
+
+**Palette**
+| Token | Value |
+|---|---|
+| Base | `#FAFAF8` (ivory white) |
+| Mint band | `#F0FDF4` |
+| Blue band | `#EFF6FF` |
+| Peach band | `#FFF7ED` |
+| Text primary | `#0F172A` (deep navy) |
+| Text secondary | `#64748B` |
+| Accent teal | `#0D9488` |
+| Accent blue | `#3B82F6` |
+| Accent coral | `#F97316` |
+
+**Components**
+
+- Cards: `rounded-2xl`, `shadow-sm`, white background, `p-6` or `p-8`
+- Buttons: `rounded-full` for primary CTAs, `rounded-lg` for secondary
+- Inputs: `rounded-xl`, subtle border, focus ring in teal
+- Section spacing: `py-20` or `py-24`
+
+**Typography**
+
+- Headings: bold, large, navy
+- Body: readable, generous line height (`leading-relaxed`)
+- No monospace fonts in consumer UI
+
+**Never use**
+
+- Dark backgrounds in main content areas
+- Dense form cards with heavy borders
+- Engineering/AI terminology in consumer copy
+- Decorative clutter
+
+---
+
+## Tech Stack
+
+| Layer      | Technology                                                     |
+| ---------- | -------------------------------------------------------------- |
+| Frontend   | Next.js 14 App Router, TypeScript strict, Tailwind CSS, Lucide |
+| Backend    | Go 1.22, GraphQL (gqlgen)                                      |
+| AI         | Groq API — `llama-3.3-70b-versatile`                           |
+| Database   | Supabase (Postgres)                                            |
+| Analytics  | PostHog — `destination_searched`, `recommendation_viewed`      |
+| Deployment | Vercel (frontend), Railway (backend)                           |
+| Tests      | Go test, Vitest, Playwright                                    |
+| CI/CD      | GitHub Actions                                                 |
+
+---
+
+## Build Priority Order
+
+1. UI polish — homepage and planner to Saily/Holafly level
+2. Natural language chat agent — tab on planner page
+3. Real plan data — replace mock_plans.go with real Airalo/Holafly data
+4. Agent steps panel — visible, well-designed, consumer language
+5. Groq smoke test — real API key, confirm enhancement fires
+6. Supabase persistence — wire trip_repository.go
+7. Trip history page — pull from Supabase
+8. PostHog — two events
+9. Tests — Go unit, Vitest, one Playwright E2E
+10. CI/CD — GitHub Actions
+11. Docker Compose — fully functional local dev
+12. Deploy — Vercel + Railway, live URL
+13. README — live URL, architecture, AI stack, how to run
+
+---
 
 ## Success Criteria
 
-- Homepage looks like a premium travel connectivity website.
-- Planner page no longer resembles a SaaS dashboard.
-- Users can select detailed usage levels.
-- Destination options include global, regional, and broad country coverage.
-- Recommendation submission still works end to end.
-- No customer-facing backend, GraphQL, trace, agent, or engineering language.
-- Typecheck and targeted lint pass.
+- Homepage looks and feels like a premium travel connectivity product
+- Chat agent correctly extracts trip intent from natural language and returns a recommendation
+- Groq enhancement is visible in the recommendation text and setup guide
+- Agent steps panel shows the pipeline reasoning in consumer language
+- Trip history persists to Supabase across sessions
+- Live URL exists and the full flow works end to end
+- TypeScript strict passes with zero errors
+- Go tests pass
+- One Playwright E2E test covers the full planner flow
 
-## Verification Checklist
+---
 
-- `npm run typecheck`
-- Targeted ESLint for changed frontend files.
-- Browser verify homepage hero, compact planner, destination directory, plan cards, and CTAs.
-- Browser verify planner prefill from query params.
-- Browser verify detailed usage controls.
-- Browser verify recommendation results, setup guide, alternatives, usage breakdown, and collapsed process.
+## Future (Post-MVP)
 
-## Future Enhancements
-
-- Real provider pricing and availability by destination.
-- Real country flags and region illustrations.
-- Plan detail pages for each country/region.
-- Checkout flow.
-- Device compatibility checker.
-- Saved trips.
-- Multi-country itinerary builder.
-- Currency localization.
-- User account and order history.
+- Real eSIM provider API integration (Airalo API)
+- Device compatibility checker
+- Multi-country itinerary builder
+- Currency localisation
+- User accounts and order history
+- Plan price alerts
+- Partner/affiliate links
