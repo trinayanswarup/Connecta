@@ -239,4 +239,3 @@ func durationMS(start time.Time) int {
 func stringPtr(value string) *string {
 	return &value
 }
-
