@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { FloatingChat } from "@/components/FloatingChat";
+import { PostHogProvider } from "@/components/PostHogProvider";
 
 export const metadata: Metadata = {
   title: "Connecta - Travel eSIM plan finder",
@@ -16,6 +17,7 @@ export default function RootLayout({
     <html lang="en">
       <body suppressHydrationWarning>
         {children}
+        <PostHogProvider />
         <FloatingChat />
       </body>
     </html>

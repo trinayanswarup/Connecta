@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ChevronRight, MapPin, Wifi } from "lucide-react";
+import { ArrowLeft, ChevronRight, MapPin, Wifi } from "lucide-react";
 import { fetchTripHistory, type TripRow, type StoredPlan } from "@/lib/supabase";
 
 function formatTripDateRange(start: string, end: string): string {
@@ -133,6 +133,15 @@ export default function HistoryPage() {
       </header>
 
       <div className="mx-auto max-w-2xl px-6 py-12 sm:px-8">
+        {/* Back nav */}
+        <Link
+          href="/trip/new"
+          className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition-colors hover:text-slate-950"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to planner
+        </Link>
+
         {/* Header */}
         <p className="text-xs font-semibold uppercase tracking-widest text-orange-600">Your trips</p>
         <h1 className="mt-2 text-3xl font-bold text-slate-950">Past recommendations</h1>

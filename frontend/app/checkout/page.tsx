@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 
 import { CheckoutForm } from "@/components/CheckoutForm";
@@ -27,17 +26,7 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
   if (supabaseUrl && supabaseKey) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-      const next = `/checkout?${new URLSearchParams(
-        Object.fromEntries(
-          Object.entries(params ?? {}).filter(([, v]) => v !== undefined) as [string, string][]
-        )
-      ).toString()}`;
-      redirect(`/auth/signin?next=${encodeURIComponent(next)}`);
-    }
-
-    userEmail = user.email;
+    userEmail = user?.email;
   }
 
   const destination = cleanParam(params?.destination, "your destination");

@@ -285,6 +285,7 @@ import { UsageBreakdown } from "@/components/UsageBreakdown";
 import { destinationOptions, plansForDestination, type DestinationKind, type MarketingPlan } from "@/lib/destination-catalog";
 import { checkoutHrefForPlan } from "@/lib/checkout";
 import type { PlanOption, TripAnalysis } from "@/lib/graphql";
+import { trackRecommendationViewed } from "@/lib/analytics";
 
 type PlannerExperienceProps = {
   initialDestination?: string;
@@ -341,6 +342,7 @@ export function PlannerExperience({
     setBestChoiceData(nextAnalysis.selectedPlan.dataLabel ?? `${nextAnalysis.selectedPlan.dataGb} GB`);
     setBestChoiceValidityDays(nextAnalysis.selectedPlan.validityDays);
     setResultsMode(true);
+    trackRecommendationViewed(tripDetails.destination, nextAnalysis.selectedPlan.name, nextAnalysis.selectedPlan.priceUsd);
   }
 
   function handleManualContinue(plan: MarketingPlan) {

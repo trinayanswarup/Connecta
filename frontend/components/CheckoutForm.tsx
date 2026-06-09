@@ -72,7 +72,7 @@ export function CheckoutForm({
     }
     setCardError(null);
     setIsProcessing(true);
-    await new Promise((resolve) => setTimeout(resolve, 2200));
+    await new Promise((resolve) => setTimeout(resolve, 1500));
     setIsProcessing(false);
     setIsSuccess(true);
   }
@@ -194,7 +194,7 @@ export function CheckoutForm({
 
               {selectedMethod === "googlepay" && (
                 <p className="rounded-2xl bg-[#FAFAF8] px-5 py-4 text-sm text-slate-500 ring-1 ring-slate-100">
-                  You will be redirected to Google Pay to complete your purchase.
+                  Google Pay is coming soon. Please use a card to complete your purchase.
                 </p>
               )}
 
@@ -208,7 +208,7 @@ export function CheckoutForm({
 
               {selectedMethod === "paypal" && (
                 <p className="rounded-2xl bg-[#FAFAF8] px-5 py-4 text-sm text-slate-500 ring-1 ring-slate-100">
-                  You will be redirected to PayPal to complete your purchase.
+                  PayPal is coming soon. Please use a card to complete your purchase.
                 </p>
               )}
             </div>

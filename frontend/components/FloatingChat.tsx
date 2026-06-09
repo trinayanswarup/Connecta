@@ -5,6 +5,7 @@ import type { FormEvent } from "react";
 import { ChevronRight, MessageCircle, X } from "lucide-react";
 import { analyzeTrip, formatDataGb } from "@/lib/graphql";
 import type { PlanOption, TripAnalysis, TripInput, UsageLevel, TravelerType } from "@/lib/graphql";
+import { trackDestinationSearched, trackRecommendationViewed } from "@/lib/analytics";
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -164,6 +165,8 @@ export function FloatingChat() {
         return;
       }
 
+      trackDestinationSearched(data.trip.destination);
+
       const ack = data.acknowledgment ?? "Finding your best plan…";
       setMessages((prev) => [...prev, { role: "assistant", content: ack }]);
 
@@ -190,6 +193,7 @@ export function FloatingChat() {
       setResultTrip(trip);
       setResult(analysis);
       setUsageLevel("MODERATE");
+      trackRecommendationViewed(trip.destination, analysis.selectedPlan.name, analysis.selectedPlan.priceUsd);
     } catch {
       setMessages((prev) => [
         ...prev,
