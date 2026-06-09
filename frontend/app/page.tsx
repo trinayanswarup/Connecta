@@ -119,6 +119,9 @@ export default function HomePage() {
             <a className="transition-colors hover:text-slate-950" href="#trust">
               eSIM Guide
             </a>
+            <Link className="transition-colors hover:text-slate-950" href="/history">
+              History
+            </Link>
           </nav>
           <Link
             className="inline-flex items-center justify-center gap-2 rounded-full bg-orange-600 px-6 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-orange-700"
