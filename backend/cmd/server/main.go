@@ -9,18 +9,35 @@ import (
 	"github.com/connecta/connecta/backend/graph"
 	"github.com/connecta/connecta/backend/graph/generated"
 	"github.com/connecta/connecta/backend/internal/config"
+	"github.com/connecta/connecta/backend/internal/db"
 	"github.com/connecta/connecta/backend/internal/groq"
 	"github.com/connecta/connecta/backend/internal/logger"
 	"github.com/connecta/connecta/backend/internal/plans"
 	"github.com/connecta/connecta/backend/repositories"
 	"github.com/connecta/connecta/backend/services"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	godotenv.Load() // loads .env if present, silently ignores if missing
 	cfg := config.Load()
 	log := logger.New(cfg.Environment)
 
-	tripRepository := repositories.NewInMemoryTripRepository()
+	var tripRepository repositories.TripRepository
+	if cfg.DatabaseURL != "" {
+		dbConn, err := db.NewPostgresDB(cfg.DatabaseURL)
+		if err != nil {
+			log.Printf("warn: postgres unavailable (%v), falling back to in-memory", err)
+			tripRepository = repositories.NewInMemoryTripRepository()
+		} else {
+			log.Printf("connected to postgres")
+			tripRepository = repositories.NewPostgresTripRepository(dbConn, log)
+		}
+	} else {
+		log.Printf("DATABASE_URL not set, using in-memory repository")
+		tripRepository = repositories.NewInMemoryTripRepository()
+	}
+
 	var enhancer agents.RecommendationEnhancer
 	if cfg.GroqAPIKey != "" {
 		groqClient := groq.NewClient(cfg.GroqAPIKey, cfg.GroqModel)

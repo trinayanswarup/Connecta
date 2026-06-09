@@ -2,8 +2,6 @@ package services
 
 import (
 	"context"
-	"crypto/rand"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"strings"
@@ -12,6 +10,7 @@ import (
 	"github.com/connecta/connecta/backend/agents"
 	"github.com/connecta/connecta/backend/internal/domain"
 	"github.com/connecta/connecta/backend/repositories"
+	"github.com/google/uuid"
 )
 
 type TripService struct {
@@ -79,8 +78,8 @@ func (s *TripService) AnalyzeTrip(ctx context.Context, input domain.TripInput) (
 	}
 
 	analysis := domain.TripAnalysis{
-		TripID:            newID("trip"),
-		AgentRunID:        newID("run"),
+		TripID:            uuid.New().String(),
+		AgentRunID:        uuid.New().String(),
 		Destination:       strings.TrimSpace(input.Destination),
 		StartDate:         input.StartDate,
 		EndDate:           input.EndDate,
@@ -241,10 +240,3 @@ func stringPtr(value string) *string {
 	return &value
 }
 
-func newID(prefix string) string {
-	var bytes [6]byte
-	if _, err := rand.Read(bytes[:]); err != nil {
-		return fmt.Sprintf("%s-%d", prefix, time.Now().UnixNano())
-	}
-	return prefix + "-" + hex.EncodeToString(bytes[:])
-}
