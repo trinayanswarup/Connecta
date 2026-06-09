@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import type { PlanOption } from "@/lib/graphql";
+import { formatDataGb, type PlanOption } from "@/lib/graphql";
 
 type PlanComparisonProps = {
   selected: PlanOption;
@@ -10,7 +10,7 @@ type PlanComparisonProps = {
 
 export function PlanComparison({ selected, alternatives, checkoutHref }: PlanComparisonProps) {
   const option = bestAlternativeForUsage(selected, alternatives);
-  const optionData = option.dataLabel ?? `${option.dataGb} GB`;
+  const optionData = formatDataGb(option);
 
   return (
     <section className="rounded-lg bg-white p-5 shadow-[0_20px_72px_-68px_rgba(15,23,42,0.42)] ring-1 ring-slate-200/70 sm:p-6">

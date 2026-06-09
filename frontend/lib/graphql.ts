@@ -128,6 +128,12 @@ type GraphQLResponse<T> = {
   errors?: Array<{ message: string }>;
 };
 
+export function formatDataGb(plan: Pick<PlanOption, "dataGb" | "dataLabel">): string {
+  if (plan.dataLabel) return plan.dataLabel;
+  if (plan.dataGb >= 999) return "Unlimited";
+  return `${plan.dataGb} GB`;
+}
+
 export async function analyzeTrip(input: TripInput): Promise<TripAnalysis> {
   const response = await fetch(graphqlEndpoint, {
     method: "POST",

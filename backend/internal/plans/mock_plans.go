@@ -15,14 +15,16 @@ type Plan struct {
 
 func MockPlans() []Plan {
 	return []Plan{
-		{ID: "global-5", Provider: "Connecta Global", Name: "Global 5GB", Destination: "GLOBAL", PriceUSD: 12, DataGB: 5, ValidityDays: 7, CoverageScore: 0.82},
-		{ID: "global-10", Provider: "Connecta Global", Name: "Global 10GB", Destination: "GLOBAL", PriceUSD: 19, DataGB: 10, ValidityDays: 15, CoverageScore: 0.86},
-		{ID: "global-20", Provider: "Connecta Global", Name: "Global 20GB", Destination: "GLOBAL", PriceUSD: 31, DataGB: 20, ValidityDays: 30, CoverageScore: 0.88},
-		{ID: "global-50", Provider: "Connecta Global", Name: "Global 50GB", Destination: "GLOBAL", PriceUSD: 59, DataGB: 50, ValidityDays: 30, CoverageScore: 0.90},
-		{ID: "eu-10", Provider: "RoamLite", Name: "Europe 10GB", Destination: "EUROPE", PriceUSD: 14, DataGB: 10, ValidityDays: 15, CoverageScore: 0.91},
-		{ID: "eu-25", Provider: "RoamLite", Name: "Europe 25GB", Destination: "EUROPE", PriceUSD: 27, DataGB: 25, ValidityDays: 30, CoverageScore: 0.92},
-		{ID: "jp-15", Provider: "MetroSignal", Name: "Japan 15GB", Destination: "JAPAN", PriceUSD: 21, DataGB: 15, ValidityDays: 15, CoverageScore: 0.94},
-		{ID: "us-20", Provider: "MetroSignal", Name: "United States 20GB", Destination: "UNITED STATES", PriceUSD: 29, DataGB: 20, ValidityDays: 30, CoverageScore: 0.93},
+		{ID: "plan-1gb", Provider: "Connecta Local", Name: "Connecta 1 GB", Destination: "global", PriceUSD: 3.99, DataGB: 1, ValidityDays: 7, CoverageScore: 0.80},
+		{ID: "plan-3gb", Provider: "Connecta Local", Name: "Connecta 3 GB", Destination: "global", PriceUSD: 9.99, DataGB: 3, ValidityDays: 30, CoverageScore: 0.85},
+		{ID: "plan-5gb", Provider: "Connecta Local", Name: "Connecta 5 GB", Destination: "global", PriceUSD: 13.99, DataGB: 5, ValidityDays: 30, CoverageScore: 0.85},
+		{ID: "plan-10gb", Provider: "Connecta Local", Name: "Connecta 10 GB", Destination: "global", PriceUSD: 24.99, DataGB: 10, ValidityDays: 30, CoverageScore: 0.90},
+		{ID: "plan-20gb", Provider: "Connecta Local", Name: "Connecta 20 GB", Destination: "global", PriceUSD: 39.99, DataGB: 20, ValidityDays: 30, CoverageScore: 0.90},
+		{ID: "plan-unlimited-10", Provider: "Connecta Local", Name: "Connecta Unlimited", Destination: "global", PriceUSD: 34.99, DataGB: 999, ValidityDays: 10, CoverageScore: 0.95},
+		{ID: "plan-unlimited-15", Provider: "Connecta Local", Name: "Connecta Unlimited", Destination: "global", PriceUSD: 48.99, DataGB: 999, ValidityDays: 15, CoverageScore: 0.95},
+		{ID: "plan-unlimited-20", Provider: "Connecta Local", Name: "Connecta Unlimited", Destination: "global", PriceUSD: 59.99, DataGB: 999, ValidityDays: 20, CoverageScore: 0.95},
+		{ID: "plan-unlimited-25", Provider: "Connecta Local", Name: "Connecta Unlimited", Destination: "global", PriceUSD: 65.99, DataGB: 999, ValidityDays: 25, CoverageScore: 0.95},
+		{ID: "plan-unlimited-30", Provider: "Connecta Local", Name: "Connecta Unlimited", Destination: "global", PriceUSD: 71.99, DataGB: 999, ValidityDays: 30, CoverageScore: 0.95},
 	}
 }
 

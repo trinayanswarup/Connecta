@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { ArrowDown, CalendarDays, CircleDollarSign, ShieldCheck, SignalHigh } from "lucide-react";
 
-import type { TripAnalysis } from "@/lib/graphql";
+import { formatDataGb, type TripAnalysis } from "@/lib/graphql";
 
 type RecommendationCardProps = {
   analysis: TripAnalysis;
@@ -11,7 +11,7 @@ type RecommendationCardProps = {
 };
 
 export function RecommendationCard({ analysis, checkoutHref, manualChoiceHref }: RecommendationCardProps) {
-  const selectedData = analysis.selectedPlan.dataLabel ?? `${analysis.selectedPlan.dataGb} GB`;
+  const selectedData = formatDataGb(analysis.selectedPlan);
 
   return (
     <section className="overflow-hidden rounded-2xl bg-white shadow-[0_30px_96px_-80px_rgba(15,23,42,0.52)] ring-1 ring-slate-200/70">

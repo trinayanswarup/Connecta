@@ -494,7 +494,7 @@ function displayDataLabel(data: string, dataGb: number | null) {
 
 function providerForDestination(kind: DestinationKind) {
   if (kind === "global") {
-    return "Connecta Global";
+    return "Connecta Local";
   }
   if (kind === "regional") {
     return "Connecta Regional";

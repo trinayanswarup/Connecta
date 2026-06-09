@@ -199,7 +199,7 @@ function nearestUnlimitedValidity(plans: MarketingPlan[], tripDays?: number) {
   }
 
   if (!tripDays) {
-    return options.find((option) => option.dayCount === 15)?.dayCount ?? options[0].dayCount;
+    return options[options.length - 1].dayCount;
   }
 
   return options.find((option) => option.dayCount >= tripDays)?.dayCount ?? options[options.length - 1].dayCount;

@@ -21,12 +21,12 @@ func (e UsageEstimator) Estimate(input domain.TripInput) domain.UsageEstimate {
 	}
 
 	breakdown := domain.UsageBreakdown{
-		Maps:        round1(dailyGB(input.Usage.Maps, 0.10, 0.25, 0.45) * days * travelerMultiplier),
-		Streaming:   round1(dailyGB(input.Usage.Streaming, 0.20, 0.90, 2.20) * days * travelerMultiplier),
-		SocialMedia: round1(dailyGB(input.Usage.SocialMedia, 0.20, 0.70, 1.50) * days * travelerMultiplier),
-		VideoCalls:  round1(dailyGB(input.Usage.VideoCalls, 0.25, 1.10, 2.50) * days * travelerMultiplier * businessMultiplier),
-		Hotspot:     round1(dailyGB(input.Usage.Hotspot, 0.20, 1.00, 2.70) * days * travelerMultiplier),
-		Work:        round1(dailyGB(input.Usage.Work, 0.25, 0.80, 1.80) * days * travelerMultiplier * businessMultiplier),
+		Maps:        round1(dailyGB(input.Usage.Maps, 0.10, 0.30, 0.60) * days * travelerMultiplier),
+		Streaming:   round1(dailyGB(input.Usage.Streaming, 0.30, 0.80, 2.00) * days * travelerMultiplier),
+		SocialMedia: round1(dailyGB(input.Usage.SocialMedia, 0.10, 0.30, 0.60) * days * travelerMultiplier),
+		VideoCalls:  round1(dailyGB(input.Usage.VideoCalls, 0.20, 0.50, 1.20) * days * travelerMultiplier * businessMultiplier),
+		Hotspot:     round1(dailyGB(input.Usage.Hotspot, 0.20, 0.50, 1.50) * days * travelerMultiplier),
+		Work:        round1(dailyGB(input.Usage.Work, 0.10, 0.30, 0.80) * days * travelerMultiplier * businessMultiplier),
 	}
 
 	estimated := round1(

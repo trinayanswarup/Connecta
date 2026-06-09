@@ -284,10 +284,9 @@ const brazilPlanTemplates: MarketingPlanTemplate[] = [
   { data: "20 GB", days: "30 days", priceUsd: 39.99 },
   {
     data: "Unlimited GB",
-    days: "15 days",
-    priceUsd: 48.99,
+    days: "30 days",
+    priceUsd: 71.99,
     validityOptions: [
-      { dayCount: 5, days: "5 days", priceUsd: 24.99 },
       { dayCount: 10, days: "10 days", priceUsd: 34.99 },
       { dayCount: 15, days: "15 days", priceUsd: 48.99 },
       { dayCount: 20, days: "20 days", priceUsd: 59.99 },
@@ -363,18 +362,18 @@ export function plansForDestination(destination: string) {
 }
 
 function unlimitedPlanTemplate(priceUsd: number, bestChoice = false): MarketingPlanTemplate {
+  const price30 = priceUsd + 23;
   return {
     data: "Unlimited GB",
-    days: "15 days",
-    priceUsd,
+    days: "30 days",
+    priceUsd: price30,
     bestChoice,
     validityOptions: [
-      { dayCount: 5, days: "5 days", priceUsd: Math.max(19.99, priceUsd - 24) },
       { dayCount: 10, days: "10 days", priceUsd: Math.max(29.99, priceUsd - 14) },
       { dayCount: 15, days: "15 days", priceUsd },
       { dayCount: 20, days: "20 days", priceUsd: priceUsd + 11 },
       { dayCount: 25, days: "25 days", priceUsd: priceUsd + 17 },
-      { dayCount: 30, days: "30 days", priceUsd: priceUsd + 23 }
+      { dayCount: 30, days: "30 days", priceUsd: price30 }
     ]
   };
 }
