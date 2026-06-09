@@ -52,6 +52,7 @@ const EXAMPLES = [
 ];
 
 export function FloatingChat() {
+  const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
@@ -62,6 +63,12 @@ export function FloatingChat() {
   const [refining, setRefining] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const resultRef = useRef<HTMLDivElement>(null);
+  const mountTimeRef = useRef<number>(0);
+
+  useEffect(() => {
+    setMounted(true);
+    mountTimeRef.current = Date.now();
+  }, []);
 
   // Scroll to bottom while chatting (typing indicator, clarification replies)
   useEffect(() => {
@@ -136,6 +143,14 @@ export function FloatingChat() {
     setLoading(true);
 
     try {
+      if (!mounted) {
+        await new Promise<void>((resolve) => setTimeout(resolve, 100));
+      }
+      const timeSinceMount = Date.now() - mountTimeRef.current;
+      if (timeSinceMount < 500) {
+        await new Promise<void>((resolve) => setTimeout(resolve, 500 - timeSinceMount));
+      }
+
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -189,7 +204,22 @@ export function FloatingChat() {
         },
       };
 
-      const analysis = await analyzeTrip(tripInput);
+      let analysis: TripAnalysis;
+      try {
+        analysis = await analyzeTrip(tripInput);
+      } catch {
+        await new Promise<void>((resolve) => setTimeout(resolve, 1000));
+        try {
+          analysis = await analyzeTrip(tripInput);
+        } catch {
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: "Could not load plans right now. Try the planner on this page." },
+          ]);
+          setLoading(false);
+          return;
+        }
+      }
       setResultTrip(trip);
       setResult(analysis);
       setUsageLevel("MODERATE");
@@ -197,7 +227,7 @@ export function FloatingChat() {
     } catch {
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "Could not load plans right now. Try the planner on this page." },
+        { role: "assistant", content: "Something went wrong. Please try again." },
       ]);
     } finally {
       setLoading(false);
