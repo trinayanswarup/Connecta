@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
+import { usePathname } from "next/navigation";
 import { ChevronRight, MessageCircle, X } from "lucide-react";
 import { analyzeTrip, formatDataGb } from "@/lib/graphql";
 import type { PlanOption, TripAnalysis, TripInput, UsageLevel, TravelerType } from "@/lib/graphql";
@@ -52,8 +53,10 @@ const EXAMPLES = [
 ];
 
 export function FloatingChat() {
+  const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [hasBeenOpened, setHasBeenOpened] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -238,6 +241,9 @@ export function FloatingChat() {
     e.preventDefault();
     void sendMessage(input);
   }
+
+  const hiddenRoutes = ["/checkout", "/auth/signin", "/auth/callback"];
+  if (hiddenRoutes.some((route) => pathname.startsWith(route))) return null;
 
   const showExamples = messages.length === 0 && !loading;
   const topAlternative = result?.alternatives[0] ?? null;
@@ -487,14 +493,24 @@ export function FloatingChat() {
       </div>
 
       {/* Floating toggle button */}
-      <button
-        aria-label={isOpen ? "Close trip planner" : "Open AI trip planner"}
-        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-slate-950 text-white shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl"
-        onClick={() => setIsOpen((prev) => !prev)}
-        type="button"
-      >
-        {isOpen ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}
-      </button>
+      <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2">
+        {!hasBeenOpened && !isOpen && (
+          <span className="rounded-full bg-slate-950 px-3 py-2 text-xs font-semibold text-white">
+            Plan with AI
+          </span>
+        )}
+        <button
+          aria-label={isOpen ? "Close trip planner" : "Open AI trip planner"}
+          className={`flex h-14 w-14 items-center justify-center rounded-full bg-slate-950 text-white shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl${!hasBeenOpened ? " animate-pulse" : ""}`}
+          onClick={() => {
+            setIsOpen((prev) => !prev);
+            setHasBeenOpened(true);
+          }}
+          type="button"
+        >
+          {isOpen ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}
+        </button>
+      </div>
     </>
   );
 }

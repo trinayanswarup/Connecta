@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math"
 	"strings"
 	"sync"
 	"time"
@@ -86,7 +87,26 @@ func agentStatusToDB(s domain.AgentStatus) string {
 }
 
 func (r *PostgresTripRepository) SaveAnalysis(ctx context.Context, analysis domain.TripAnalysis) error {
-	usageJSON, err := json.Marshal(analysis.Estimate.Breakdown)
+	breakdown := analysis.Estimate.Breakdown
+	if math.IsNaN(breakdown.Maps) || math.IsInf(breakdown.Maps, 0) {
+		breakdown.Maps = 0
+	}
+	if math.IsNaN(breakdown.Streaming) || math.IsInf(breakdown.Streaming, 0) {
+		breakdown.Streaming = 0
+	}
+	if math.IsNaN(breakdown.SocialMedia) || math.IsInf(breakdown.SocialMedia, 0) {
+		breakdown.SocialMedia = 0
+	}
+	if math.IsNaN(breakdown.VideoCalls) || math.IsInf(breakdown.VideoCalls, 0) {
+		breakdown.VideoCalls = 0
+	}
+	if math.IsNaN(breakdown.Hotspot) || math.IsInf(breakdown.Hotspot, 0) {
+		breakdown.Hotspot = 0
+	}
+	if math.IsNaN(breakdown.Work) || math.IsInf(breakdown.Work, 0) {
+		breakdown.Work = 0
+	}
+	usageJSON, err := json.Marshal(breakdown)
 	if err != nil {
 		return fmt.Errorf("marshaling usage profile: %w", err)
 	}
@@ -129,14 +149,14 @@ func (r *PostgresTripRepository) SaveAnalysis(ctx context.Context, analysis doma
 	`,
 		analysis.TripID,
 		analysis.Destination,
-		analysis.StartDate,
-		analysis.EndDate,
+		analysis.StartDate.Format("2006-01-02"),
+		analysis.EndDate.Format("2006-01-02"),
 		string(analysis.TravelerType),
-		usageJSON,
+		string(usageJSON),
 		analysis.Estimate.EstimatedGB,
 		analysis.Estimate.RecommendedGB,
-		recJSON,
-		guideJSON,
+		string(recJSON),
+		string(guideJSON),
 		now,
 		now,
 	)

@@ -16,10 +16,10 @@ type Plan struct {
 func MockPlans() []Plan {
 	return []Plan{
 		{ID: "plan-1gb", Provider: "Connecta Local", Name: "Connecta 1 GB", Destination: "global", PriceUSD: 3.99, DataGB: 1, ValidityDays: 7, CoverageScore: 0.80},
-		{ID: "plan-3gb", Provider: "Connecta Local", Name: "Connecta 3 GB", Destination: "global", PriceUSD: 9.99, DataGB: 3, ValidityDays: 30, CoverageScore: 0.85},
-		{ID: "plan-5gb", Provider: "Connecta Local", Name: "Connecta 5 GB", Destination: "global", PriceUSD: 13.99, DataGB: 5, ValidityDays: 30, CoverageScore: 0.85},
-		{ID: "plan-10gb", Provider: "Connecta Local", Name: "Connecta 10 GB", Destination: "global", PriceUSD: 24.99, DataGB: 10, ValidityDays: 30, CoverageScore: 0.90},
-		{ID: "plan-20gb", Provider: "Connecta Local", Name: "Connecta 20 GB", Destination: "global", PriceUSD: 39.99, DataGB: 20, ValidityDays: 30, CoverageScore: 0.90},
+		{ID: "plan-3gb", Provider: "Connecta Local", Name: "Connecta 3 GB", Destination: "global", PriceUSD: 6.99, DataGB: 3, ValidityDays: 30, CoverageScore: 0.85},
+		{ID: "plan-5gb", Provider: "Connecta Local", Name: "Connecta 5 GB", Destination: "global", PriceUSD: 9.99, DataGB: 5, ValidityDays: 30, CoverageScore: 0.85},
+		{ID: "plan-10gb", Provider: "Connecta Local", Name: "Connecta 10 GB", Destination: "global", PriceUSD: 15.99, DataGB: 10, ValidityDays: 30, CoverageScore: 0.90},
+		{ID: "plan-20gb", Provider: "Connecta Local", Name: "Connecta 20 GB", Destination: "global", PriceUSD: 22.99, DataGB: 20, ValidityDays: 30, CoverageScore: 0.90},
 		{ID: "plan-unlimited-10", Provider: "Connecta Local", Name: "Connecta Unlimited", Destination: "global", PriceUSD: 34.99, DataGB: 999, ValidityDays: 10, CoverageScore: 0.95},
 		{ID: "plan-unlimited-15", Provider: "Connecta Local", Name: "Connecta Unlimited", Destination: "global", PriceUSD: 48.99, DataGB: 999, ValidityDays: 15, CoverageScore: 0.95},
 		{ID: "plan-unlimited-20", Provider: "Connecta Local", Name: "Connecta Unlimited", Destination: "global", PriceUSD: 59.99, DataGB: 999, ValidityDays: 20, CoverageScore: 0.95},

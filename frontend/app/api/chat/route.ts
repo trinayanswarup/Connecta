@@ -108,6 +108,8 @@ export async function POST(request: Request) {
     const body = (await request.json()) as ChatRequest;
     const { message, history } = body;
 
+    console.log('Chat API called with:', message?.slice(0, 50));
+
     const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) {
       return NextResponse.json({ error: "GROQ_API_KEY is not configured" }, { status: 500 });
@@ -120,6 +122,9 @@ export async function POST(request: Request) {
       ...history.map((m) => ({ role: m.role, content: m.content })),
       { role: "user" as const, content: message },
     ];
+
+    console.log('Calling Groq with model:', 'llama-3.3-70b-versatile');
+    console.log('GROQ_API_KEY present:', !!process.env.GROQ_API_KEY);
 
     const groqResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
@@ -135,12 +140,24 @@ export async function POST(request: Request) {
       }),
     });
 
+    const groqResponseText = await groqResponse.text();
+    console.log('Groq response status:', groqResponse.status);
+    console.log('Groq response body:', groqResponseText.slice(0, 500));
+
     if (!groqResponse.ok) {
-      const errorText = await groqResponse.text();
-      return NextResponse.json({ error: `Request failed: ${errorText}` }, { status: 500 });
+      if (groqResponse.status === 429) {
+        return Response.json({
+          complete: false,
+          clarification: "I'm handling too many requests right now. Please try again in a few minutes.",
+        });
+      }
+      return Response.json({
+        complete: false,
+        clarification: "Something went wrong. Please try again.",
+      });
     }
 
-    const groqData = (await groqResponse.json()) as {
+    const groqData = JSON.parse(groqResponseText) as {
       choices: Array<{ message: { content: string } }>;
     };
 
@@ -166,8 +183,12 @@ export async function POST(request: Request) {
         trip: null,
       });
     }
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json({ error: msg }, { status: 500 });
+  } catch (error) {
+    console.error('Chat API error:', error);
+    console.error('Error details:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
+    return Response.json({
+      complete: false,
+      clarification: 'Something went wrong. Please try again.',
+    }, { status: 200 });
   }
 }

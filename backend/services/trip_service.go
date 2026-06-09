@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -103,6 +104,7 @@ func (s *TripService) AnalyzeTrip(ctx context.Context, input domain.TripInput) (
 	})
 	analysis.AgentSteps = steps
 	if err := s.trips.SaveAnalysis(ctx, analysis); err != nil {
+		log.Printf("warn: save analysis failed (non-fatal): %v", err)
 		errorMessage := err.Error()
 		steps[len(steps)-1] = domain.AgentStep{
 			Name:          "Save trip",
@@ -114,7 +116,7 @@ func (s *TripService) AnalyzeTrip(ctx context.Context, input domain.TripInput) (
 			Error:         &errorMessage,
 		}
 		analysis.AgentSteps = steps
-		return analysis, err
+		// continue — return the recommendation anyway
 	}
 
 	return analysis, nil

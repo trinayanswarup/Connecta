@@ -326,9 +326,8 @@ export function CheckoutForm({
               </div>
             )}
             {couponApplied && (
-              <p className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
-                <CheckCircle2 className="h-3.5 w-3.5" />
-                Coupon applied successfully
+              <p className="text-xs font-semibold text-red-500">
+                This coupon code is not valid
               </p>
             )}
           </div>

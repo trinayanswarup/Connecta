@@ -17,19 +17,19 @@ func TestOptimizeSelectsOneGBPlanForLowUsage(t *testing.T) {
 func TestOptimizeSelectsThreeGBPlan(t *testing.T) {
 	result := testOptimizerResultWithGB(4.0)
 	assertPlanID(t, result.Selected, "plan-3gb")
-	assertPlanPrice(t, result.Selected, 9.99)
+	assertPlanPrice(t, result.Selected, 6.99)
 }
 
 func TestOptimizeSelectsFiveGBPlan(t *testing.T) {
 	result := testOptimizerResultWithGB(8.0)
 	assertPlanID(t, result.Selected, "plan-5gb")
-	assertPlanPrice(t, result.Selected, 13.99)
+	assertPlanPrice(t, result.Selected, 9.99)
 }
 
 func TestOptimizeSelectsTenGBPlan(t *testing.T) {
 	result := testOptimizerResultWithGB(15.0)
 	assertPlanID(t, result.Selected, "plan-10gb")
-	assertPlanPrice(t, result.Selected, 24.99)
+	assertPlanPrice(t, result.Selected, 15.99)
 }
 
 func TestOptimizeSelectsUnlimitedPlanByTripDuration(t *testing.T) {
