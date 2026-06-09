@@ -113,6 +113,48 @@ func mustParseDate(value string) time.Time {
 	return parsed
 }
 
+func TestAnalyzeTripBasicIntegration(t *testing.T) {
+	service := NewTripService(
+		agents.NewUsageEstimator(),
+		agents.NewPlanOptimizer(plans.MockPlans()),
+		repositories.NewInMemoryTripRepository(),
+	)
+
+	input := domain.TripInput{
+		Destination:  "Japan",
+		StartDate:    mustParseDate("2026-08-01"),
+		EndDate:      mustParseDate("2026-08-07"),
+		TravelerType: domain.TravelerSolo,
+		Usage: domain.UsageProfile{
+			Maps:        domain.UsageModerate,
+			Streaming:   domain.UsageModerate,
+			SocialMedia: domain.UsageModerate,
+			VideoCalls:  domain.UsageModerate,
+			Hotspot:     domain.UsageModerate,
+			Work:        domain.UsageModerate,
+		},
+	}
+
+	analysis, err := service.AnalyzeTrip(context.Background(), input)
+	if err != nil {
+		t.Fatalf("AnalyzeTrip returned error: %v", err)
+	}
+	if analysis.SelectedPlan.ID == "" {
+		t.Error("selectedPlan should not be empty")
+	}
+	if analysis.Estimate.EstimatedGB <= 0 {
+		t.Errorf("estimatedGb should be > 0, got %.1f", analysis.Estimate.EstimatedGB)
+	}
+	if len(analysis.AgentSteps) < 2 {
+		t.Errorf("expected at least 2 agent steps, got %d", len(analysis.AgentSteps))
+	}
+	for _, step := range analysis.AgentSteps {
+		if step.Status != domain.AgentStatusCompleted && step.Status != domain.AgentStatusSkipped {
+			t.Errorf("step %q has unexpected status %q", step.Name, step.Status)
+		}
+	}
+}
+
 func findStep(steps []domain.AgentStep, name string) (domain.AgentStep, bool) {
 	for _, step := range steps {
 		if step.Name == name {
