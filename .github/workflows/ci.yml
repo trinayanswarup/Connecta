@@ -52,22 +52,22 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Install dependencies
-        run: cd frontend && npm ci
+        run: npm ci
 
       - name: Type check
-        run: cd frontend && npm run typecheck
+        run: npm --workspace frontend run typecheck
 
       - name: Lint
-        run: cd frontend && npm run lint -- --max-warnings 0
+        run: npm --workspace frontend run lint -- --max-warnings 0
 
       - name: Test
-        run: cd frontend && npm test
+        run: npm --workspace frontend run test
 
       - name: Build
-        run: cd frontend && npm run build
+        run: npm --workspace frontend run build
         env:
           NEXT_PUBLIC_GRAPHQL_ENDPOINT: http://localhost:8080/graphql
           NEXT_PUBLIC_POSTHOG_KEY: ph_test_placeholder
