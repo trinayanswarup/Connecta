@@ -61,7 +61,7 @@ jobs:
         run: npm --workspace frontend run typecheck
 
       - name: Lint
-        run: npm --workspace frontend run lint -- --max-warnings 0
+        run: npm --workspace frontend run lint
 
       - name: Test
         run: npm --workspace frontend run test

@@ -219,7 +219,7 @@ export function CheckoutForm({
                 Where should we send your eSIM?
               </label>
               <p className="mb-3 text-xs text-slate-400">
-                We'll email your QR code and setup guide to this address.
+                We&apos;ll email your QR code and setup guide to this address.
               </p>
               <div className="relative">
                 <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
