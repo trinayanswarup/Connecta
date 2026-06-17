@@ -81,6 +81,7 @@ func (s *TripService) AnalyzeTrip(ctx context.Context, input domain.TripInput) (
 	analysis := domain.TripAnalysis{
 		TripID:            uuid.New().String(),
 		AgentRunID:        uuid.New().String(),
+		SessionID:         input.SessionID,
 		Destination:       strings.TrimSpace(input.Destination),
 		StartDate:         input.StartDate,
 		EndDate:           input.EndDate,
@@ -210,12 +211,23 @@ func recommendationText(input domain.TripInput, estimate domain.UsageEstimate, p
 		budgetNote = fmt.Sprintf(" It is above your $%.0f budget, but it avoids under-buying data.", *input.BudgetUSD)
 	}
 
+	if plan.DataGB >= estimate.RecommendedGB {
+		return fmt.Sprintf(
+			"%s comfortably covers your trip to %s: it offers %.0f GB against a recommended %.0f GB.%s",
+			plan.Name,
+			input.Destination,
+			plan.DataGB,
+			estimate.RecommendedGB,
+			budgetNote,
+		)
+	}
+
 	return fmt.Sprintf(
-		"%s is the best fit for this trip: it covers the %.0f GB recommended allowance with %.0f GB available for %s.%s",
+		"%s is the closest match for your trip to %s: it offers %.0f GB, just under your recommended %.0f GB, keeping cost reasonable.%s",
 		plan.Name,
-		estimate.RecommendedGB,
+		input.Destination,
 		plan.DataGB,
-		strings.Title(strings.ToLower(string(input.TravelerType))),
+		estimate.RecommendedGB,
 		budgetNote,
 	)
 }

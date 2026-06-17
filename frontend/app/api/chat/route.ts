@@ -54,7 +54,12 @@ DATE RULES — follow these exactly:
 
 DEFAULTS — apply automatically, never ask:
 - travelerType: default to "SOLO" if not mentioned.
-- All usage fields: default to "MODERATE" if not mentioned.
+- maps: default to "MODERATE" if not mentioned.
+- streaming: default to "LIGHT" if not mentioned.
+- socialMedia: default to "MODERATE" if not mentioned.
+- videoCalls: default to "LIGHT" if not mentioned.
+- hotspot: default to "NONE" if not mentioned.
+- work: default to "LIGHT" if not mentioned.
 
 CLARIFICATION RULES:
 - Set complete=false ONLY if destination is completely missing.

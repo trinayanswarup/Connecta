@@ -571,6 +571,7 @@ input TripInput {
   travelerType: TravelerType!
   budgetUsd: Float
   usage: UsageInput!
+  sessionId: String
 }
 
 input UsageInput {
@@ -3496,7 +3497,7 @@ func (ec *executionContext) unmarshalInputTripInput(ctx context.Context, obj any
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"destination", "startDate", "endDate", "travelerType", "budgetUsd", "usage"}
+	fieldsInOrder := [...]string{"destination", "startDate", "endDate", "travelerType", "budgetUsd", "usage", "sessionId"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3545,6 +3546,13 @@ func (ec *executionContext) unmarshalInputTripInput(ctx context.Context, obj any
 				return it, err
 			}
 			it.Usage = data
+		case "sessionId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sessionId"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SessionID = data
 		}
 	}
 	return it, nil

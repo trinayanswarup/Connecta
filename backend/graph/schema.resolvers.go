@@ -110,6 +110,7 @@ func toDomainTripInput(input models.TripInput) (domain.TripInput, error) {
 		EndDate:      endDate,
 		TravelerType: domain.TravelerType(input.TravelerType),
 		BudgetUSD:    input.BudgetUsd,
+		SessionID:    input.SessionID,
 		Usage: domain.UsageProfile{
 			Streaming:   domain.UsageLevel(input.Usage.Streaming),
 			VideoCalls:  domain.UsageLevel(input.Usage.VideoCalls),

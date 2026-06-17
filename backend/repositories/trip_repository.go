@@ -136,10 +136,10 @@ func (r *PostgresTripRepository) SaveAnalysis(ctx context.Context, analysis doma
 
 	_, err = r.db.ExecContext(ctx, `
 		INSERT INTO trips (
-			id, destination, start_date, end_date, traveler_type,
+			id, user_id, destination, start_date, end_date, traveler_type,
 			usage_profile, estimated_gb, recommended_gb,
 			recommendation, connectivity_guide, created_at, updated_at
-		) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
+		) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
 		ON CONFLICT (id) DO UPDATE SET
 			estimated_gb       = EXCLUDED.estimated_gb,
 			recommended_gb     = EXCLUDED.recommended_gb,
@@ -148,6 +148,7 @@ func (r *PostgresTripRepository) SaveAnalysis(ctx context.Context, analysis doma
 			updated_at         = EXCLUDED.updated_at
 	`,
 		analysis.TripID,
+		analysis.SessionID,
 		analysis.Destination,
 		analysis.StartDate.Format("2006-01-02"),
 		analysis.EndDate.Format("2006-01-02"),

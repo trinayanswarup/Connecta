@@ -1,3 +1,6 @@
+import { createClient } from "./supabase/client";
+import { getSessionId } from "./session";
+
 export type StoredPlan = {
   ID?: string;
   Provider?: string;
@@ -26,5 +29,23 @@ export type TripRow = {
 };
 
 export async function fetchTripHistory(): Promise<TripRow[]> {
-  return [];
+  const supabase = createClient();
+  if (!supabase) return [];
+
+  const sessionId = getSessionId();
+  if (!sessionId) return [];
+
+  const { data, error } = await supabase
+    .from("trips")
+    .select("id, destination, start_date, end_date, traveler_type, estimated_gb, recommended_gb, recommendation, created_at")
+    .eq("user_id", sessionId)
+    .order("created_at", { ascending: false })
+    .limit(20);
+
+  if (error || !data) {
+    console.error("fetchTripHistory error:", error);
+    return [];
+  }
+
+  return data as TripRow[];
 }

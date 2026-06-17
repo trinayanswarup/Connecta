@@ -199,11 +199,11 @@ export function FloatingChat() {
         budgetUsd: undefined,
         usage: {
           maps: trip.usage.maps ?? "MODERATE",
-          streaming: trip.usage.streaming ?? "MODERATE",
+          streaming: trip.usage.streaming ?? "LIGHT",
           socialMedia: trip.usage.socialMedia ?? "MODERATE",
-          videoCalls: trip.usage.videoCalls ?? "MODERATE",
-          hotspot: trip.usage.hotspot ?? "MODERATE",
-          work: trip.usage.work ?? "MODERATE",
+          videoCalls: trip.usage.videoCalls ?? "LIGHT",
+          hotspot: trip.usage.hotspot ?? "NONE",
+          work: trip.usage.work ?? "LIGHT",
         },
       };
 

@@ -1,3 +1,5 @@
+import { getSessionId } from "./session";
+
 export const graphqlEndpoint =
   process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT ?? "http://localhost:8080/graphql";
 
@@ -21,6 +23,7 @@ export type TripInput = {
   travelerType: TravelerType;
   budgetUsd?: number;
   usage: UsageInput;
+  sessionId?: string;
 };
 
 export type UsageBreakdownResult = Record<keyof UsageInput, number>;
@@ -135,6 +138,7 @@ export function formatDataGb(plan: Pick<PlanOption, "dataGb" | "dataLabel">): st
 }
 
 export async function analyzeTrip(input: TripInput): Promise<TripAnalysis> {
+  const sessionId = input.sessionId ?? getSessionId();
   const response = await fetch(graphqlEndpoint, {
     method: "POST",
     headers: {
@@ -142,7 +146,7 @@ export async function analyzeTrip(input: TripInput): Promise<TripAnalysis> {
     },
     body: JSON.stringify({
       query: ANALYZE_TRIP_MUTATION,
-      variables: { input }
+      variables: { input: { ...input, sessionId } }
     })
   });
 

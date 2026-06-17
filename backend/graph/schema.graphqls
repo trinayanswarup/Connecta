@@ -15,6 +15,7 @@ input TripInput {
   travelerType: TravelerType!
   budgetUsd: Float
   usage: UsageInput!
+  sessionId: String
 }
 
 input UsageInput {

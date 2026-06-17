@@ -276,12 +276,12 @@ export function findDestinationBySlug(slug: string) {
   return destinationOptions.find((destination) => slugifyDestination(destination.name) === slug);
 }
 
-const brazilPlanTemplates: MarketingPlanTemplate[] = [
+const standardPlanTemplates: MarketingPlanTemplate[] = [
   { data: "1 GB", days: "7 days", priceUsd: 3.99 },
-  { data: "3 GB", days: "30 days", priceUsd: 9.99 },
-  { data: "5 GB", days: "30 days", priceUsd: 13.99 },
-  { data: "10 GB", days: "30 days", priceUsd: 24.99, bestChoice: true },
-  { data: "20 GB", days: "30 days", priceUsd: 39.99 },
+  { data: "3 GB", days: "30 days", priceUsd: 6.99 },
+  { data: "5 GB", days: "30 days", priceUsd: 9.99 },
+  { data: "10 GB", days: "30 days", priceUsd: 15.99 },
+  { data: "20 GB", days: "30 days", priceUsd: 22.99, bestChoice: true },
   {
     data: "Unlimited GB",
     days: "30 days",
@@ -296,86 +296,10 @@ const brazilPlanTemplates: MarketingPlanTemplate[] = [
   }
 ];
 
-const spainPlanTemplates: MarketingPlanTemplate[] = [
-  { data: "1 GB", days: "7 days", priceUsd: 3.99 },
-  { data: "3 GB", days: "30 days", priceUsd: 6.99 },
-  { data: "5 GB", days: "30 days", priceUsd: 9.99 },
-  { data: "10 GB", days: "30 days", priceUsd: 15.99 },
-  { data: "20 GB", days: "30 days", priceUsd: 22.99, bestChoice: true },
-  unlimitedPlanTemplate(48.99)
-];
+export const marketingPlans: MarketingPlan[] = toMarketingPlans(standardPlanTemplates);
 
-const europePlanTemplates: MarketingPlanTemplate[] = [
-  { data: "1 GB", days: "7 days", priceUsd: 4.99 },
-  { data: "3 GB", days: "30 days", priceUsd: 12.49 },
-  { data: "5 GB", days: "30 days", priceUsd: 19.49 },
-  { data: "10 GB", days: "30 days", priceUsd: 35.99 },
-  { data: "50 GB", days: "90 days", priceUsd: 95.99 },
-  unlimitedPlanTemplate(49.99, true)
-];
-
-const regionalPlanTemplates: MarketingPlanTemplate[] = [
-  { data: "1 GB", days: "7 days", priceUsd: 4.99 },
-  { data: "3 GB", days: "30 days", priceUsd: 12.49 },
-  { data: "5 GB", days: "30 days", priceUsd: 19.49 },
-  { data: "10 GB", days: "30 days", priceUsd: 35.99, bestChoice: true },
-  { data: "20 GB", days: "30 days", priceUsd: 59.99 },
-  unlimitedPlanTemplate(49.99)
-];
-
-const globalPlanTemplates: MarketingPlanTemplate[] = [
-  { data: "1 GB", days: "7 days", priceUsd: 5.99 },
-  { data: "3 GB", days: "30 days", priceUsd: 14.99 },
-  { data: "5 GB", days: "30 days", priceUsd: 22.99 },
-  { data: "10 GB", days: "30 days", priceUsd: 39.99 },
-  { data: "20 GB", days: "30 days", priceUsd: 69.99, bestChoice: true },
-  unlimitedPlanTemplate(59.99)
-];
-
-export const marketingPlans: MarketingPlan[] = toMarketingPlans(brazilPlanTemplates);
-
-export function plansForDestination(destination: string) {
-  const option = destinationOptions.find((candidate) => candidate.name.toLowerCase() === destination.trim().toLowerCase());
-  const normalizedDestination = destination.trim().toLowerCase();
-
-  if (normalizedDestination === "spain") {
-    return toMarketingPlans(spainPlanTemplates);
-  }
-
-  if (normalizedDestination === "europe") {
-    return toMarketingPlans(europePlanTemplates);
-  }
-
-  if (option?.kind === "global") {
-    return toMarketingPlans(globalPlanTemplates);
-  }
-
-  if (option?.kind === "regional") {
-    return toMarketingPlans(regionalPlanTemplates);
-  }
-
-  if (option?.region === "Europe") {
-    return toMarketingPlans(spainPlanTemplates);
-  }
-
-  return toMarketingPlans(brazilPlanTemplates);
-}
-
-function unlimitedPlanTemplate(priceUsd: number, bestChoice = false): MarketingPlanTemplate {
-  const price30 = priceUsd + 23;
-  return {
-    data: "Unlimited GB",
-    days: "30 days",
-    priceUsd: price30,
-    bestChoice,
-    validityOptions: [
-      { dayCount: 10, days: "10 days", priceUsd: Math.max(29.99, priceUsd - 14) },
-      { dayCount: 15, days: "15 days", priceUsd },
-      { dayCount: 20, days: "20 days", priceUsd: priceUsd + 11 },
-      { dayCount: 25, days: "25 days", priceUsd: priceUsd + 17 },
-      { dayCount: 30, days: "30 days", priceUsd: price30 }
-    ]
-  };
+export function plansForDestination(_destination: string) {
+  return toMarketingPlans(standardPlanTemplates);
 }
 
 function toMarketingPlans(templates: MarketingPlanTemplate[]): MarketingPlan[] {

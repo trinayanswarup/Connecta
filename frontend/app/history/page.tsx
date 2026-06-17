@@ -40,9 +40,9 @@ function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center">
       <MapPin className="mb-4 h-12 w-12 text-slate-300" />
-      <p className="text-lg font-semibold text-slate-500">Trip history is private</p>
+      <p className="text-lg font-semibold text-slate-500">No trips yet</p>
       <p className="mt-2 max-w-sm text-sm leading-6 text-slate-400">
-        Public history access is disabled while Connecta moves saved trips behind authenticated accounts.
+        Plan your first trip to see it here.
       </p>
       <Link
         href="/trip/new"
@@ -147,7 +147,7 @@ export default function HistoryPage() {
         {/* Header */}
         <p className="text-xs font-semibold uppercase tracking-widest text-orange-600">Your trips</p>
         <h1 className="mt-2 text-3xl font-bold text-slate-950">Past recommendations</h1>
-        <p className="mt-2 text-sm text-slate-500">Saved trips will appear here once account-linked history is enabled.</p>
+        <p className="mt-2 text-sm text-slate-500">All trips planned from this browser are shown here.</p>
 
         {/* Content */}
         <div className="mt-8 space-y-4">

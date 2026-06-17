@@ -26,6 +26,7 @@ type TripInput struct {
 	EndDate      time.Time
 	TravelerType TravelerType
 	BudgetUSD    *float64
+	SessionID    *string
 	Usage        UsageProfile
 }
 
@@ -93,6 +94,7 @@ type AgentStep struct {
 type TripAnalysis struct {
 	TripID            string
 	AgentRunID        string
+	SessionID         *string
 	Destination       string
 	StartDate         time.Time
 	EndDate           time.Time

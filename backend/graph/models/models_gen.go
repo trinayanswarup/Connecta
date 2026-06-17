@@ -81,6 +81,7 @@ type TripInput struct {
 	TravelerType TravelerType `json:"travelerType"`
 	BudgetUsd    *float64     `json:"budgetUsd,omitempty"`
 	Usage        *UsageInput  `json:"usage"`
+	SessionID    *string      `json:"sessionId,omitempty"`
 }
 
 type UsageBreakdown struct {
