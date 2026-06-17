@@ -27,7 +27,8 @@ func TestAnalyzeTripFallsBackWhenEnhancerFails(t *testing.T) {
 		t.Fatalf("AnalyzeTrip returned error: %v", err)
 	}
 
-	if !strings.Contains(analysis.Recommendation, "is the best fit") {
+	if !strings.Contains(analysis.Recommendation, "comfortably covers") &&
+		!strings.Contains(analysis.Recommendation, "is the closest match") {
 		t.Fatalf("expected deterministic recommendation fallback, got %q", analysis.Recommendation)
 	}
 	if analysis.ConnectivityGuide == nil {
