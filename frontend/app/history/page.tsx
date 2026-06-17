@@ -40,8 +40,10 @@ function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center">
       <MapPin className="mb-4 h-12 w-12 text-slate-300" />
-      <p className="text-lg font-semibold text-slate-400">No trips yet</p>
-      <p className="mt-1 text-sm text-slate-400">Start by describing your trip in the chat</p>
+      <p className="text-lg font-semibold text-slate-500">Trip history is private</p>
+      <p className="mt-2 max-w-sm text-sm leading-6 text-slate-400">
+        Public history access is disabled while Connecta moves saved trips behind authenticated accounts.
+      </p>
       <Link
         href="/trip/new"
         className="mt-6 rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-slate-800"
@@ -145,7 +147,7 @@ export default function HistoryPage() {
         {/* Header */}
         <p className="text-xs font-semibold uppercase tracking-widest text-orange-600">Your trips</p>
         <h1 className="mt-2 text-3xl font-bold text-slate-950">Past recommendations</h1>
-        <p className="mt-2 text-sm text-slate-500">Your recent eSIM plan searches</p>
+        <p className="mt-2 text-sm text-slate-500">Saved trips will appear here once account-linked history is enabled.</p>
 
         {/* Content */}
         <div className="mt-8 space-y-4">

@@ -79,3 +79,161 @@ create index if not exists idx_trips_created_at on trips(created_at desc);
 create index if not exists idx_agent_runs_trip_id on agent_runs(trip_id);
 create index if not exists idx_agent_steps_run_id on agent_steps(agent_run_id);
 create index if not exists idx_plans_destination on plans(destination);
+
+alter table user_preferences enable row level security;
+alter table plans enable row level security;
+alter table trips enable row level security;
+alter table agent_runs enable row level security;
+alter table agent_steps enable row level security;
+alter table trip_feedback enable row level security;
+
+drop policy if exists "plans are readable by visitors" on plans;
+drop policy if exists "users can read own preferences" on user_preferences;
+drop policy if exists "users can insert own preferences" on user_preferences;
+drop policy if exists "users can update own preferences" on user_preferences;
+drop policy if exists "users can delete own preferences" on user_preferences;
+drop policy if exists "users can read own trips" on trips;
+drop policy if exists "users can insert own trips" on trips;
+drop policy if exists "users can update own trips" on trips;
+drop policy if exists "users can delete own trips" on trips;
+drop policy if exists "users can read own agent runs" on agent_runs;
+drop policy if exists "users can read own agent steps" on agent_steps;
+drop policy if exists "users can read own trip feedback" on trip_feedback;
+drop policy if exists "users can insert own trip feedback" on trip_feedback;
+drop policy if exists "users can update own trip feedback" on trip_feedback;
+drop policy if exists "users can delete own trip feedback" on trip_feedback;
+
+create policy "plans are readable by visitors"
+  on plans for select
+  to anon, authenticated
+  using (true);
+
+create policy "users can read own preferences"
+  on user_preferences for select
+  to authenticated
+  using ((select auth.uid()) is not null and user_id = (select auth.uid())::text);
+
+create policy "users can insert own preferences"
+  on user_preferences for insert
+  to authenticated
+  with check ((select auth.uid()) is not null and user_id = (select auth.uid())::text);
+
+create policy "users can update own preferences"
+  on user_preferences for update
+  to authenticated
+  using ((select auth.uid()) is not null and user_id = (select auth.uid())::text)
+  with check ((select auth.uid()) is not null and user_id = (select auth.uid())::text);
+
+create policy "users can delete own preferences"
+  on user_preferences for delete
+  to authenticated
+  using ((select auth.uid()) is not null and user_id = (select auth.uid())::text);
+
+create policy "users can read own trips"
+  on trips for select
+  to authenticated
+  using ((select auth.uid()) is not null and user_id = (select auth.uid())::text);
+
+create policy "users can insert own trips"
+  on trips for insert
+  to authenticated
+  with check ((select auth.uid()) is not null and user_id = (select auth.uid())::text);
+
+create policy "users can update own trips"
+  on trips for update
+  to authenticated
+  using ((select auth.uid()) is not null and user_id = (select auth.uid())::text)
+  with check ((select auth.uid()) is not null and user_id = (select auth.uid())::text);
+
+create policy "users can delete own trips"
+  on trips for delete
+  to authenticated
+  using ((select auth.uid()) is not null and user_id = (select auth.uid())::text);
+
+create policy "users can read own agent runs"
+  on agent_runs for select
+  to authenticated
+  using (
+    exists (
+      select 1
+      from trips
+      where trips.id = agent_runs.trip_id
+        and (select auth.uid()) is not null
+        and trips.user_id = (select auth.uid())::text
+    )
+  );
+
+create policy "users can read own agent steps"
+  on agent_steps for select
+  to authenticated
+  using (
+    exists (
+      select 1
+      from agent_runs
+      join trips on trips.id = agent_runs.trip_id
+      where agent_runs.id = agent_steps.agent_run_id
+        and (select auth.uid()) is not null
+        and trips.user_id = (select auth.uid())::text
+    )
+  );
+
+create policy "users can read own trip feedback"
+  on trip_feedback for select
+  to authenticated
+  using (
+    exists (
+      select 1
+      from trips
+      where trips.id = trip_feedback.trip_id
+        and (select auth.uid()) is not null
+        and trips.user_id = (select auth.uid())::text
+    )
+  );
+
+create policy "users can insert own trip feedback"
+  on trip_feedback for insert
+  to authenticated
+  with check (
+    exists (
+      select 1
+      from trips
+      where trips.id = trip_feedback.trip_id
+        and (select auth.uid()) is not null
+        and trips.user_id = (select auth.uid())::text
+    )
+  );
+
+create policy "users can update own trip feedback"
+  on trip_feedback for update
+  to authenticated
+  using (
+    exists (
+      select 1
+      from trips
+      where trips.id = trip_feedback.trip_id
+        and (select auth.uid()) is not null
+        and trips.user_id = (select auth.uid())::text
+    )
+  )
+  with check (
+    exists (
+      select 1
+      from trips
+      where trips.id = trip_feedback.trip_id
+        and (select auth.uid()) is not null
+        and trips.user_id = (select auth.uid())::text
+    )
+  );
+
+create policy "users can delete own trip feedback"
+  on trip_feedback for delete
+  to authenticated
+  using (
+    exists (
+      select 1
+      from trips
+      where trips.id = trip_feedback.trip_id
+        and (select auth.uid()) is not null
+        and trips.user_id = (select auth.uid())::text
+    )
+  );
