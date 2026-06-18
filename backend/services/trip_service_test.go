@@ -286,7 +286,7 @@ func TestConfirmTripDefaultsDatesWhenNotProvided(t *testing.T) {
 	destination := "Mexico"
 	confirmed, err := service.ConfirmTrip(context.Background(), domain.ConfirmTripInput{
 		Destination: &destination,
-		Plan: domain.ConfirmedPlan{Provider: "Connecta", Name: "X", PriceUSD: 5, DataLabel: "1 GB", ValidityDays: 7},
+		Plan:        domain.ConfirmedPlan{Provider: "Connecta", Name: "X", PriceUSD: 5, DataLabel: "1 GB", ValidityDays: 7},
 	})
 	if err != nil {
 		t.Fatalf("expected no error when dates are omitted, got %v", err)
