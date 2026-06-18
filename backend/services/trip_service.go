@@ -19,9 +19,10 @@ type TripService struct {
 	optimizer agents.PlanOptimizer
 	enhancer  agents.RecommendationEnhancer
 	trips     repositories.TripRepository
+	usage     repositories.UsageSnapshotRepository
 }
 
-func NewTripService(estimator agents.UsageEstimator, optimizer agents.PlanOptimizer, trips repositories.TripRepository, enhancers ...agents.RecommendationEnhancer) *TripService {
+func NewTripService(estimator agents.UsageEstimator, optimizer agents.PlanOptimizer, trips repositories.TripRepository, usage repositories.UsageSnapshotRepository, enhancers ...agents.RecommendationEnhancer) *TripService {
 	var enhancer agents.RecommendationEnhancer
 	if len(enhancers) > 0 {
 		enhancer = enhancers[0]
@@ -31,6 +32,7 @@ func NewTripService(estimator agents.UsageEstimator, optimizer agents.PlanOptimi
 		optimizer: optimizer,
 		enhancer:  enhancer,
 		trips:     trips,
+		usage:     usage,
 	}
 }
 
@@ -129,6 +131,94 @@ func (s *TripService) ListTrips(ctx context.Context) ([]domain.TripAnalysis, err
 
 func (s *TripService) GetAnalysis(ctx context.Context, id string) (domain.TripAnalysis, bool, error) {
 	return s.trips.GetAnalysis(ctx, id)
+}
+
+func (s *TripService) GetBySession(ctx context.Context, sessionID string) ([]domain.TripAnalysis, error) {
+	return s.trips.GetBySession(ctx, sessionID)
+}
+
+// ConfirmTrip marks a trip as actually purchased.
+//
+// If input.TripID is set, it confirms a trip analyzeTrip already created
+// (the web checkout path) — destination/dates/recommendation are left
+// untouched, only ConfirmedAt/ConfirmedPlan change.
+//
+// If input.TripID is empty, there is no existing Connecta trip to attach
+// to (the SailGuard path, since SailGuard never calls analyzeTrip) — a
+// new trip is created and confirmed in the same step. Destination,
+// StartDate, and EndDate are required in that case.
+func (s *TripService) ConfirmTrip(ctx context.Context, input domain.ConfirmTripInput) (domain.TripAnalysis, error) {
+	now := time.Now().UTC()
+	plan := input.Plan
+
+	if input.TripID != nil && strings.TrimSpace(*input.TripID) != "" {
+		analysis, ok, err := s.trips.GetAnalysis(ctx, *input.TripID)
+		if err != nil {
+			return domain.TripAnalysis{}, fmt.Errorf("looking up trip %s: %w", *input.TripID, err)
+		}
+		if !ok {
+			return domain.TripAnalysis{}, fmt.Errorf("trip %s not found", *input.TripID)
+		}
+
+		analysis.ConfirmedAt = &now
+		analysis.ConfirmedPlan = &plan
+
+		if err := s.trips.SaveAnalysis(ctx, analysis); err != nil {
+			return domain.TripAnalysis{}, fmt.Errorf("saving confirmed trip: %w", err)
+		}
+		return analysis, nil
+	}
+
+	if input.Destination == nil || strings.TrimSpace(*input.Destination) == "" {
+		return domain.TripAnalysis{}, errors.New("destination is required when tripId is not provided")
+	}
+
+	// startDate/endDate are nice to have but not always available — e.g.
+	// the web's "choose your own plan" shortcut skips analyzeTrip entirely
+	// and never collects them. Default to a one-week placeholder rather
+	// than blocking the confirmation; SailGuard always supplies real
+	// dates from its own wizard, so this fallback only affects that one
+	// web edge case.
+	startDate := now
+	if input.StartDate != nil {
+		startDate = *input.StartDate
+	}
+	endDate := now.AddDate(0, 0, 7)
+	if input.EndDate != nil {
+		endDate = *input.EndDate
+	}
+
+	travelerType := domain.TravelerSolo
+	if input.TravelerType != nil {
+		travelerType = *input.TravelerType
+	}
+
+	analysis := domain.TripAnalysis{
+		TripID:        uuid.New().String(),
+		SessionID:     input.SessionID,
+		Destination:   strings.TrimSpace(*input.Destination),
+		StartDate:     startDate,
+		EndDate:       endDate,
+		TravelerType:  travelerType,
+		ConfirmedAt:   &now,
+		ConfirmedPlan: &plan,
+	}
+
+	if err := s.trips.SaveAnalysis(ctx, analysis); err != nil {
+		return domain.TripAnalysis{}, fmt.Errorf("saving confirmed trip: %w", err)
+	}
+	return analysis, nil
+}
+
+func (s *TripService) SubmitUsageSnapshot(ctx context.Context, snapshot domain.UsageSnapshot) (domain.UsageSnapshot, error) {
+	if strings.TrimSpace(snapshot.TripID) == "" {
+		return domain.UsageSnapshot{}, errors.New("tripId is required")
+	}
+	return s.usage.Save(ctx, snapshot)
+}
+
+func (s *TripService) GetUsageByTrip(ctx context.Context, tripID string) ([]domain.UsageSnapshot, error) {
+	return s.usage.ListByTrip(ctx, tripID)
 }
 
 func (s *TripService) enhanceRecommendation(ctx context.Context, input domain.TripInput, estimate domain.UsageEstimate, optimization domain.OptimizationResult, deterministicRecommendation string, deterministicGuide domain.ConnectivityGuide) (domain.RecommendationEnhancement, domain.AgentStep) {

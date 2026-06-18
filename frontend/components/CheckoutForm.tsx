@@ -17,6 +17,8 @@ import {
   Wallet
 } from "lucide-react";
 
+import { confirmTrip } from "@/lib/graphql";
+
 type PaymentMethod = "card" | "googlepay" | "paypal";
 
 type CheckoutFormProps = {
@@ -28,6 +30,7 @@ type CheckoutFormProps = {
   price: string;
   creditValue: string;
   userEmail?: string;
+  tripId?: string;
 };
 
 export function CheckoutForm({
@@ -38,7 +41,8 @@ export function CheckoutForm({
   provider,
   price,
   creditValue,
-  userEmail
+  userEmail,
+  tripId
 }: CheckoutFormProps) {
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>("card");
   const [cardNumber, setCardNumber] = useState("");
@@ -72,9 +76,25 @@ export function CheckoutForm({
     }
     setCardError(null);
     setIsProcessing(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsProcessing(false);
-    setIsSuccess(true);
+    try {
+      await confirmTrip({
+        tripId,
+        destination,
+        plan: {
+          provider,
+          name: plan,
+          priceUsd: Number(price) || 0,
+          dataLabel: data,
+          validityDays: parseInt(validity, 10) || 30
+        }
+      });
+      setIsSuccess(true);
+    } catch (error) {
+      console.error("confirmTrip failed:", error);
+      setCardError("We couldn't confirm your purchase right now. Please try again.");
+    } finally {
+      setIsProcessing(false);
+    }
   }
 
   if (isSuccess) {

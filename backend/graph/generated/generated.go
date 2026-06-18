@@ -53,6 +53,14 @@ type ComplexityRoot struct {
 		Status        func(childComplexity int) int
 	}
 
+	ConfirmedPlan struct {
+		DataLabel    func(childComplexity int) int
+		Name         func(childComplexity int) int
+		PriceUsd     func(childComplexity int) int
+		Provider     func(childComplexity int) int
+		ValidityDays func(childComplexity int) int
+	}
+
 	ConnectivityGuide struct {
 		AirportSetup    func(childComplexity int) int
 		BackupInternet  func(childComplexity int) int
@@ -62,7 +70,9 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		AnalyzeTrip func(childComplexity int, input models.TripInput) int
+		AnalyzeTrip         func(childComplexity int, input models.TripInput) int
+		ConfirmTrip         func(childComplexity int, input models.ConfirmTripInput) int
+		SubmitUsageSnapshot func(childComplexity int, input models.SubmitUsageSnapshotInput) int
 	}
 
 	PlanOption struct {
@@ -76,17 +86,22 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		AgentRun func(childComplexity int, id string) int
-		Trip     func(childComplexity int, id string) int
-		Trips    func(childComplexity int) int
+		AgentRun       func(childComplexity int, id string) int
+		Trip           func(childComplexity int, id string) int
+		TripUsage      func(childComplexity int, tripID string) int
+		Trips          func(childComplexity int) int
+		TripsBySession func(childComplexity int, sessionID string) int
 	}
 
 	Trip struct {
+		ConfirmedAt   func(childComplexity int) int
+		ConfirmedPlan func(childComplexity int) int
 		Destination   func(childComplexity int) int
 		EndDate       func(childComplexity int) int
 		EstimatedGb   func(childComplexity int) int
 		ID            func(childComplexity int) int
 		RecommendedGb func(childComplexity int) int
+		SelectedPlan  func(childComplexity int) int
 		StartDate     func(childComplexity int) int
 		TravelerType  func(childComplexity int) int
 	}
@@ -113,15 +128,28 @@ type ComplexityRoot struct {
 		VideoCalls  func(childComplexity int) int
 		Work        func(childComplexity int) int
 	}
+
+	UsageSnapshot struct {
+		BatteryPct  func(childComplexity int) int
+		CapturedAt  func(childComplexity int) int
+		DataUsedMb  func(childComplexity int) int
+		ID          func(childComplexity int) int
+		NetworkType func(childComplexity int) int
+		TripID      func(childComplexity int) int
+	}
 }
 
 type MutationResolver interface {
 	AnalyzeTrip(ctx context.Context, input models.TripInput) (*models.TripAnalysis, error)
+	ConfirmTrip(ctx context.Context, input models.ConfirmTripInput) (*models.Trip, error)
+	SubmitUsageSnapshot(ctx context.Context, input models.SubmitUsageSnapshotInput) (*models.UsageSnapshot, error)
 }
 type QueryResolver interface {
 	Trips(ctx context.Context) ([]*models.Trip, error)
 	Trip(ctx context.Context, id string) (*models.Trip, error)
 	AgentRun(ctx context.Context, id string) (*models.AgentRun, error)
+	TripsBySession(ctx context.Context, sessionID string) ([]*models.Trip, error)
+	TripUsage(ctx context.Context, tripID string) ([]*models.UsageSnapshot, error)
 }
 
 type executableSchema graphql.ExecutableSchemaState[ResolverRoot, DirectiveRoot, ComplexityRoot]
@@ -206,6 +234,37 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.ComplexityRoot.AgentStep.Status(childComplexity), true
 
+	case "ConfirmedPlan.dataLabel":
+		if e.ComplexityRoot.ConfirmedPlan.DataLabel == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ConfirmedPlan.DataLabel(childComplexity), true
+	case "ConfirmedPlan.name":
+		if e.ComplexityRoot.ConfirmedPlan.Name == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ConfirmedPlan.Name(childComplexity), true
+	case "ConfirmedPlan.priceUsd":
+		if e.ComplexityRoot.ConfirmedPlan.PriceUsd == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ConfirmedPlan.PriceUsd(childComplexity), true
+	case "ConfirmedPlan.provider":
+		if e.ComplexityRoot.ConfirmedPlan.Provider == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ConfirmedPlan.Provider(childComplexity), true
+	case "ConfirmedPlan.validityDays":
+		if e.ComplexityRoot.ConfirmedPlan.ValidityDays == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ConfirmedPlan.ValidityDays(childComplexity), true
+
 	case "ConnectivityGuide.airportSetup":
 		if e.ComplexityRoot.ConnectivityGuide.AirportSetup == nil {
 			break
@@ -248,6 +307,28 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Mutation.AnalyzeTrip(childComplexity, args["input"].(models.TripInput)), true
+	case "Mutation.confirmTrip":
+		if e.ComplexityRoot.Mutation.ConfirmTrip == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_confirmTrip_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Mutation.ConfirmTrip(childComplexity, args["input"].(models.ConfirmTripInput)), true
+	case "Mutation.submitUsageSnapshot":
+		if e.ComplexityRoot.Mutation.SubmitUsageSnapshot == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_submitUsageSnapshot_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Mutation.SubmitUsageSnapshot(childComplexity, args["input"].(models.SubmitUsageSnapshotInput)), true
 
 	case "PlanOption.dataGb":
 		if e.ComplexityRoot.PlanOption.DataGb == nil {
@@ -315,13 +396,47 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Query.Trip(childComplexity, args["id"].(string)), true
+	case "Query.tripUsage":
+		if e.ComplexityRoot.Query.TripUsage == nil {
+			break
+		}
+
+		args, err := ec.field_Query_tripUsage_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Query.TripUsage(childComplexity, args["tripId"].(string)), true
 	case "Query.trips":
 		if e.ComplexityRoot.Query.Trips == nil {
 			break
 		}
 
 		return e.ComplexityRoot.Query.Trips(childComplexity), true
+	case "Query.tripsBySession":
+		if e.ComplexityRoot.Query.TripsBySession == nil {
+			break
+		}
 
+		args, err := ec.field_Query_tripsBySession_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Query.TripsBySession(childComplexity, args["sessionId"].(string)), true
+
+	case "Trip.confirmedAt":
+		if e.ComplexityRoot.Trip.ConfirmedAt == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Trip.ConfirmedAt(childComplexity), true
+	case "Trip.confirmedPlan":
+		if e.ComplexityRoot.Trip.ConfirmedPlan == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Trip.ConfirmedPlan(childComplexity), true
 	case "Trip.destination":
 		if e.ComplexityRoot.Trip.Destination == nil {
 			break
@@ -352,6 +467,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Trip.RecommendedGb(childComplexity), true
+	case "Trip.selectedPlan":
+		if e.ComplexityRoot.Trip.SelectedPlan == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Trip.SelectedPlan(childComplexity), true
 	case "Trip.startDate":
 		if e.ComplexityRoot.Trip.StartDate == nil {
 			break
@@ -469,6 +590,43 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.ComplexityRoot.UsageBreakdown.Work(childComplexity), true
 
+	case "UsageSnapshot.batteryPct":
+		if e.ComplexityRoot.UsageSnapshot.BatteryPct == nil {
+			break
+		}
+
+		return e.ComplexityRoot.UsageSnapshot.BatteryPct(childComplexity), true
+	case "UsageSnapshot.capturedAt":
+		if e.ComplexityRoot.UsageSnapshot.CapturedAt == nil {
+			break
+		}
+
+		return e.ComplexityRoot.UsageSnapshot.CapturedAt(childComplexity), true
+	case "UsageSnapshot.dataUsedMb":
+		if e.ComplexityRoot.UsageSnapshot.DataUsedMb == nil {
+			break
+		}
+
+		return e.ComplexityRoot.UsageSnapshot.DataUsedMb(childComplexity), true
+	case "UsageSnapshot.id":
+		if e.ComplexityRoot.UsageSnapshot.ID == nil {
+			break
+		}
+
+		return e.ComplexityRoot.UsageSnapshot.ID(childComplexity), true
+	case "UsageSnapshot.networkType":
+		if e.ComplexityRoot.UsageSnapshot.NetworkType == nil {
+			break
+		}
+
+		return e.ComplexityRoot.UsageSnapshot.NetworkType(childComplexity), true
+	case "UsageSnapshot.tripId":
+		if e.ComplexityRoot.UsageSnapshot.TripID == nil {
+			break
+		}
+
+		return e.ComplexityRoot.UsageSnapshot.TripID(childComplexity), true
+
 	}
 	return 0, false
 }
@@ -477,6 +635,9 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	opCtx := graphql.GetOperationContext(ctx)
 	ec := newExecutionContext(opCtx, e, make(chan graphql.DeferredResult))
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputConfirmTripInput,
+		ec.unmarshalInputConfirmedPlanInput,
+		ec.unmarshalInputSubmitUsageSnapshotInput,
 		ec.unmarshalInputTripInput,
 		ec.unmarshalInputUsageInput,
 	)
@@ -558,10 +719,14 @@ var sources = []*ast.Source{
   trips: [Trip!]!
   trip(id: ID!): Trip
   agentRun(id: ID!): AgentRun
+  tripsBySession(sessionId: String!): [Trip!]!
+  tripUsage(tripId: ID!): [UsageSnapshot!]!
 }
 
 type Mutation {
   analyzeTrip(input: TripInput!): TripAnalysis!
+  confirmTrip(input: ConfirmTripInput!): Trip!
+  submitUsageSnapshot(input: SubmitUsageSnapshotInput!): UsageSnapshot!
 }
 
 input TripInput {
@@ -581,6 +746,37 @@ input UsageInput {
   maps: UsageLevel!
   socialMedia: UsageLevel!
   work: UsageLevel!
+}
+
+input ConfirmedPlanInput {
+  provider: String!
+  name: String!
+  priceUsd: Float!
+  dataLabel: String!
+  validityDays: Int!
+}
+
+# Confirms a trip was actually purchased (web checkout or SailGuard).
+# Pass tripId to confirm a trip that analyzeTrip already created.
+# Omit tripId (and supply destination/startDate/endDate instead) when the
+# purchase originates somewhere with no existing Connecta trip row yet —
+# this creates the trip and marks it confirmed in one step, which is the
+# path SailGuard uses since it doesn't call analyzeTrip itself.
+input ConfirmTripInput {
+  tripId: ID
+  sessionId: String
+  destination: String
+  startDate: String
+  endDate: String
+  travelerType: TravelerType
+  plan: ConfirmedPlanInput!
+}
+
+input SubmitUsageSnapshotInput {
+  tripId: ID!
+  dataUsedMb: Float!
+  batteryPct: Int
+  networkType: String
 }
 
 enum TravelerType {
@@ -605,6 +801,26 @@ type Trip {
   travelerType: TravelerType!
   estimatedGb: Float
   recommendedGb: Float
+  selectedPlan: PlanOption
+  confirmedAt: String
+  confirmedPlan: ConfirmedPlan
+}
+
+type ConfirmedPlan {
+  provider: String!
+  name: String!
+  priceUsd: Float!
+  dataLabel: String!
+  validityDays: Int!
+}
+
+type UsageSnapshot {
+  id: ID!
+  tripId: ID!
+  dataUsedMb: Float!
+  batteryPct: Int
+  networkType: String
+  capturedAt: String!
 }
 
 type TripAnalysis {
@@ -714,6 +930,22 @@ func (ec *executionContext) childFields_AgentStep(ctx context.Context, field gra
 	return nil, fmt.Errorf("no field named %q was found under type AgentStep", field.Name)
 }
 
+func (ec *executionContext) childFields_ConfirmedPlan(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+	switch field.Name {
+	case "provider":
+		return ec.fieldContext_ConfirmedPlan_provider(ctx, field)
+	case "name":
+		return ec.fieldContext_ConfirmedPlan_name(ctx, field)
+	case "priceUsd":
+		return ec.fieldContext_ConfirmedPlan_priceUsd(ctx, field)
+	case "dataLabel":
+		return ec.fieldContext_ConfirmedPlan_dataLabel(ctx, field)
+	case "validityDays":
+		return ec.fieldContext_ConfirmedPlan_validityDays(ctx, field)
+	}
+	return nil, fmt.Errorf("no field named %q was found under type ConfirmedPlan", field.Name)
+}
+
 func (ec *executionContext) childFields_ConnectivityGuide(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 	switch field.Name {
 	case "beforeDeparture":
@@ -766,6 +998,12 @@ func (ec *executionContext) childFields_Trip(ctx context.Context, field graphql.
 		return ec.fieldContext_Trip_estimatedGb(ctx, field)
 	case "recommendedGb":
 		return ec.fieldContext_Trip_recommendedGb(ctx, field)
+	case "selectedPlan":
+		return ec.fieldContext_Trip_selectedPlan(ctx, field)
+	case "confirmedAt":
+		return ec.fieldContext_Trip_confirmedAt(ctx, field)
+	case "confirmedPlan":
+		return ec.fieldContext_Trip_confirmedPlan(ctx, field)
 	}
 	return nil, fmt.Errorf("no field named %q was found under type Trip", field.Name)
 }
@@ -814,6 +1052,24 @@ func (ec *executionContext) childFields_UsageBreakdown(ctx context.Context, fiel
 		return ec.fieldContext_UsageBreakdown_work(ctx, field)
 	}
 	return nil, fmt.Errorf("no field named %q was found under type UsageBreakdown", field.Name)
+}
+
+func (ec *executionContext) childFields_UsageSnapshot(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+	switch field.Name {
+	case "id":
+		return ec.fieldContext_UsageSnapshot_id(ctx, field)
+	case "tripId":
+		return ec.fieldContext_UsageSnapshot_tripId(ctx, field)
+	case "dataUsedMb":
+		return ec.fieldContext_UsageSnapshot_dataUsedMb(ctx, field)
+	case "batteryPct":
+		return ec.fieldContext_UsageSnapshot_batteryPct(ctx, field)
+	case "networkType":
+		return ec.fieldContext_UsageSnapshot_networkType(ctx, field)
+	case "capturedAt":
+		return ec.fieldContext_UsageSnapshot_capturedAt(ctx, field)
+	}
+	return nil, fmt.Errorf("no field named %q was found under type UsageSnapshot", field.Name)
 }
 
 func (ec *executionContext) childFields___Directive(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
@@ -946,6 +1202,34 @@ func (ec *executionContext) field_Mutation_analyzeTrip_args(ctx context.Context,
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_confirmTrip_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input",
+		func(ctx context.Context, v any) (models.ConfirmTripInput, error) {
+			return ec.unmarshalNConfirmTripInput2githubᚗcomᚋconnectaᚋconnectaᚋbackendᚋgraphᚋmodelsᚐConfirmTripInput(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_submitUsageSnapshot_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input",
+		func(ctx context.Context, v any) (models.SubmitUsageSnapshotInput, error) {
+			return ec.unmarshalNSubmitUsageSnapshotInput2githubᚗcomᚋconnectaᚋconnectaᚋbackendᚋgraphᚋmodelsᚐSubmitUsageSnapshotInput(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -974,6 +1258,20 @@ func (ec *executionContext) field_Query_agentRun_args(ctx context.Context, rawAr
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_tripUsage_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "tripId",
+		func(ctx context.Context, v any) (string, error) {
+			return ec.unmarshalNID2string(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["tripId"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_trip_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -985,6 +1283,20 @@ func (ec *executionContext) field_Query_trip_args(ctx context.Context, rawArgs m
 		return nil, err
 	}
 	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_tripsBySession_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "sessionId",
+		func(ctx context.Context, v any) (string, error) {
+			return ec.unmarshalNString2string(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["sessionId"] = arg0
 	return args, nil
 }
 
@@ -1314,6 +1626,121 @@ func (ec *executionContext) fieldContext_AgentStep_error(_ context.Context, fiel
 	return graphql.NewScalarFieldContext("AgentStep", field, false, false, errors.New("field of type String does not have child fields"))
 }
 
+func (ec *executionContext) _ConfirmedPlan_provider(ctx context.Context, field graphql.CollectedField, obj *models.ConfirmedPlan) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_ConfirmedPlan_provider(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.Provider, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNString2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_ConfirmedPlan_provider(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("ConfirmedPlan", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _ConfirmedPlan_name(ctx context.Context, field graphql.CollectedField, obj *models.ConfirmedPlan) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_ConfirmedPlan_name(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.Name, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNString2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_ConfirmedPlan_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("ConfirmedPlan", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _ConfirmedPlan_priceUsd(ctx context.Context, field graphql.CollectedField, obj *models.ConfirmedPlan) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_ConfirmedPlan_priceUsd(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.PriceUsd, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v float64) graphql.Marshaler {
+			return ec.marshalNFloat2float64(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_ConfirmedPlan_priceUsd(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("ConfirmedPlan", field, false, false, errors.New("field of type Float does not have child fields"))
+}
+
+func (ec *executionContext) _ConfirmedPlan_dataLabel(ctx context.Context, field graphql.CollectedField, obj *models.ConfirmedPlan) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_ConfirmedPlan_dataLabel(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.DataLabel, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNString2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_ConfirmedPlan_dataLabel(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("ConfirmedPlan", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _ConfirmedPlan_validityDays(ctx context.Context, field graphql.CollectedField, obj *models.ConfirmedPlan) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_ConfirmedPlan_validityDays(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.ValidityDays, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v int) graphql.Marshaler {
+			return ec.marshalNInt2int(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_ConfirmedPlan_validityDays(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("ConfirmedPlan", field, false, false, errors.New("field of type Int does not have child fields"))
+}
+
 func (ec *executionContext) _ConnectivityGuide_beforeDeparture(ctx context.Context, field graphql.CollectedField, obj *models.ConnectivityGuide) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -1467,6 +1894,94 @@ func (ec *executionContext) fieldContext_Mutation_analyzeTrip(ctx context.Contex
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_analyzeTrip_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_confirmTrip(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Mutation_confirmTrip(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Mutation().ConfirmTrip(ctx, fc.Args["input"].(models.ConfirmTripInput))
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *models.Trip) graphql.Marshaler {
+			return ec.marshalNTrip2ᚖgithubᚗcomᚋconnectaᚋconnectaᚋbackendᚋgraphᚋmodelsᚐTrip(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Mutation_confirmTrip(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_Trip(ctx, field)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_confirmTrip_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_submitUsageSnapshot(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Mutation_submitUsageSnapshot(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Mutation().SubmitUsageSnapshot(ctx, fc.Args["input"].(models.SubmitUsageSnapshotInput))
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *models.UsageSnapshot) graphql.Marshaler {
+			return ec.marshalNUsageSnapshot2ᚖgithubᚗcomᚋconnectaᚋconnectaᚋbackendᚋgraphᚋmodelsᚐUsageSnapshot(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Mutation_submitUsageSnapshot(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_UsageSnapshot(ctx, field)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_submitUsageSnapshot_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -1754,6 +2269,94 @@ func (ec *executionContext) fieldContext_Query_agentRun(ctx context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_tripsBySession(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Query_tripsBySession(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Query().TripsBySession(ctx, fc.Args["sessionId"].(string))
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v []*models.Trip) graphql.Marshaler {
+			return ec.marshalNTrip2ᚕᚖgithubᚗcomᚋconnectaᚋconnectaᚋbackendᚋgraphᚋmodelsᚐTripᚄ(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Query_tripsBySession(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_Trip(ctx, field)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_tripsBySession_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_tripUsage(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Query_tripUsage(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Query().TripUsage(ctx, fc.Args["tripId"].(string))
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v []*models.UsageSnapshot) graphql.Marshaler {
+			return ec.marshalNUsageSnapshot2ᚕᚖgithubᚗcomᚋconnectaᚋconnectaᚋbackendᚋgraphᚋmodelsᚐUsageSnapshotᚄ(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Query_tripUsage(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_UsageSnapshot(ctx, field)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_tripUsage_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -1989,6 +2592,93 @@ func (ec *executionContext) _Trip_recommendedGb(ctx context.Context, field graph
 }
 func (ec *executionContext) fieldContext_Trip_recommendedGb(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	return graphql.NewScalarFieldContext("Trip", field, false, false, errors.New("field of type Float does not have child fields"))
+}
+
+func (ec *executionContext) _Trip_selectedPlan(ctx context.Context, field graphql.CollectedField, obj *models.Trip) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Trip_selectedPlan(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.SelectedPlan, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *models.PlanOption) graphql.Marshaler {
+			return ec.marshalOPlanOption2ᚖgithubᚗcomᚋconnectaᚋconnectaᚋbackendᚋgraphᚋmodelsᚐPlanOption(ctx, selections, v)
+		},
+		true,
+		false,
+	)
+}
+func (ec *executionContext) fieldContext_Trip_selectedPlan(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Trip",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_PlanOption(ctx, field)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Trip_confirmedAt(ctx context.Context, field graphql.CollectedField, obj *models.Trip) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Trip_confirmedAt(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.ConfirmedAt, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *string) graphql.Marshaler {
+			return ec.marshalOString2ᚖstring(ctx, selections, v)
+		},
+		true,
+		false,
+	)
+}
+func (ec *executionContext) fieldContext_Trip_confirmedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("Trip", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _Trip_confirmedPlan(ctx context.Context, field graphql.CollectedField, obj *models.Trip) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Trip_confirmedPlan(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.ConfirmedPlan, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *models.ConfirmedPlan) graphql.Marshaler {
+			return ec.marshalOConfirmedPlan2ᚖgithubᚗcomᚋconnectaᚋconnectaᚋbackendᚋgraphᚋmodelsᚐConfirmedPlan(ctx, selections, v)
+		},
+		true,
+		false,
+	)
+}
+func (ec *executionContext) fieldContext_Trip_confirmedPlan(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Trip",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_ConfirmedPlan(ctx, field)
+		},
+	}
+	return fc, nil
 }
 
 func (ec *executionContext) _TripAnalysis_tripId(ctx context.Context, field graphql.CollectedField, obj *models.TripAnalysis) (ret graphql.Marshaler) {
@@ -2425,6 +3115,144 @@ func (ec *executionContext) _UsageBreakdown_work(ctx context.Context, field grap
 }
 func (ec *executionContext) fieldContext_UsageBreakdown_work(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	return graphql.NewScalarFieldContext("UsageBreakdown", field, false, false, errors.New("field of type Float does not have child fields"))
+}
+
+func (ec *executionContext) _UsageSnapshot_id(ctx context.Context, field graphql.CollectedField, obj *models.UsageSnapshot) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_UsageSnapshot_id(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.ID, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNID2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_UsageSnapshot_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("UsageSnapshot", field, false, false, errors.New("field of type ID does not have child fields"))
+}
+
+func (ec *executionContext) _UsageSnapshot_tripId(ctx context.Context, field graphql.CollectedField, obj *models.UsageSnapshot) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_UsageSnapshot_tripId(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.TripID, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNID2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_UsageSnapshot_tripId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("UsageSnapshot", field, false, false, errors.New("field of type ID does not have child fields"))
+}
+
+func (ec *executionContext) _UsageSnapshot_dataUsedMb(ctx context.Context, field graphql.CollectedField, obj *models.UsageSnapshot) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_UsageSnapshot_dataUsedMb(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.DataUsedMb, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v float64) graphql.Marshaler {
+			return ec.marshalNFloat2float64(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_UsageSnapshot_dataUsedMb(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("UsageSnapshot", field, false, false, errors.New("field of type Float does not have child fields"))
+}
+
+func (ec *executionContext) _UsageSnapshot_batteryPct(ctx context.Context, field graphql.CollectedField, obj *models.UsageSnapshot) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_UsageSnapshot_batteryPct(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.BatteryPct, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *int) graphql.Marshaler {
+			return ec.marshalOInt2ᚖint(ctx, selections, v)
+		},
+		true,
+		false,
+	)
+}
+func (ec *executionContext) fieldContext_UsageSnapshot_batteryPct(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("UsageSnapshot", field, false, false, errors.New("field of type Int does not have child fields"))
+}
+
+func (ec *executionContext) _UsageSnapshot_networkType(ctx context.Context, field graphql.CollectedField, obj *models.UsageSnapshot) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_UsageSnapshot_networkType(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.NetworkType, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *string) graphql.Marshaler {
+			return ec.marshalOString2ᚖstring(ctx, selections, v)
+		},
+		true,
+		false,
+	)
+}
+func (ec *executionContext) fieldContext_UsageSnapshot_networkType(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("UsageSnapshot", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _UsageSnapshot_capturedAt(ctx context.Context, field graphql.CollectedField, obj *models.UsageSnapshot) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_UsageSnapshot_capturedAt(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.CapturedAt, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNString2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_UsageSnapshot_capturedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("UsageSnapshot", field, false, false, errors.New("field of type String does not have child fields"))
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -3486,6 +4314,187 @@ func (ec *executionContext) fieldContext___Type_isOneOf(_ context.Context, field
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputConfirmTripInput(ctx context.Context, obj any) (models.ConfirmTripInput, error) {
+	var it models.ConfirmTripInput
+	if obj == nil {
+		return it, nil
+	}
+
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"tripId", "sessionId", "destination", "startDate", "endDate", "travelerType", "plan"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "tripId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tripId"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TripID = data
+		case "sessionId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sessionId"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SessionID = data
+		case "destination":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("destination"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Destination = data
+		case "startDate":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("startDate"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.StartDate = data
+		case "endDate":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("endDate"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.EndDate = data
+		case "travelerType":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("travelerType"))
+			data, err := ec.unmarshalOTravelerType2ᚖgithubᚗcomᚋconnectaᚋconnectaᚋbackendᚋgraphᚋmodelsᚐTravelerType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TravelerType = data
+		case "plan":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("plan"))
+			data, err := ec.unmarshalNConfirmedPlanInput2ᚖgithubᚗcomᚋconnectaᚋconnectaᚋbackendᚋgraphᚋmodelsᚐConfirmedPlanInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Plan = data
+		}
+	}
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputConfirmedPlanInput(ctx context.Context, obj any) (models.ConfirmedPlanInput, error) {
+	var it models.ConfirmedPlanInput
+	if obj == nil {
+		return it, nil
+	}
+
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"provider", "name", "priceUsd", "dataLabel", "validityDays"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "provider":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("provider"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Provider = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "priceUsd":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("priceUsd"))
+			data, err := ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PriceUsd = data
+		case "dataLabel":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dataLabel"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DataLabel = data
+		case "validityDays":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("validityDays"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ValidityDays = data
+		}
+	}
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputSubmitUsageSnapshotInput(ctx context.Context, obj any) (models.SubmitUsageSnapshotInput, error) {
+	var it models.SubmitUsageSnapshotInput
+	if obj == nil {
+		return it, nil
+	}
+
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"tripId", "dataUsedMb", "batteryPct", "networkType"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "tripId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tripId"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TripID = data
+		case "dataUsedMb":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dataUsedMb"))
+			data, err := ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DataUsedMb = data
+		case "batteryPct":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("batteryPct"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.BatteryPct = data
+		case "networkType":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("networkType"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NetworkType = data
+		}
+	}
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputTripInput(ctx context.Context, obj any) (models.TripInput, error) {
 	var it models.TripInput
 	if obj == nil {
@@ -3742,6 +4751,65 @@ func (ec *executionContext) _AgentStep(ctx context.Context, sel ast.SelectionSet
 	return out
 }
 
+var confirmedPlanImplementors = []string{"ConfirmedPlan"}
+
+func (ec *executionContext) _ConfirmedPlan(ctx context.Context, sel ast.SelectionSet, obj *models.ConfirmedPlan) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, confirmedPlanImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ConfirmedPlan")
+		case "provider":
+			out.Values[i] = ec._ConfirmedPlan_provider(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "name":
+			out.Values[i] = ec._ConfirmedPlan_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "priceUsd":
+			out.Values[i] = ec._ConfirmedPlan_priceUsd(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "dataLabel":
+			out.Values[i] = ec._ConfirmedPlan_dataLabel(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "validityDays":
+			out.Values[i] = ec._ConfirmedPlan_validityDays(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(min(len(deferred), math.MaxInt32)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var connectivityGuideImplementors = []string{"ConnectivityGuide"}
 
 func (ec *executionContext) _ConnectivityGuide(ctx context.Context, sel ast.SelectionSet, obj *models.ConnectivityGuide) graphql.Marshaler {
@@ -3823,6 +4891,20 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "analyzeTrip":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_analyzeTrip(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "confirmTrip":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_confirmTrip(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "submitUsageSnapshot":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_submitUsageSnapshot(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -3998,6 +5080,50 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "tripsBySession":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_tripsBySession(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "tripUsage":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_tripUsage(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "__type":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___type(ctx, field)
@@ -4069,6 +5195,12 @@ func (ec *executionContext) _Trip(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Trip_estimatedGb(ctx, field, obj)
 		case "recommendedGb":
 			out.Values[i] = ec._Trip_recommendedGb(ctx, field, obj)
+		case "selectedPlan":
+			out.Values[i] = ec._Trip_selectedPlan(ctx, field, obj)
+		case "confirmedAt":
+			out.Values[i] = ec._Trip_confirmedAt(ctx, field, obj)
+		case "confirmedPlan":
+			out.Values[i] = ec._Trip_confirmedPlan(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4216,6 +5348,64 @@ func (ec *executionContext) _UsageBreakdown(ctx context.Context, sel ast.Selecti
 			}
 		case "work":
 			out.Values[i] = ec._UsageBreakdown_work(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(min(len(deferred), math.MaxInt32)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var usageSnapshotImplementors = []string{"UsageSnapshot"}
+
+func (ec *executionContext) _UsageSnapshot(ctx context.Context, sel ast.SelectionSet, obj *models.UsageSnapshot) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, usageSnapshotImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UsageSnapshot")
+		case "id":
+			out.Values[i] = ec._UsageSnapshot_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "tripId":
+			out.Values[i] = ec._UsageSnapshot_tripId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "dataUsedMb":
+			out.Values[i] = ec._UsageSnapshot_dataUsedMb(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "batteryPct":
+			out.Values[i] = ec._UsageSnapshot_batteryPct(ctx, field, obj)
+		case "networkType":
+			out.Values[i] = ec._UsageSnapshot_networkType(ctx, field, obj)
+		case "capturedAt":
+			out.Values[i] = ec._UsageSnapshot_capturedAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -4629,6 +5819,16 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) unmarshalNConfirmTripInput2githubᚗcomᚋconnectaᚋconnectaᚋbackendᚋgraphᚋmodelsᚐConfirmTripInput(ctx context.Context, v any) (models.ConfirmTripInput, error) {
+	res, err := ec.unmarshalInputConfirmTripInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNConfirmedPlanInput2ᚖgithubᚗcomᚋconnectaᚋconnectaᚋbackendᚋgraphᚋmodelsᚐConfirmedPlanInput(ctx context.Context, v any) (*models.ConfirmedPlanInput, error) {
+	res, err := ec.unmarshalInputConfirmedPlanInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v any) (float64, error) {
 	res, err := graphql.UnmarshalFloatContext(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4749,6 +5949,11 @@ func (ec *executionContext) marshalNString2ᚕstringᚄ(ctx context.Context, sel
 	return ret
 }
 
+func (ec *executionContext) unmarshalNSubmitUsageSnapshotInput2githubᚗcomᚋconnectaᚋconnectaᚋbackendᚋgraphᚋmodelsᚐSubmitUsageSnapshotInput(ctx context.Context, v any) (models.SubmitUsageSnapshotInput, error) {
+	res, err := ec.unmarshalInputSubmitUsageSnapshotInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNTravelerType2githubᚗcomᚋconnectaᚋconnectaᚋbackendᚋgraphᚋmodelsᚐTravelerType(ctx context.Context, v any) (models.TravelerType, error) {
 	var res models.TravelerType
 	err := res.UnmarshalGQL(v)
@@ -4757,6 +5962,10 @@ func (ec *executionContext) unmarshalNTravelerType2githubᚗcomᚋconnectaᚋcon
 
 func (ec *executionContext) marshalNTravelerType2githubᚗcomᚋconnectaᚋconnectaᚋbackendᚋgraphᚋmodelsᚐTravelerType(ctx context.Context, sel ast.SelectionSet, v models.TravelerType) graphql.Marshaler {
 	return v
+}
+
+func (ec *executionContext) marshalNTrip2githubᚗcomᚋconnectaᚋconnectaᚋbackendᚋgraphᚋmodelsᚐTrip(ctx context.Context, sel ast.SelectionSet, v models.Trip) graphql.Marshaler {
+	return ec._Trip(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNTrip2ᚕᚖgithubᚗcomᚋconnectaᚋconnectaᚋbackendᚋgraphᚋmodelsᚐTripᚄ(ctx context.Context, sel ast.SelectionSet, v []*models.Trip) graphql.Marshaler {
@@ -4827,6 +6036,36 @@ func (ec *executionContext) unmarshalNUsageLevel2githubᚗcomᚋconnectaᚋconne
 
 func (ec *executionContext) marshalNUsageLevel2githubᚗcomᚋconnectaᚋconnectaᚋbackendᚋgraphᚋmodelsᚐUsageLevel(ctx context.Context, sel ast.SelectionSet, v models.UsageLevel) graphql.Marshaler {
 	return v
+}
+
+func (ec *executionContext) marshalNUsageSnapshot2githubᚗcomᚋconnectaᚋconnectaᚋbackendᚋgraphᚋmodelsᚐUsageSnapshot(ctx context.Context, sel ast.SelectionSet, v models.UsageSnapshot) graphql.Marshaler {
+	return ec._UsageSnapshot(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUsageSnapshot2ᚕᚖgithubᚗcomᚋconnectaᚋconnectaᚋbackendᚋgraphᚋmodelsᚐUsageSnapshotᚄ(ctx context.Context, sel ast.SelectionSet, v []*models.UsageSnapshot) graphql.Marshaler {
+	ret := graphql.MarshalSliceConcurrently(ctx, len(v), 0, false, func(ctx context.Context, i int) graphql.Marshaler {
+		fc := graphql.GetFieldContext(ctx)
+		fc.Result = &v[i]
+		return ec.marshalNUsageSnapshot2ᚖgithubᚗcomᚋconnectaᚋconnectaᚋbackendᚋgraphᚋmodelsᚐUsageSnapshot(ctx, sel, v[i])
+	})
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNUsageSnapshot2ᚖgithubᚗcomᚋconnectaᚋconnectaᚋbackendᚋgraphᚋmodelsᚐUsageSnapshot(ctx context.Context, sel ast.SelectionSet, v *models.UsageSnapshot) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UsageSnapshot(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
@@ -5007,6 +6246,13 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
+func (ec *executionContext) marshalOConfirmedPlan2ᚖgithubᚗcomᚋconnectaᚋconnectaᚋbackendᚋgraphᚋmodelsᚐConfirmedPlan(ctx context.Context, sel ast.SelectionSet, v *models.ConfirmedPlan) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ConfirmedPlan(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalOConnectivityGuide2ᚖgithubᚗcomᚋconnectaᚋconnectaᚋbackendᚋgraphᚋmodelsᚐConnectivityGuide(ctx context.Context, sel ast.SelectionSet, v *models.ConnectivityGuide) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -5049,6 +6295,31 @@ func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v any) (*int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalInt(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	_ = sel
+	_ = ctx
+	res := graphql.MarshalInt(*v)
+	return res
+}
+
+func (ec *executionContext) marshalOPlanOption2ᚖgithubᚗcomᚋconnectaᚋconnectaᚋbackendᚋgraphᚋmodelsᚐPlanOption(ctx context.Context, sel ast.SelectionSet, v *models.PlanOption) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._PlanOption(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v any) (*string, error) {
 	if v == nil {
 		return nil, nil
@@ -5065,6 +6336,22 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	_ = ctx
 	res := graphql.MarshalString(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOTravelerType2ᚖgithubᚗcomᚋconnectaᚋconnectaᚋbackendᚋgraphᚋmodelsᚐTravelerType(ctx context.Context, v any) (*models.TravelerType, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(models.TravelerType)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOTravelerType2ᚖgithubᚗcomᚋconnectaᚋconnectaᚋbackendᚋgraphᚋmodelsᚐTravelerType(ctx context.Context, sel ast.SelectionSet, v *models.TravelerType) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) marshalOTrip2ᚖgithubᚗcomᚋconnectaᚋconnectaᚋbackendᚋgraphᚋmodelsᚐTrip(ctx context.Context, sel ast.SelectionSet, v *models.Trip) graphql.Marshaler {

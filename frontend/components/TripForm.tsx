@@ -291,11 +291,11 @@ export function TripForm({
         <div className="grid gap-5 scroll-mt-6" ref={resultsRef}>
           <RecommendationCard
             analysis={analysis}
-            checkoutHref={checkoutHrefForPlan(analysis.selectedPlan, destination)}
+            checkoutHref={checkoutHrefForPlan(analysis.selectedPlan, destination, analysis.tripId)}
           />
           <PlanComparison
             alternatives={analysis.alternatives}
-            checkoutHref={checkoutHrefForPlan(bestAlternativeForUsage(analysis.selectedPlan, analysis.alternatives), destination)}
+            checkoutHref={checkoutHrefForPlan(bestAlternativeForUsage(analysis.selectedPlan, analysis.alternatives), destination, analysis.tripId)}
             selected={analysis.selectedPlan}
           />
           <UsageBreakdown breakdown={analysis.usageBreakdown} />

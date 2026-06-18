@@ -7,7 +7,7 @@ export type CheckoutPlan = {
   validityDays: number;
 };
 
-export function checkoutHrefForPlan(plan: CheckoutPlan, destination: string) {
+export function checkoutHrefForPlan(plan: CheckoutPlan, destination: string, tripId?: string) {
   const params = new URLSearchParams({
     data: plan.dataLabel ?? (plan.dataGb >= 999 ? "Unlimited" : `${plan.dataGb} GB`),
     destination,
@@ -16,6 +16,9 @@ export function checkoutHrefForPlan(plan: CheckoutPlan, destination: string) {
     provider: plan.provider,
     validity: `${plan.validityDays} days`
   });
+  if (tripId) {
+    params.set("tripId", tripId);
+  }
 
   return `/checkout?${params.toString()}`;
 }

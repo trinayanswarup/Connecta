@@ -12,6 +12,7 @@ type CheckoutPageProps = {
     price?: string;
     provider?: string;
     validity?: string;
+    tripId?: string;
   }>;
 };
 
@@ -60,6 +61,7 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
           plan={plan}
           price={price}
           provider={provider}
+          tripId={params?.tripId}
           userEmail={userEmail}
           validity={validity}
         />

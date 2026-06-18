@@ -16,6 +16,7 @@ func TestAnalyzeTripResolverReturnsRecommendationFlow(t *testing.T) {
 		agents.NewUsageEstimator(),
 		agents.NewPlanOptimizer(plans.MockPlans()),
 		repositories.NewInMemoryTripRepository(),
+		repositories.NewInMemoryUsageSnapshotRepository(),
 	))
 
 	analysis, err := resolver.Mutation().AnalyzeTrip(context.Background(), models.TripInput{
