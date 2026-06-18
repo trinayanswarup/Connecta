@@ -96,6 +96,15 @@ function TripCard({ trip }: { trip: TripRow }) {
         </div>
       )}
 
+      {trip.confirmed_at && (
+        <Link
+          href={`/trip/${trip.id}`}
+          className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-orange-600 hover:text-orange-700"
+        >
+          View live usage <ChevronRight className="h-4 w-4" />
+        </Link>
+      )}
+
       {/* Plan row */}
       {hasplan && (
         <div className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-orange-100 bg-orange-50 px-4 py-3">
