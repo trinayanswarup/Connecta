@@ -349,7 +349,7 @@ export function PlannerExperience({
     const manualPlan = toPlanOption(plan, selectedDestination.name, selectedDestination.kind);
     setBestChoiceData(plan.data);
     setBestChoiceValidityDays(parseDays(plan.days));
-    router.push(checkoutHrefForPlan(manualPlan, selectedDestination.name));
+    router.push(checkoutHrefForPlan(manualPlan, selectedDestination.name, analysis?.tripId));
   }
 
   const otherOption = analysis ? bestAlternativeForUsage(analysis.selectedPlan, analysis.alternatives) : null;
@@ -407,7 +407,7 @@ export function PlannerExperience({
           {resultsMode && analysis ? (
             <RecommendationCard
               analysis={analysis}
-              checkoutHref={checkoutHrefForPlan(analysis.selectedPlan, selectedDestination.name)}
+              checkoutHref={checkoutHrefForPlan(analysis.selectedPlan, selectedDestination.name, analysis.tripId)}
               manualChoiceHref="#choose-yourself"
             />
           ) : null}
@@ -417,7 +417,7 @@ export function PlannerExperience({
           <div className="mt-7 grid gap-7">
             <PlanComparison
               alternatives={analysis.alternatives}
-              checkoutHref={otherOption ? checkoutHrefForPlan(otherOption, selectedDestination.name) : undefined}
+              checkoutHref={otherOption ? checkoutHrefForPlan(otherOption, selectedDestination.name, analysis.tripId) : undefined}
               selected={analysis.selectedPlan}
             />
             <UsageBreakdown breakdown={analysis.usageBreakdown} />

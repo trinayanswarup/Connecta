@@ -82,6 +82,73 @@ func (r *queryResolver) AgentRun(ctx context.Context, id string) (*models.AgentR
 	return nil, nil
 }
 
+// TripsBySession is the resolver for the tripsBySession field.
+func (r *queryResolver) TripsBySession(ctx context.Context, sessionID string) ([]*models.Trip, error) {
+	if r.TripService == nil {
+		return nil, errors.New("trip service is not configured")
+	}
+
+	analyses, err := r.TripService.GetBySession(ctx, sessionID)
+	if err != nil {
+		return nil, err
+	}
+
+	trips := make([]*models.Trip, 0, len(analyses))
+	for _, analysis := range analyses {
+		trips = append(trips, toGraphTrip(analysis))
+	}
+	return trips, nil
+}
+
+// TripUsage is the resolver for the tripUsage field.
+func (r *queryResolver) TripUsage(ctx context.Context, tripID string) ([]*models.UsageSnapshot, error) {
+	if r.TripService == nil {
+		return nil, errors.New("trip service is not configured")
+	}
+
+	snapshots, err := r.TripService.GetUsageByTrip(ctx, tripID)
+	if err != nil {
+		return nil, err
+	}
+	return toGraphUsageSnapshots(snapshots), nil
+}
+
+// ConfirmTrip is the resolver for the confirmTrip field.
+func (r *mutationResolver) ConfirmTrip(ctx context.Context, input models.ConfirmTripInput) (*models.Trip, error) {
+	if r.TripService == nil {
+		return nil, errors.New("trip service is not configured")
+	}
+
+	domainInput, err := toDomainConfirmTripInput(input)
+	if err != nil {
+		return nil, err
+	}
+
+	analysis, err := r.TripService.ConfirmTrip(ctx, domainInput)
+	if err != nil {
+		return nil, err
+	}
+	return toGraphTrip(analysis), nil
+}
+
+// SubmitUsageSnapshot is the resolver for the submitUsageSnapshot field.
+func (r *mutationResolver) SubmitUsageSnapshot(ctx context.Context, input models.SubmitUsageSnapshotInput) (*models.UsageSnapshot, error) {
+	if r.TripService == nil {
+		return nil, errors.New("trip service is not configured")
+	}
+
+	saved, err := r.TripService.SubmitUsageSnapshot(ctx, domain.UsageSnapshot{
+		TripID:      input.TripID,
+		DataUsedMB:  input.DataUsedMb,
+		BatteryPct:  input.BatteryPct,
+		NetworkType: input.NetworkType,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return toGraphUsageSnapshot(saved), nil
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
@@ -148,7 +215,7 @@ func toGraphTripAnalysis(analysis domain.TripAnalysis) *models.TripAnalysis {
 func toGraphTrip(analysis domain.TripAnalysis) *models.Trip {
 	estimated := analysis.Estimate.EstimatedGB
 	recommended := analysis.Estimate.RecommendedGB
-	return &models.Trip{
+	trip := &models.Trip{
 		ID:            analysis.TripID,
 		Destination:   analysis.Destination,
 		StartDate:     analysis.StartDate.Format("2006-01-02"),
@@ -157,6 +224,81 @@ func toGraphTrip(analysis domain.TripAnalysis) *models.Trip {
 		EstimatedGb:   &estimated,
 		RecommendedGb: &recommended,
 	}
+
+	if analysis.SelectedPlan.Name != "" {
+		trip.SelectedPlan = toGraphPlanOption(analysis.SelectedPlan)
+	}
+
+	if analysis.ConfirmedAt != nil {
+		confirmedAt := analysis.ConfirmedAt.Format(time.RFC3339)
+		trip.ConfirmedAt = &confirmedAt
+	}
+	if analysis.ConfirmedPlan != nil {
+		trip.ConfirmedPlan = &models.ConfirmedPlan{
+			Provider:     analysis.ConfirmedPlan.Provider,
+			Name:         analysis.ConfirmedPlan.Name,
+			PriceUsd:     analysis.ConfirmedPlan.PriceUSD,
+			DataLabel:    analysis.ConfirmedPlan.DataLabel,
+			ValidityDays: analysis.ConfirmedPlan.ValidityDays,
+		}
+	}
+
+	return trip
+}
+
+func toDomainConfirmTripInput(input models.ConfirmTripInput) (domain.ConfirmTripInput, error) {
+	result := domain.ConfirmTripInput{
+		TripID:      input.TripID,
+		SessionID:   input.SessionID,
+		Destination: input.Destination,
+		Plan: domain.ConfirmedPlan{
+			Provider:     input.Plan.Provider,
+			Name:         input.Plan.Name,
+			PriceUSD:     input.Plan.PriceUsd,
+			DataLabel:    input.Plan.DataLabel,
+			ValidityDays: input.Plan.ValidityDays,
+		},
+	}
+
+	if input.StartDate != nil {
+		startDate, err := time.Parse("2006-01-02", *input.StartDate)
+		if err != nil {
+			return domain.ConfirmTripInput{}, errors.New("startDate must use YYYY-MM-DD")
+		}
+		result.StartDate = &startDate
+	}
+	if input.EndDate != nil {
+		endDate, err := time.Parse("2006-01-02", *input.EndDate)
+		if err != nil {
+			return domain.ConfirmTripInput{}, errors.New("endDate must use YYYY-MM-DD")
+		}
+		result.EndDate = &endDate
+	}
+	if input.TravelerType != nil {
+		travelerType := domain.TravelerType(*input.TravelerType)
+		result.TravelerType = &travelerType
+	}
+
+	return result, nil
+}
+
+func toGraphUsageSnapshot(snapshot domain.UsageSnapshot) *models.UsageSnapshot {
+	return &models.UsageSnapshot{
+		ID:          snapshot.ID,
+		TripID:      snapshot.TripID,
+		DataUsedMb:  snapshot.DataUsedMB,
+		BatteryPct:  snapshot.BatteryPct,
+		NetworkType: snapshot.NetworkType,
+		CapturedAt:  snapshot.CapturedAt.Format(time.RFC3339),
+	}
+}
+
+func toGraphUsageSnapshots(snapshots []domain.UsageSnapshot) []*models.UsageSnapshot {
+	result := make([]*models.UsageSnapshot, 0, len(snapshots))
+	for _, snapshot := range snapshots {
+		result = append(result, toGraphUsageSnapshot(snapshot))
+	}
+	return result
 }
 
 func toGraphAgentRun(analysis domain.TripAnalysis) *models.AgentRun {

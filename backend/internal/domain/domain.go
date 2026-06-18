@@ -105,6 +105,45 @@ type TripAnalysis struct {
 	Recommendation    string
 	AgentSteps        []AgentStep
 	ConnectivityGuide *ConnectivityGuide
+	ConfirmedAt       *time.Time
+	ConfirmedPlan     *ConfirmedPlan
+}
+
+// ConfirmedPlan is what was actually purchased for a trip, as opposed to
+// SelectedPlan/Alternatives which are analyzeTrip's recommendations.
+// SailGuard trips have no SelectedPlan at all (Connecta never analyzed
+// them) — ConfirmedPlan is the only plan info that exists for those.
+type ConfirmedPlan struct {
+	Provider     string
+	Name         string
+	PriceUSD     float64
+	DataLabel    string
+	ValidityDays int
+}
+
+// ConfirmTripInput is the parsed form of GraphQL's ConfirmTripInput.
+// Either TripID is set (confirming a trip analyzeTrip already created),
+// or Destination/StartDate/EndDate are set (creating + confirming a new
+// trip in one step, the path SailGuard uses).
+type ConfirmTripInput struct {
+	TripID       *string
+	SessionID    *string
+	Destination  *string
+	StartDate    *time.Time
+	EndDate      *time.Time
+	TravelerType *TravelerType
+	Plan         ConfirmedPlan
+}
+
+// UsageSnapshot is one real-device usage reading pushed up by SailGuard
+// for a confirmed trip.
+type UsageSnapshot struct {
+	ID          string
+	TripID      string
+	DataUsedMB  float64
+	BatteryPct  *int
+	NetworkType *string
+	CapturedAt  time.Time
 }
 
 type ConnectivityGuide struct {

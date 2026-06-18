@@ -26,6 +26,32 @@ type AgentStep struct {
 	Error         *string     `json:"error,omitempty"`
 }
 
+type ConfirmTripInput struct {
+	TripID       *string             `json:"tripId,omitempty"`
+	SessionID    *string             `json:"sessionId,omitempty"`
+	Destination  *string             `json:"destination,omitempty"`
+	StartDate    *string             `json:"startDate,omitempty"`
+	EndDate      *string             `json:"endDate,omitempty"`
+	TravelerType *TravelerType       `json:"travelerType,omitempty"`
+	Plan         *ConfirmedPlanInput `json:"plan"`
+}
+
+type ConfirmedPlan struct {
+	Provider     string  `json:"provider"`
+	Name         string  `json:"name"`
+	PriceUsd     float64 `json:"priceUsd"`
+	DataLabel    string  `json:"dataLabel"`
+	ValidityDays int     `json:"validityDays"`
+}
+
+type ConfirmedPlanInput struct {
+	Provider     string  `json:"provider"`
+	Name         string  `json:"name"`
+	PriceUsd     float64 `json:"priceUsd"`
+	DataLabel    string  `json:"dataLabel"`
+	ValidityDays int     `json:"validityDays"`
+}
+
 type ConnectivityGuide struct {
 	BeforeDeparture []string `json:"beforeDeparture"`
 	AirportSetup    []string `json:"airportSetup"`
@@ -50,14 +76,24 @@ type PlanOption struct {
 type Query struct {
 }
 
+type SubmitUsageSnapshotInput struct {
+	TripID      string  `json:"tripId"`
+	DataUsedMb  float64 `json:"dataUsedMb"`
+	BatteryPct  *int    `json:"batteryPct,omitempty"`
+	NetworkType *string `json:"networkType,omitempty"`
+}
+
 type Trip struct {
-	ID            string       `json:"id"`
-	Destination   string       `json:"destination"`
-	StartDate     string       `json:"startDate"`
-	EndDate       string       `json:"endDate"`
-	TravelerType  TravelerType `json:"travelerType"`
-	EstimatedGb   *float64     `json:"estimatedGb,omitempty"`
-	RecommendedGb *float64     `json:"recommendedGb,omitempty"`
+	ID            string         `json:"id"`
+	Destination   string         `json:"destination"`
+	StartDate     string         `json:"startDate"`
+	EndDate       string         `json:"endDate"`
+	TravelerType  TravelerType   `json:"travelerType"`
+	EstimatedGb   *float64       `json:"estimatedGb,omitempty"`
+	RecommendedGb *float64       `json:"recommendedGb,omitempty"`
+	SelectedPlan  *PlanOption    `json:"selectedPlan,omitempty"`
+	ConfirmedAt   *string        `json:"confirmedAt,omitempty"`
+	ConfirmedPlan *ConfirmedPlan `json:"confirmedPlan,omitempty"`
 }
 
 type TripAnalysis struct {
@@ -100,6 +136,15 @@ type UsageInput struct {
 	Maps        UsageLevel `json:"maps"`
 	SocialMedia UsageLevel `json:"socialMedia"`
 	Work        UsageLevel `json:"work"`
+}
+
+type UsageSnapshot struct {
+	ID          string  `json:"id"`
+	TripID      string  `json:"tripId"`
+	DataUsedMb  float64 `json:"dataUsedMb"`
+	BatteryPct  *int    `json:"batteryPct,omitempty"`
+	NetworkType *string `json:"networkType,omitempty"`
+	CapturedAt  string  `json:"capturedAt"`
 }
 
 type AgentStatus string

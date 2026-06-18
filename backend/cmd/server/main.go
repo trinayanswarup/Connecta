@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 
@@ -24,18 +25,27 @@ func main() {
 	log := logger.New(cfg.Environment)
 
 	var tripRepository repositories.TripRepository
+	var usageRepository repositories.UsageSnapshotRepository
+	var dbConn *sql.DB
 	if cfg.DatabaseURL != "" {
-		dbConn, err := db.NewPostgresDB(cfg.DatabaseURL)
+		var err error
+		dbConn, err = db.NewPostgresDB(cfg.DatabaseURL)
 		if err != nil {
 			log.Printf("warn: postgres unavailable (%v), falling back to in-memory", err)
-			tripRepository = repositories.NewInMemoryTripRepository()
+			dbConn = nil
 		} else {
 			log.Printf("connected to postgres")
-			tripRepository = repositories.NewPostgresTripRepository(dbConn, log)
 		}
 	} else {
 		log.Printf("DATABASE_URL not set, using in-memory repository")
+	}
+
+	if dbConn != nil {
+		tripRepository = repositories.NewPostgresTripRepository(dbConn, log)
+		usageRepository = repositories.NewPostgresUsageSnapshotRepository(dbConn, log)
+	} else {
 		tripRepository = repositories.NewInMemoryTripRepository()
+		usageRepository = repositories.NewInMemoryUsageSnapshotRepository()
 	}
 
 	var enhancer agents.RecommendationEnhancer
@@ -47,6 +57,7 @@ func main() {
 		agents.NewUsageEstimator(),
 		agents.NewPlanOptimizer(plans.MockPlans()),
 		tripRepository,
+		usageRepository,
 		enhancer,
 	)
 	graphqlServer := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{

@@ -19,6 +19,7 @@ func TestAnalyzeTripFallsBackWhenEnhancerFails(t *testing.T) {
 		agents.NewUsageEstimator(),
 		agents.NewPlanOptimizer(plans.MockPlans()),
 		repositories.NewInMemoryTripRepository(),
+		repositories.NewInMemoryUsageSnapshotRepository(),
 		failingEnhancer{},
 	)
 
@@ -61,6 +62,7 @@ func TestAnalyzeTripSkipsAIEnhancementWhenEnhancerIsMissing(t *testing.T) {
 		agents.NewUsageEstimator(),
 		agents.NewPlanOptimizer(plans.MockPlans()),
 		repositories.NewInMemoryTripRepository(),
+		repositories.NewInMemoryUsageSnapshotRepository(),
 	)
 
 	analysis, err := service.AnalyzeTrip(context.Background(), testTripInput())
@@ -119,6 +121,7 @@ func TestAnalyzeTripBasicIntegration(t *testing.T) {
 		agents.NewUsageEstimator(),
 		agents.NewPlanOptimizer(plans.MockPlans()),
 		repositories.NewInMemoryTripRepository(),
+		repositories.NewInMemoryUsageSnapshotRepository(),
 	)
 
 	input := domain.TripInput{
@@ -163,4 +166,178 @@ func findStep(steps []domain.AgentStep, name string) (domain.AgentStep, bool) {
 		}
 	}
 	return domain.AgentStep{}, false
+}
+
+func TestConfirmTripConfirmsAnExistingTrip(t *testing.T) {
+	service := NewTripService(
+		agents.NewUsageEstimator(),
+		agents.NewPlanOptimizer(plans.MockPlans()),
+		repositories.NewInMemoryTripRepository(),
+		repositories.NewInMemoryUsageSnapshotRepository(),
+	)
+
+	analysis, err := service.AnalyzeTrip(context.Background(), testTripInput())
+	if err != nil {
+		t.Fatalf("AnalyzeTrip returned error: %v", err)
+	}
+
+	tripID := analysis.TripID
+	confirmed, err := service.ConfirmTrip(context.Background(), domain.ConfirmTripInput{
+		TripID: &tripID,
+		Plan: domain.ConfirmedPlan{
+			Provider:     "Connecta",
+			Name:         "Japan 10GB",
+			PriceUSD:     15.99,
+			DataLabel:    "10 GB",
+			ValidityDays: 30,
+		},
+	})
+	if err != nil {
+		t.Fatalf("ConfirmTrip returned error: %v", err)
+	}
+
+	if confirmed.TripID != tripID {
+		t.Errorf("expected confirmed trip id %q, got %q", tripID, confirmed.TripID)
+	}
+	if confirmed.ConfirmedAt == nil {
+		t.Fatal("expected ConfirmedAt to be set")
+	}
+	if confirmed.ConfirmedPlan == nil || confirmed.ConfirmedPlan.Name != "Japan 10GB" {
+		t.Fatalf("expected confirmed plan to be saved, got %#v", confirmed.ConfirmedPlan)
+	}
+	// destination/dates/recommendation from the original analysis must be untouched
+	if confirmed.Destination != analysis.Destination {
+		t.Errorf("destination changed on confirm: got %q, want %q", confirmed.Destination, analysis.Destination)
+	}
+	if confirmed.Recommendation != analysis.Recommendation {
+		t.Error("recommendation should be untouched by ConfirmTrip")
+	}
+
+	stored, ok, err := service.GetAnalysis(context.Background(), tripID)
+	if err != nil || !ok {
+		t.Fatalf("expected trip to be retrievable after confirm, ok=%v err=%v", ok, err)
+	}
+	if stored.ConfirmedAt == nil {
+		t.Error("confirmation should persist through SaveAnalysis")
+	}
+}
+
+func TestConfirmTripCreatesNewTripWhenNoTripIDGiven(t *testing.T) {
+	tripRepo := repositories.NewInMemoryTripRepository()
+	service := NewTripService(
+		agents.NewUsageEstimator(),
+		agents.NewPlanOptimizer(plans.MockPlans()),
+		tripRepo,
+		repositories.NewInMemoryUsageSnapshotRepository(),
+	)
+
+	destination := "Thailand"
+	startDate := mustParseDate("2026-09-01")
+	endDate := mustParseDate("2026-09-10")
+	sessionID := "sailguard-link-code-123"
+
+	confirmed, err := service.ConfirmTrip(context.Background(), domain.ConfirmTripInput{
+		SessionID:   &sessionID,
+		Destination: &destination,
+		StartDate:   &startDate,
+		EndDate:     &endDate,
+		Plan: domain.ConfirmedPlan{
+			Provider:     "Saily",
+			Name:         "Thailand 5GB",
+			PriceUSD:     12.50,
+			DataLabel:    "5 GB",
+			ValidityDays: 15,
+		},
+	})
+	if err != nil {
+		t.Fatalf("ConfirmTrip returned error: %v", err)
+	}
+
+	if confirmed.TripID == "" {
+		t.Fatal("expected a newly generated trip id")
+	}
+	if confirmed.Destination != destination {
+		t.Errorf("expected destination %q, got %q", destination, confirmed.Destination)
+	}
+	if confirmed.TravelerType != domain.TravelerSolo {
+		t.Errorf("expected default travelerType SOLO, got %q", confirmed.TravelerType)
+	}
+	if confirmed.ConfirmedAt == nil || confirmed.ConfirmedPlan == nil {
+		t.Fatal("expected confirmedAt and confirmedPlan to be set")
+	}
+
+	bySession, err := tripRepo.GetBySession(context.Background(), sessionID)
+	if err != nil {
+		t.Fatalf("GetBySession returned error: %v", err)
+	}
+	if len(bySession) != 1 || bySession[0].TripID != confirmed.TripID {
+		t.Fatalf("expected the new trip to be findable by session id, got %#v", bySession)
+	}
+}
+
+func TestConfirmTripDefaultsDatesWhenNotProvided(t *testing.T) {
+	service := NewTripService(
+		agents.NewUsageEstimator(),
+		agents.NewPlanOptimizer(plans.MockPlans()),
+		repositories.NewInMemoryTripRepository(),
+		repositories.NewInMemoryUsageSnapshotRepository(),
+	)
+
+	destination := "Mexico"
+	confirmed, err := service.ConfirmTrip(context.Background(), domain.ConfirmTripInput{
+		Destination: &destination,
+		Plan:        domain.ConfirmedPlan{Provider: "Connecta", Name: "X", PriceUSD: 5, DataLabel: "1 GB", ValidityDays: 7},
+	})
+	if err != nil {
+		t.Fatalf("expected no error when dates are omitted, got %v", err)
+	}
+	if confirmed.StartDate.IsZero() || confirmed.EndDate.IsZero() {
+		t.Fatal("expected default dates to be set")
+	}
+	if !confirmed.EndDate.After(confirmed.StartDate) {
+		t.Errorf("expected endDate after startDate, got start=%v end=%v", confirmed.StartDate, confirmed.EndDate)
+	}
+}
+
+func TestConfirmTripRequiresDestinationWhenNoTripID(t *testing.T) {
+	service := NewTripService(
+		agents.NewUsageEstimator(),
+		agents.NewPlanOptimizer(plans.MockPlans()),
+		repositories.NewInMemoryTripRepository(),
+		repositories.NewInMemoryUsageSnapshotRepository(),
+	)
+
+	_, err := service.ConfirmTrip(context.Background(), domain.ConfirmTripInput{
+		Plan: domain.ConfirmedPlan{Provider: "Saily", Name: "X", PriceUSD: 1, DataLabel: "1 GB", ValidityDays: 7},
+	})
+	if err == nil {
+		t.Fatal("expected an error when neither tripId nor destination/dates are provided")
+	}
+}
+
+func TestSubmitUsageSnapshotRequiresTripID(t *testing.T) {
+	service := NewTripService(
+		agents.NewUsageEstimator(),
+		agents.NewPlanOptimizer(plans.MockPlans()),
+		repositories.NewInMemoryTripRepository(),
+		repositories.NewInMemoryUsageSnapshotRepository(),
+	)
+
+	_, err := service.SubmitUsageSnapshot(context.Background(), domain.UsageSnapshot{DataUsedMB: 42})
+	if err == nil {
+		t.Fatal("expected an error when tripId is missing")
+	}
+
+	saved, err := service.SubmitUsageSnapshot(context.Background(), domain.UsageSnapshot{TripID: "trip-1", DataUsedMB: 42})
+	if err != nil {
+		t.Fatalf("SubmitUsageSnapshot returned error: %v", err)
+	}
+	if saved.ID == "" {
+		t.Error("expected a generated snapshot id")
+	}
+
+	usage, err := service.GetUsageByTrip(context.Background(), "trip-1")
+	if err != nil || len(usage) != 1 {
+		t.Fatalf("expected 1 snapshot for trip-1, got %d (err=%v)", len(usage), err)
+	}
 }

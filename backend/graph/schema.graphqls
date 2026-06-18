@@ -2,10 +2,14 @@ type Query {
   trips: [Trip!]!
   trip(id: ID!): Trip
   agentRun(id: ID!): AgentRun
+  tripsBySession(sessionId: String!): [Trip!]!
+  tripUsage(tripId: ID!): [UsageSnapshot!]!
 }
 
 type Mutation {
   analyzeTrip(input: TripInput!): TripAnalysis!
+  confirmTrip(input: ConfirmTripInput!): Trip!
+  submitUsageSnapshot(input: SubmitUsageSnapshotInput!): UsageSnapshot!
 }
 
 input TripInput {
@@ -25,6 +29,37 @@ input UsageInput {
   maps: UsageLevel!
   socialMedia: UsageLevel!
   work: UsageLevel!
+}
+
+input ConfirmedPlanInput {
+  provider: String!
+  name: String!
+  priceUsd: Float!
+  dataLabel: String!
+  validityDays: Int!
+}
+
+# Confirms a trip was actually purchased (web checkout or SailGuard).
+# Pass tripId to confirm a trip that analyzeTrip already created.
+# Omit tripId (and supply destination/startDate/endDate instead) when the
+# purchase originates somewhere with no existing Connecta trip row yet —
+# this creates the trip and marks it confirmed in one step, which is the
+# path SailGuard uses since it doesn't call analyzeTrip itself.
+input ConfirmTripInput {
+  tripId: ID
+  sessionId: String
+  destination: String
+  startDate: String
+  endDate: String
+  travelerType: TravelerType
+  plan: ConfirmedPlanInput!
+}
+
+input SubmitUsageSnapshotInput {
+  tripId: ID!
+  dataUsedMb: Float!
+  batteryPct: Int
+  networkType: String
 }
 
 enum TravelerType {
@@ -49,6 +84,26 @@ type Trip {
   travelerType: TravelerType!
   estimatedGb: Float
   recommendedGb: Float
+  selectedPlan: PlanOption
+  confirmedAt: String
+  confirmedPlan: ConfirmedPlan
+}
+
+type ConfirmedPlan {
+  provider: String!
+  name: String!
+  priceUsd: Float!
+  dataLabel: String!
+  validityDays: Int!
+}
+
+type UsageSnapshot {
+  id: ID!
+  tripId: ID!
+  dataUsedMb: Float!
+  batteryPct: Int
+  networkType: String
+  capturedAt: String!
 }
 
 type TripAnalysis {

@@ -18,6 +18,7 @@ type TripRepository interface {
 	SaveAnalysis(ctx context.Context, analysis domain.TripAnalysis) error
 	ListTrips(ctx context.Context) ([]domain.TripAnalysis, error)
 	GetAnalysis(ctx context.Context, id string) (domain.TripAnalysis, bool, error)
+	GetBySession(ctx context.Context, sessionID string) ([]domain.TripAnalysis, error)
 }
 
 // InMemoryTripRepository — used when DATABASE_URL is not set.
@@ -63,6 +64,20 @@ func (r *InMemoryTripRepository) GetAnalysis(_ context.Context, id string) (doma
 
 	analysis, ok := r.records[id]
 	return analysis, ok, nil
+}
+
+func (r *InMemoryTripRepository) GetBySession(_ context.Context, sessionID string) ([]domain.TripAnalysis, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	var results []domain.TripAnalysis
+	for i := len(r.order) - 1; i >= 0; i-- {
+		analysis := r.records[r.order[i]]
+		if analysis.SessionID != nil && *analysis.SessionID == sessionID {
+			results = append(results, analysis)
+		}
+	}
+	return results, nil
 }
 
 // PostgresTripRepository — persists to Supabase Postgres.
@@ -132,19 +147,36 @@ func (r *PostgresTripRepository) SaveAnalysis(ctx context.Context, analysis doma
 		return fmt.Errorf("marshaling connectivity guide: %w", err)
 	}
 
+	var confirmedAtVal interface{}
+	if analysis.ConfirmedAt != nil {
+		confirmedAtVal = *analysis.ConfirmedAt
+	}
+
+	var confirmedPlanVal interface{}
+	if analysis.ConfirmedPlan != nil {
+		confirmedPlanJSON, err := json.Marshal(analysis.ConfirmedPlan)
+		if err != nil {
+			return fmt.Errorf("marshaling confirmed plan: %w", err)
+		}
+		confirmedPlanVal = string(confirmedPlanJSON)
+	}
+
 	now := time.Now().UTC()
 
 	_, err = r.db.ExecContext(ctx, `
 		INSERT INTO trips (
 			id, user_id, destination, start_date, end_date, traveler_type,
 			usage_profile, estimated_gb, recommended_gb,
-			recommendation, connectivity_guide, created_at, updated_at
-		) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
+			recommendation, connectivity_guide, confirmed_at, confirmed_plan,
+			created_at, updated_at
+		) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
 		ON CONFLICT (id) DO UPDATE SET
 			estimated_gb       = EXCLUDED.estimated_gb,
 			recommended_gb     = EXCLUDED.recommended_gb,
 			recommendation     = EXCLUDED.recommendation,
 			connectivity_guide = EXCLUDED.connectivity_guide,
+			confirmed_at       = EXCLUDED.confirmed_at,
+			confirmed_plan     = EXCLUDED.confirmed_plan,
 			updated_at         = EXCLUDED.updated_at
 	`,
 		analysis.TripID,
@@ -158,6 +190,8 @@ func (r *PostgresTripRepository) SaveAnalysis(ctx context.Context, analysis doma
 		analysis.Estimate.RecommendedGB,
 		string(recJSON),
 		string(guideJSON),
+		confirmedAtVal,
+		confirmedPlanVal,
 		now,
 		now,
 	)
@@ -200,7 +234,16 @@ func (r *PostgresTripRepository) SaveAnalysis(ctx context.Context, analysis doma
 	return nil
 }
 
-func (r *PostgresTripRepository) GetAnalysis(ctx context.Context, id string) (domain.TripAnalysis, bool, error) {
+const tripSelectColumns = `
+	id, destination, start_date, end_date, traveler_type,
+	usage_profile, estimated_gb, recommended_gb, recommendation, connectivity_guide,
+	confirmed_at, confirmed_plan
+`
+
+// scanTripRow scans one trips row into a domain.TripAnalysis. scan is
+// either a *sql.Row's Scan or a *sql.Rows' Scan — both have the same
+// signature, so GetAnalysis, ListTrips, and GetBySession all share this.
+func scanTripRow(scan func(dest ...interface{}) error) (domain.TripAnalysis, error) {
 	var (
 		tripID        string
 		destination   string
@@ -212,21 +255,16 @@ func (r *PostgresTripRepository) GetAnalysis(ctx context.Context, id string) (do
 		recommendedGB float64
 		recJSON       []byte
 		guideJSON     []byte
+		confirmedAt   sql.NullTime
+		confirmedJSON []byte
 	)
 
-	err := r.db.QueryRowContext(ctx, `
-		SELECT id, destination, start_date, end_date, traveler_type,
-		       usage_profile, estimated_gb, recommended_gb, recommendation, connectivity_guide
-		FROM trips WHERE id = $1
-	`, id).Scan(
+	if err := scan(
 		&tripID, &destination, &startDate, &endDate, &travelerType,
 		&usageJSON, &estimatedGB, &recommendedGB, &recJSON, &guideJSON,
-	)
-	if err == sql.ErrNoRows {
-		return domain.TripAnalysis{}, false, nil
-	}
-	if err != nil {
-		return domain.TripAnalysis{}, false, fmt.Errorf("querying trip %s: %w", id, err)
+		&confirmedAt, &confirmedJSON,
+	); err != nil {
+		return domain.TripAnalysis{}, err
 	}
 
 	var rec storedRecommendation
@@ -240,6 +278,20 @@ func (r *PostgresTripRepository) GetAnalysis(ctx context.Context, id string) (do
 		}
 	}
 
+	var confirmedPlan *domain.ConfirmedPlan
+	if len(confirmedJSON) > 0 && string(confirmedJSON) != "null" {
+		p := domain.ConfirmedPlan{}
+		if json.Unmarshal(confirmedJSON, &p) == nil {
+			confirmedPlan = &p
+		}
+	}
+
+	var confirmedAtPtr *time.Time
+	if confirmedAt.Valid {
+		t := confirmedAt.Time
+		confirmedAtPtr = &t
+	}
+
 	return domain.TripAnalysis{
 		TripID:            tripID,
 		Destination:       destination,
@@ -251,15 +303,26 @@ func (r *PostgresTripRepository) GetAnalysis(ctx context.Context, id string) (do
 		Alternatives:      rec.Alternatives,
 		Recommendation:    rec.Text,
 		ConnectivityGuide: guide,
-	}, true, nil
+		ConfirmedAt:       confirmedAtPtr,
+		ConfirmedPlan:     confirmedPlan,
+	}, nil
+}
+
+func (r *PostgresTripRepository) GetAnalysis(ctx context.Context, id string) (domain.TripAnalysis, bool, error) {
+	row := r.db.QueryRowContext(ctx, `SELECT `+tripSelectColumns+` FROM trips WHERE id = $1`, id)
+
+	analysis, err := scanTripRow(row.Scan)
+	if err == sql.ErrNoRows {
+		return domain.TripAnalysis{}, false, nil
+	}
+	if err != nil {
+		return domain.TripAnalysis{}, false, fmt.Errorf("querying trip %s: %w", id, err)
+	}
+	return analysis, true, nil
 }
 
 func (r *PostgresTripRepository) ListTrips(ctx context.Context) ([]domain.TripAnalysis, error) {
-	rows, err := r.db.QueryContext(ctx, `
-		SELECT id, destination, start_date, end_date, traveler_type,
-		       usage_profile, estimated_gb, recommended_gb, recommendation, connectivity_guide
-		FROM trips ORDER BY created_at DESC LIMIT 20
-	`)
+	rows, err := r.db.QueryContext(ctx, `SELECT `+tripSelectColumns+` FROM trips ORDER BY created_at DESC LIMIT 20`)
 	if err != nil {
 		return nil, fmt.Errorf("listing trips: %w", err)
 	}
@@ -267,49 +330,31 @@ func (r *PostgresTripRepository) ListTrips(ctx context.Context) ([]domain.TripAn
 
 	var results []domain.TripAnalysis
 	for rows.Next() {
-		var (
-			tripID        string
-			destination   string
-			startDate     time.Time
-			endDate       time.Time
-			travelerType  string
-			usageJSON     []byte
-			estimatedGB   float64
-			recommendedGB float64
-			recJSON       []byte
-			guideJSON     []byte
-		)
-		if err := rows.Scan(
-			&tripID, &destination, &startDate, &endDate, &travelerType,
-			&usageJSON, &estimatedGB, &recommendedGB, &recJSON, &guideJSON,
-		); err != nil {
+		analysis, err := scanTripRow(rows.Scan)
+		if err != nil {
 			r.log.Printf("warn: scanning trip row: %v", err)
 			continue
 		}
+		results = append(results, analysis)
+	}
+	return results, rows.Err()
+}
 
-		var rec storedRecommendation
-		_ = json.Unmarshal(recJSON, &rec)
+func (r *PostgresTripRepository) GetBySession(ctx context.Context, sessionID string) ([]domain.TripAnalysis, error) {
+	rows, err := r.db.QueryContext(ctx, `SELECT `+tripSelectColumns+` FROM trips WHERE user_id = $1 ORDER BY created_at DESC LIMIT 20`, sessionID)
+	if err != nil {
+		return nil, fmt.Errorf("listing trips for session: %w", err)
+	}
+	defer rows.Close()
 
-		var guide *domain.ConnectivityGuide
-		if len(guideJSON) > 0 && string(guideJSON) != "null" {
-			g := domain.ConnectivityGuide{}
-			if json.Unmarshal(guideJSON, &g) == nil {
-				guide = &g
-			}
+	var results []domain.TripAnalysis
+	for rows.Next() {
+		analysis, err := scanTripRow(rows.Scan)
+		if err != nil {
+			r.log.Printf("warn: scanning trip row: %v", err)
+			continue
 		}
-
-		results = append(results, domain.TripAnalysis{
-			TripID:            tripID,
-			Destination:       destination,
-			StartDate:         startDate,
-			EndDate:           endDate,
-			TravelerType:      domain.TravelerType(travelerType),
-			Estimate:          domain.UsageEstimate{EstimatedGB: estimatedGB, RecommendedGB: recommendedGB},
-			SelectedPlan:      rec.SelectedPlan,
-			Alternatives:      rec.Alternatives,
-			Recommendation:    rec.Text,
-			ConnectivityGuide: guide,
-		})
+		results = append(results, analysis)
 	}
 	return results, rows.Err()
 }

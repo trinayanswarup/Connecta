@@ -131,6 +131,79 @@ type GraphQLResponse<T> = {
   errors?: Array<{ message: string }>;
 };
 
+export type ConfirmedPlanInput = {
+  provider: string;
+  name: string;
+  priceUsd: number;
+  dataLabel: string;
+  validityDays: number;
+};
+
+export type ConfirmTripInput = {
+  tripId?: string;
+  sessionId?: string;
+  destination?: string;
+  startDate?: string;
+  endDate?: string;
+  travelerType?: TravelerType;
+  plan: ConfirmedPlanInput;
+};
+
+export type ConfirmedTrip = {
+  id: string;
+  destination: string;
+  confirmedAt?: string | null;
+  confirmedPlan?: ConfirmedPlanInput | null;
+};
+
+const CONFIRM_TRIP_MUTATION = `
+  mutation ConfirmTrip($input: ConfirmTripInput!) {
+    confirmTrip(input: $input) {
+      id
+      destination
+      confirmedAt
+      confirmedPlan {
+        provider
+        name
+        priceUsd
+        dataLabel
+        validityDays
+      }
+    }
+  }
+`;
+
+export async function confirmTrip(input: ConfirmTripInput): Promise<ConfirmedTrip> {
+  const sessionId = input.sessionId ?? getSessionId();
+  const response = await fetch(graphqlEndpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      query: CONFIRM_TRIP_MUTATION,
+      variables: { input: { ...input, sessionId } }
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error(`GraphQL request failed with ${response.status}`);
+  }
+
+  const payload = (await response.json()) as GraphQLResponse<{
+    confirmTrip: ConfirmedTrip;
+  }>;
+
+  if (payload.errors?.length) {
+    throw new Error(payload.errors.map((error) => error.message).join(", "));
+  }
+  if (!payload.data) {
+    throw new Error("GraphQL response did not include data");
+  }
+
+  return payload.data.confirmTrip;
+}
+
 export function formatDataGb(plan: Pick<PlanOption, "dataGb" | "dataLabel">): string {
   if (plan.dataLabel) return plan.dataLabel;
   if (plan.dataGb >= 999) return "Unlimited";

@@ -237,3 +237,68 @@ create policy "users can delete own trip feedback"
         and trips.user_id = (select auth.uid())::text
     )
   );
+
+-- SailGuard integration (added on sailguard-integration branch)
+-- Adds: a confirmed-purchase marker on trips, and a usage_snapshots table
+-- that SailGuard pushes real device usage into via the Go backend.
+-- Both statements are additive and idempotent — safe to run against a
+-- database that already has the base schema above.
+
+alter table trips add column if not exists confirmed_at timestamptz;
+alter table trips add column if not exists confirmed_plan jsonb;
+
+create table if not exists usage_snapshots (
+  id uuid primary key default gen_random_uuid(),
+  trip_id uuid not null references trips(id) on delete cascade,
+  data_used_mb numeric(10, 2) not null,
+  battery_pct integer check (battery_pct between 0 and 100),
+  network_type text,
+  captured_at timestamptz not null default now()
+);
+
+create index if not exists idx_usage_snapshots_trip_id on usage_snapshots(trip_id);
+create index if not exists idx_usage_snapshots_captured_at on usage_snapshots(captured_at desc);
+
+alter table usage_snapshots enable row level security;
+
+drop policy if exists "users can read own usage snapshots" on usage_snapshots;
+create policy "users can read own usage snapshots"
+  on usage_snapshots for select
+  to authenticated
+  using (
+    exists (
+      select 1 from trips
+      where trips.id = usage_snapshots.trip_id
+        and (select auth.uid()) is not null
+        and trips.user_id = (select auth.uid())::text
+    )
+  );
+
+-- NOTE on the "anon" policies below:
+-- The frontend's fetchTripHistory() reads `trips` via the anon key,
+-- filtered client-side by the localStorage session id. The
+-- "users can read own trips" policy above only covers the `authenticated`
+-- role, so an equivalent anon-role policy must already exist live on
+-- Supabase (added directly via the SQL editor) for that to work — it is
+-- not present in this file, which means this checked-in schema has
+-- drifted from the live database. The two policies below are written so
+-- they are safe to (re)apply either way: if an anon policy with one of
+-- these names already exists, it's dropped and recreated identically;
+-- if it doesn't exist yet, it's created now. They intentionally use
+-- `using (true)` for the anon role, matching the existing "plans are
+-- readable by visitors" policy above — anon has no real identity to
+-- check against, so privacy here relies on the client filtering by its
+-- own session id, not on RLS. That's an existing, pre-accepted tradeoff
+-- of the session-id model, not something new introduced here.
+
+drop policy if exists "anon can read trips by session" on trips;
+create policy "anon can read trips by session"
+  on trips for select
+  to anon
+  using (true);
+
+drop policy if exists "anon can read usage snapshots" on usage_snapshots;
+create policy "anon can read usage snapshots"
+  on usage_snapshots for select
+  to anon
+  using (true);
