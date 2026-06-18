@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, ChevronRight, MapPin, Wifi } from "lucide-react";
+import { ArrowLeft, CheckCircle2, ChevronRight, MapPin, Wifi } from "lucide-react";
 import { fetchTripHistory, type TripRow, type StoredPlan } from "@/lib/supabase";
 
 function formatTripDateRange(start: string, end: string): string {
@@ -28,6 +28,11 @@ function formatTravelerType(t: string): string {
 function formatPlanData(plan: StoredPlan): string {
   if ((plan.DataGB ?? 0) >= 999) return "Unlimited";
   return `${plan.DataGB ?? 0} GB`;
+}
+
+function formatConfirmedSource(provider?: string): string {
+  if (!provider || provider === "Connecta" || provider === "Connecta Local") return "Confirmed";
+  return `Confirmed via ${provider}`;
 }
 
 function SkeletonCard() {
@@ -70,6 +75,26 @@ function TripCard({ trip }: { trip: TripRow }) {
         </div>
         <span className="shrink-0 text-xs text-slate-400">{formatCreatedAt(trip.created_at)}</span>
       </div>
+
+      {/* Confirmed row — shown when this trip was actually purchased, from
+          either the web checkout or SailGuard */}
+      {trip.confirmed_at && trip.confirmed_plan && (
+        <div className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3">
+          <div className="min-w-0">
+            <p className="text-xs font-medium uppercase tracking-wide text-emerald-700">
+              {formatConfirmedSource(trip.confirmed_plan.Provider)}
+            </p>
+            <p className="mt-0.5 font-semibold text-slate-950">
+              {trip.confirmed_plan.DataLabel ?? "Plan"}
+              {trip.confirmed_plan.ValidityDays ? ` · ${trip.confirmed_plan.ValidityDays} days` : ""}
+            </p>
+            <p className="text-sm text-slate-500">
+              US${(trip.confirmed_plan.PriceUSD ?? 0).toFixed(2)}
+            </p>
+          </div>
+          <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600" />
+        </div>
+      )}
 
       {/* Plan row */}
       {hasplan && (
