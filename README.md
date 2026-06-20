@@ -93,13 +93,13 @@ Two input modes feed the same engine:
 ```bash
 # Backend
 cd backend
-cp .env.example .env        # add DATABASE_URL and optionally GROQ_API_KEY
-go run ./cmd/server          # :8080 · GraphQL playground at /graphql
+cp .env.example .env
+go run ./cmd/server
 
 # Frontend
 cd frontend
-cp .env.example .env.local   # add NEXT_PUBLIC_GRAPHQL_ENDPOINT=http://localhost:8080/graphql
-npm install && npm run dev   # :3000
+cp .env.example .env.local
+npm install && npm run dev
 ```
 
 `GROQ_API_KEY` is optional — the product never breaks without it.
