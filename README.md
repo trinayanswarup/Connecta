@@ -6,6 +6,14 @@ The system has two clients: a Next.js web app for planning and checkout, and **[
 
 ---
 
+## Screenshots
+
+![Home](docs/screenshots/home.png)
+![Planner](docs/screenshots/planner.png)
+![Recommendation](docs/screenshots/recommendation.png)
+![History](docs/screenshots/history.png)
+![Checkout](docs/screenshots/checkout.png)
+
 ## Stack
 
 |          |                                                   |
