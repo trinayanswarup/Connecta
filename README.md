@@ -6,6 +6,8 @@ The system has two clients: a Next.js web app for planning and checkout, and **[
 
 **[Live Demo](https://connecta-frontend-one.vercel.app)** · **[Backend](https://connecta-eagq.onrender.com/graphql)** · **[Android App](https://github.com/trinayanswarup/SailGuard)**
 
+> **Note:** The backend runs on Render's free tier and may take 30–60 seconds to wake up after inactivity. If the planner returns an error on first load, wait a moment and try again.
+
 ---
 
 ## Screenshots
