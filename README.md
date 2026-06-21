@@ -4,16 +4,21 @@ Connecta is a travel eSIM planner that recommends the right data plan from a use
 
 The system has two clients: a Next.js web app for planning and checkout, and **[SailGuard](https://github.com/trinayanswarup/SailGuard)**, a native Android companion app that tracks real mobile data usage every 30 seconds using Android's `TrafficStats` API. Confirmed plan selections and live usage snapshots sync through the same Postgres backend — so the web app shows a live usage chart from the phone.
 
+**[Live Demo](https://connecta-frontend-one.vercel.app)** · **[Backend](https://connecta-eagq.onrender.com/graphql)** · **[Android App](https://github.com/trinayanswarup/SailGuard)**
+
 ---
 
 ## Screenshots
 
-![Home](docs/screenshots/home.png)
-![Planner](docs/screenshots/planner.png)
-![AiPlanner](docs/screenshots/aiplanner.png)
-![Recommendation](docs/screenshots/recommendation.png)
-![History](docs/screenshots/history.png)
-![Checkout](docs/screenshots/checkout.png)
+<p align="center">
+  <img src="docs/screenshots/home.png" width="19%" />
+  <img src="docs/screenshots/planner.png" width="19%" />
+  <img src="docs/screenshots/recommendation.png" width="19%" />
+  <img src="docs/screenshots/history.png" width="19%" />
+  <img src="docs/screenshots/checkout.png" width="19%" />
+</p>
+
+---
 
 ## Stack
 
@@ -24,7 +29,7 @@ The system has two clients: a Next.js web app for planning and checkout, and **[
 | AI       | Groq — `llama-3.3-70b-versatile`                  |
 | Database | Supabase (Postgres + RLS)                         |
 | Android  | Kotlin, Jetpack Compose (separate repo)           |
-| Deploy   | Vercel (frontend) · Railway (backend)             |
+| Deploy   | Vercel (frontend) · Render (backend)              |
 
 ---
 
@@ -135,6 +140,8 @@ connecta/
     schema.sql           full schema — original + SailGuard-integration migration
 ```
 
+---
+
 ## Development notes
 
-CLAUDE.md and AGENTS.md are excluded from this repository. They contain AI coding instructions, internal build quirks, and session-specific workflow notes used during active development with Claude Code. They are not useful to anyone reading the codebase and add noise without signal.
+`CLAUDE.md` and `AGENTS.md` are excluded from this repository. They contain AI coding instructions, internal build quirks, and session-specific workflow notes used during active development with Claude Code. They are not useful to anyone reading the codebase and add noise without signal.
