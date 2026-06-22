@@ -146,4 +146,5 @@ connecta/
 
 ## Development notes
 
-`CLAUDE.md` and `AGENTS.md` are excluded from this repository. They contain AI coding instructions, internal build quirks, and session-specific workflow notes used during active development with Claude Code. They are not useful to anyone reading the codebase and add noise without signal.
+Detailed planning docs (CLAUDE.md, PRD.md, AGENTS.md) are kept private. They contain AI coding instructions, internal build quirks, and session-specific workflow notes used during active development with Claude Code.
+Public versions are committed for reference.
