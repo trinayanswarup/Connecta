@@ -2,7 +2,7 @@
 
 Connecta is a travel eSIM planner that recommends the right data plan from a user's destination, trip length, and usage habits. A deterministic Go/GraphQL backend estimates data needs and selects the plan; Groq can parse free-text trip descriptions or rewrite the explanation, but it never controls the final recommendation.
 
-The system has two clients: a Next.js web app for planning and checkout, and **[SailGuard](https://github.com/trinayanswarup/SailGuard)**, a native Android companion app that tracks real mobile data usage every 30 seconds using Android's `TrafficStats` API. Confirmed plan selections and live usage snapshots sync through the same Postgres backend — so the web app shows a live usage chart from the phone.
+The system has two clients: a Next.js + TypeScript web app for planning and checkout, and **[SailGuard](https://github.com/trinayanswarup/SailGuard)**, a native Android companion app that tracks real mobile data usage every 30 seconds using Android's `TrafficStats` API. Confirmed plan selections and live usage snapshots sync through the same Postgres backend — so the web app shows a live usage chart from the phone.
 
 **[Live Demo](https://connecta-frontend-one.vercel.app)** · **[Backend](https://connecta-eagq.onrender.com/graphql)** · **[Android App](https://github.com/trinayanswarup/SailGuard)**
 
