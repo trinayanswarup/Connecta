@@ -2,9 +2,11 @@
 
 Connecta is a travel eSIM planner that recommends the right data plan from a user's destination, trip length, and usage habits. A deterministic Go/GraphQL backend estimates data needs and selects the plan; Groq can parse free-text trip descriptions or rewrite the explanation, but it never controls the final recommendation.
 
-The system has two clients: a Next.js web app for planning and checkout, and **[SailGuard](https://github.com/trinayanswarup/SailGuard)**, a native Android companion app that tracks real mobile data usage every 30 seconds using Android's `TrafficStats` API. Confirmed plan selections and live usage snapshots sync through the same Postgres backend — so the web app shows a live usage chart from the phone.
+The system has two clients: a Next.js + TypeScript web app for planning and checkout, and **[SailGuard](https://github.com/trinayanswarup/SailGuard)**, a native Android companion app that tracks real mobile data usage every 30 seconds using Android's `TrafficStats` API. Confirmed plan selections and live usage snapshots sync through the same Postgres backend — so the web app shows a live usage chart from the phone.
 
 **[Live Demo](https://connecta-frontend-one.vercel.app)** · **[Backend](https://connecta-eagq.onrender.com/graphql)** · **[Android App](https://github.com/trinayanswarup/SailGuard)**
+
+> **Note:** The backend runs on Render's free tier and may take 30–60 seconds to wake up after inactivity. If the planner returns an error on first load, wait a moment and try again.
 
 ---
 
@@ -144,4 +146,5 @@ connecta/
 
 ## Development notes
 
-`CLAUDE.md` and `AGENTS.md` are excluded from this repository. They contain AI coding instructions, internal build quirks, and session-specific workflow notes used during active development with Claude Code. They are not useful to anyone reading the codebase and add noise without signal.
+Detailed planning docs (CLAUDE.md, PRD.md, AGENTS.md) are kept private. They contain AI coding instructions, internal build quirks, and session-specific workflow notes used during active development with Claude Code.
+Public versions are committed for reference.
